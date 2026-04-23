@@ -26,6 +26,9 @@ Three files drive discovery; changing one without the others will break loading:
 When adding or removing a skill, update both `plugin.json` (add to `skills`
 array) and — if the plugin's surface area changed meaningfully — bump `version`
 in both `plugin.json` and the matching `marketplace.json` plugin entry together.
+Also update the "Skills included" table in `README.md`: add the new skill in
+alphabetical order with a one-line summary of what it does, or remove the row
+on deletion.
 
 ## Authoring skills
 
