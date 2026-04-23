@@ -1,4 +1,5 @@
-# User-specific AI tooling settings
+# Claude Code / AI artifacts (if any temp files are generated)
+*.ai.tmp
 .claude/*.local.*
 .claude/memories/
 .claude/todos/
@@ -64,7 +65,3 @@ ENV/
 # Windows
 [Dd]esktop.ini
 $RECYCLE.BIN/
-
-# Claude Code / AI artifacts (if any temp files are generated)
-.claude/
-*.ai.tmp
