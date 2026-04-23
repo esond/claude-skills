@@ -52,16 +52,23 @@ Save both values. The email will be inlined into the rebase helper script in Ste
 
 ## Step 2 — find unsigned commits by the user
 
-Pick a base for the range `BASE..HEAD`, preferring in this order:
+Pick a base for the range `$BASE..HEAD`, preferring in this order:
 
 1. Upstream tracking branch, if set: `git rev-parse --abbrev-ref '@{upstream}'`
 2. Merge-base with `main`: `git merge-base HEAD main`
 3. If neither works (no upstream, no `main`), ask the user what base to use. Don't guess.
 
+Capture the chosen base in a shell variable so the rest of the skill's commands are
+self-contained:
+
+```bash
+BASE=<result of whichever option succeeded above>
+```
+
 Then list candidate commits:
 
 ```bash
-git log --pretty='format:%H %G? %ae %s' BASE..HEAD
+git log --pretty='format:%H %G? %ae %s' "$BASE..HEAD"
 ```
 
 `%G?` signature codes: `G` good, `B` bad, `U` unknown validity, `N` no signature, `E` can't check, `X`/`Y`/`R` various expired/revoked states. You want rows where the code is **exactly `N`** AND the author email matches `user.email`.
@@ -130,7 +137,7 @@ If the rebase errors partway through, **stop and report to the user**. Don't ref
 After a successful rebase, re-run the Step 2 query:
 
 ```bash
-git log --pretty='format:%H %G? %ae %s' BASE..HEAD
+git log --pretty='format:%H %G? %ae %s' "$BASE..HEAD"
 ```
 
 Every row that previously showed `N` for a user-authored commit should now show `G`. If any still show `N`, something went wrong — report the remaining rows to the user and stop.
@@ -138,7 +145,7 @@ Every row that previously showed `N` for a user-authored commit should now show 
 Also run a human-readable check:
 
 ```bash
-git log --show-signature BASE..HEAD | head -60
+git log --show-signature "$BASE..HEAD" | head -60
 ```
 
 so the user can eyeball the actual signature lines.
