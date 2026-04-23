@@ -1,0 +1,19 @@
+{
+  "name": "esond-personal",
+  "owner": {
+    "name": "Eric Sondergard",
+    "url": "https://github.com/esond"
+  },
+  "repository": "https://github.com/esond/claude",
+  "metadata": {
+    "description": "Eric's personal Claude Code marketplace."
+  },
+  "plugins": [
+    {
+      "name": "personal",
+      "source": "./",
+      "description": "Personal skills, agents, and commands for Claude Code.",
+      "version": "0.1.0"
+    }
+  ]
+}

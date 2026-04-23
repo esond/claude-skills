@@ -1,0 +1,15 @@
+{
+  "name": "personal",
+  "version": "0.1.0",
+  "description": "Eric's personal Claude Code skills, agents, and commands.",
+  "author": {
+    "name": "Eric Sondergard",
+    "url": "https://github.com/esond"
+  },
+  "repository": "https://github.com/esond/claude",
+  "skills": [
+    "./skills/plan-repl",
+    "./skills/pr-review-resolver",
+    "./skills/sign-unsigned-commits"
+  ]
+}
