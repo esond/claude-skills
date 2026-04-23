@@ -2,10 +2,13 @@
 name: permission-consolidator
 description: >
   Review and consolidate Claude Code permission entries in settings.json files.
-  Use this skill when the user wants to clean up, consolidate, review, or audit
-  their Claude Code permissions, or mentions that their allow list is getting long
-  or messy. Also trigger when the user mentions "permissions", "settings.local.json",
-  or "allow list" in the context of Claude Code configuration.
+  Use this skill whenever the user wants to clean up, consolidate, review, audit,
+  or prune their Claude Code permissions, or says things like "my allow list is
+  huge", "too many permission entries", "the permissions file is a mess",
+  "consolidate my permissions", or "look at settings.local.json". Also trigger
+  proactively when the user mentions "permissions", "settings.local.json",
+  "settings.json", "allow list", or complains about repeatedly approving similar
+  commands — even if they don't literally ask to "consolidate".
 ---
 
 # Permission Consolidator
@@ -47,11 +50,13 @@ If the user provides a path, use it. Otherwise, look for settings files:
 - `<project>/.claude/settings.local.json`
 - `~/.claude/settings.json`
 
-Read the file and extract `permissions.allow`.
+Read the file and extract `permissions.allow`. If the file doesn't exist, or
+`permissions.allow` is missing or empty, say so and stop — there is nothing to
+consolidate.
 
 ### Step 2: Analyze for consolidation candidates
 
-Group `Bash(...)` entries by their command prefix hierarchy. Build a mental tree:
+Group `Bash(...)` entries by their command prefix hierarchy. Build a tree:
 
 ```
 gh
@@ -80,8 +85,10 @@ Identify entries that look like one-off commands or accidents:
 
 - **No wildcard**: `Bash(yarn format:fix)` instead of `Bash(yarn format:*)` — may be
   intentionally narrow, or may be an oversight
-- **Very long/specific**: entries containing UUIDs, hashes, specific IDs, long argument
-  lists (e.g., `Bash(for thread_id in PRRT_kwDOPAqDXs53bRcW ...)`)
+- **Very long/specific**: entries containing UUIDs, hashes, specific IDs, or long
+  argument lists (e.g., a `Bash(...)` entry with a 40-character commit SHA or a
+  GitHub node ID embedded in it) — these were almost certainly approved for a
+  single past invocation and won't match again
 - **Shell fragments**: entries that look like parts of a multi-line command that got
   split across permission prompts (e.g., `Bash(do gh:*)`, `Bash(done)`)
 - **Uncommon commands**: entries for commands that aren't typical development tools
