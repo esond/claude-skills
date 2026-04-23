@@ -54,9 +54,12 @@ through:
 - Edge cases, caching layers, validation logic, error handling
 - Tests that cover the relevant areas
 
-Use emphatic, specific language when exploring. Go through everything in detail. Don't settle
-for surface-level understanding — the whole point of this phase is to prevent implementations
-that work in isolation but break the surrounding system.
+Ground findings in specifics. Quote file paths and line numbers, name the functions and types
+involved, and describe what the code actually does rather than what it probably does. Read
+tests alongside the source — they encode the invariants the implementation must preserve, and
+they often reveal intent that isn't obvious from the code itself. Surface-level understanding
+is the whole problem this phase exists to prevent: an implementation that works in isolation
+but breaks the surrounding system.
 
 Write findings to `tasks/{task-name}/research.md` with clear sections:
 - What you found and how things currently work
@@ -134,8 +137,9 @@ When addressing a note:
 After addressing all notes, tell the user: "I've addressed all notes and updated the plan.
 Take another look — add more notes or tell me it's good to go."
 
-Expect 1-6 annotation passes. Don't rush the user through this phase — it's the highest
-leverage part of the entire workflow.
+Expect several annotation passes. Don't rush the user through this phase — it's the highest
+leverage part of the entire workflow. Every round of notes here replaces a round of rework
+later, and rework after code exists is dramatically more expensive than rework on a plan.
 
 ---
 
@@ -162,8 +166,9 @@ and wait for their sign-off.
 
 **Do not begin implementation.** After presenting the task breakdown, stop and wait for the
 user to explicitly tell you to implement. They may want to adjust the tasks, reorder them, or
-go back and revise the plan. Only proceed to Phase 5 when the user gives a clear instruction
-like "implement it", "go ahead", or "start building".
+go back and revise the plan. This checkpoint is cheap — reordering a list takes seconds —
+while code written against a stale plan is expensive to unwind. Only proceed to Phase 5 when
+the user gives a clear instruction like "implement it", "go ahead", or "start building".
 
 ---
 
@@ -187,3 +192,21 @@ Work through `tasks/{task-name}/todo.md` in order:
 
 Once implementation is underway, the user's feedback will be short and direct. Match their
 brevity — don't over-explain during this phase.
+
+---
+
+## Things not to do
+
+- **Don't** start coding before the plan is approved. The value of this workflow collapses
+  entirely if Phase 5 begins early — you'd be paying the cost of research and planning without
+  collecting the benefit.
+- **Don't** silently edit the plan to accommodate a note you disagree with. Raise the
+  disagreement in chat first. A note the user later sees edited away without discussion erodes
+  their trust in the file as a shared record.
+- **Don't** leave findings only in chat. `research.md`, `plan.md`, and `todo.md` are the
+  durable artifacts — chat scrolls away, files don't.
+- **Don't** widen implementation beyond `todo.md`. If you discover a genuinely necessary
+  change mid-flight, stop and revise the plan. Drift during implementation is exactly what
+  this workflow is designed to prevent.
+- **Don't** treat research as optional because the task feels familiar. Familiarity is where
+  surprise bugs live — the patterns you assume are in place may not be.
