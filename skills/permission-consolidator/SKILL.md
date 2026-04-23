@@ -56,7 +56,9 @@ consolidate.
 
 ### Step 2: Analyze for consolidation candidates
 
-Group `Bash(...)` entries by their command prefix hierarchy. Build a tree:
+Strip the `Bash(` prefix and trailing `)` from each `Bash(...)` entry to get the
+inner command pattern, then group those inner patterns by command prefix
+hierarchy. Build a tree using the stripped form (easier to read):
 
 ```
 gh
@@ -72,6 +74,11 @@ be replaced by a single broader entry. Work from the leaves inward:
 
 - `gh pr create:*`, `gh pr view:*`, `gh pr review:*` → `gh pr:*`
 - Then `gh pr:*` + `gh api:*` + `gh run:*` → `gh:*`
+
+**When you surface a candidate to the user or write it back to the file, re-wrap
+it as a full permission entry** — e.g., `Bash(gh:*)`, not `gh:*`. The stripped
+form is only for analysis and display inside the tree; anything the user
+confirms ends up in `permissions.allow` as a valid `Bash(...)` string.
 
 Present the **most aggressive reasonable consolidation** as the suggestion, but show
 the intermediate options too so the user can pick their comfort level.
