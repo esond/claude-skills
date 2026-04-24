@@ -1,13 +1,13 @@
 ---
 name: reorganize-branch-commits
-description: Reorganize the commits on a non-default git branch into a clean, logical history via interactive rebase. Propose groupings based on the actual work done (features, refactors, tests, fixes, docs), get explicit user approval, then rewrite history while preserving signatures and running hooks. Use this skill whenever the user wants to tidy up, clean up, reorganize, restructure, squash, reshape, or curate commits on a feature branch — even if they phrase it as "my branch is a mess", "the history is ugly", "let's squash this down", "combine these commits", "fix up the commit log before I open a PR", "organize this into logical commits", "interactive rebase and group these", or "make the commits presentable for review". Trigger proactively when the user is about to open or push a PR and the branch has scrappy/WIP/"fix" commits that should be collapsed into meaningful units. Refuses to operate on default branches (main, master, develop, trunk, or the repo's configured default) — this is a feature-branch-only tool.
+description: Reorganize the commits on a non-default git branch into a clean, logical history by rewriting the branch — `git reset` + re-commit by default, scripted `git rebase -i` when existing commit boundaries already align. Propose groupings based on the actual work done (features, refactors, tests, fixes, docs), get explicit user approval, then rewrite history while re-signing the new commits and running hooks. Use this skill whenever the user wants to tidy up, clean up, reorganize, restructure, squash, reshape, or curate commits on a feature branch — even if they phrase it as "my branch is a mess", "the history is ugly", "let's squash this down", "combine these commits", "fix up the commit log before I open a PR", "organize this into logical commits", "interactive rebase and group these", or "make the commits presentable for review". Trigger proactively when the user is about to open or push a PR and the branch has scrappy/WIP/"fix" commits that should be collapsed into meaningful units. Refuses to operate on default branches (main, master, develop, trunk, or the repo's configured default) — this is a feature-branch-only tool.
 ---
 
 # reorganize-branch-commits
 
-Restructure the commits on a non-default branch into a clean, logical history. Two jobs: (1) propose a grouping grounded in the actual diffs, and (2) execute the rewrite safely — default branches refused, backup first, signing preserved, hooks run.
+Restructure the commits on a non-default branch into a clean, logical history. Two jobs: (1) propose a grouping grounded in the actual diffs, and (2) execute the rewrite safely — default branches refused, backup first, new commits re-signed, hooks run.
 
-This is history-rewriting. Every commit from `BASE` forward gets a new hash, even ones not being restructured, because the rebase replays them all. Say so up front.
+This is history-rewriting. Every commit from `BASE` forward gets a new hash, even ones not being restructured, because both strategies rebuild the range from scratch. Existing signatures don't carry across — every commit in the replayed range is a new commit and has to be re-signed. Say so up front.
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ Call the result `DEFAULT`. If `CURRENT == DEFAULT`, stop. If `DEFAULT` couldn't 
 
 Prefer in order:
 
-1. `git merge-base HEAD "$DEFAULT"` (fork point)
+1. `git merge-base HEAD "origin/$DEFAULT"` (fork point) — prefer the remote-tracking ref since `$DEFAULT` was detected via `origin/HEAD` and a local branch named `$DEFAULT` may not exist. If there's no remote and `$DEFAULT` exists locally, use `$DEFAULT` instead.
 2. An explicit base the user supplies (e.g., branch stacked on another feature branch)
 3. If `@{upstream}` has commits the local branch doesn't, surface that — they may want to rebase against upstream first
 
@@ -79,7 +79,7 @@ Heuristics:
 - **Separate by concern:** feature code, tests, refactors, unrelated fixes, docs, tooling.
 - **Pure refactors go before the feature that needs them.**
 - **"fix typo" / "address review" / "wip"** fold into the commit whose intent they serve.
-- **Mirror repo conventions.** Check `git log "$DEFAULT" -20 --oneline` for subject style (conventional-commits prefixes, scopes, issue refs). Don't invent a new convention.
+- **Mirror repo conventions.** Check `git log "origin/$DEFAULT" -20 --oneline` (or `"$DEFAULT"` locally if there's no remote) for subject style (conventional-commits prefixes, scopes, issue refs). Don't invent a new convention.
 
 Present exactly like this so the user can edit it:
 
@@ -175,18 +175,21 @@ Feed a pre-written todo non-interactively:
 ```bash
 cat > /tmp/rebase-todo <<'EOF'
 pick   <sha1>   original subject
-exec   git commit --amend -m "<new subject for group 1>"
+exec   git commit -S --amend -m "<new subject for group 1>"
 fixup  <sha2>
 fixup  <sha3>
 pick   <sha4>   original subject
-exec   git commit --amend -m "<new subject for group 2>"
+exec   git commit -S --amend -m "<new subject for group 2>"
 squash <sha5>
 EOF
 
-GIT_SEQUENCE_EDITOR="cp /tmp/rebase-todo" GIT_EDITOR="true" git rebase -i "$BASE"
+GIT_SEQUENCE_EDITOR="cp /tmp/rebase-todo" GIT_EDITOR="true" \
+  git -c commit.gpgsign=true rebase -i "$BASE"
 ```
 
-`GIT_EDITOR="true"` suppresses the message editor that `reword`/`squash` would normally pop. Using `exec git commit --amend -m` right after a `pick` is the cleanest way to rewrite subjects without interactive editing. Authorship from `pick` is preserved; `fixup` keeps its target's metadata.
+`GIT_EDITOR="true"` suppresses the message editor that `reword`/`squash` would normally pop. Using `exec git commit -S --amend -m` right after a `pick` is the cleanest way to rewrite subjects without interactive editing. Authorship from `pick` is preserved; `fixup` keeps its target's metadata.
+
+Signing note: unlike Strategy A's explicit `-S` on every commit, rebase replay obeys `commit.gpgsign`, and `exec git commit --amend` is an independent commit that doesn't inherit the rebase's settings. So **both** are needed: `-c commit.gpgsign=true` on the rebase ensures every replayed `pick`/`fixup`/`squash` is signed, and `-S` on each `exec ... --amend` signs the subject rewrites. If the repo doesn't sign, drop both.
 
 If the rebase halts on a conflict, don't auto-resolve. Stop, report the conflicting paths, and let the user choose: resolve and `git rebase --continue`, or `git rebase --abort` (the backup from Step 6 is still there either way).
 
