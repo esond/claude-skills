@@ -1,6 +1,6 @@
 ---
 name: reorganize-branch-commits
-description: Reorganize the commits on a non-default git branch into a clean, logical history by rewriting the branch — `git reset` + re-commit by default, scripted `git rebase -i` when existing commit boundaries already align. Propose groupings based on the actual work done (features, refactors, tests, fixes, docs), get explicit user approval, then rewrite history while re-signing the new commits and running hooks. Use this skill whenever the user wants to tidy up, clean up, reorganize, restructure, squash, reshape, or curate commits on a feature branch — even if they phrase it as "my branch is a mess", "the history is ugly", "let's squash this down", "combine these commits", "fix up the commit log before I open a PR", "organize this into logical commits", "interactive rebase and group these", or "make the commits presentable for review". Trigger proactively when the user is about to open or push a PR and the branch has scrappy/WIP/"fix" commits that should be collapsed into meaningful units. Refuses to operate on default branches (main, master, develop, trunk, or the repo's configured default) — this is a feature-branch-only tool.
+description: Reorganize the commits on a non-default git branch into a clean, logical history by rewriting the branch — `git reset` + re-commit by default, scripted `git rebase -i` when existing commit boundaries already align. Propose groupings based on the actual work done (features, refactors, tests, fixes, docs), get explicit user approval, then rewrite history while re-signing the new commits and running hooks. Use this skill whenever the user wants to tidy up, clean up, reorganize, restructure, squash, reshape, or curate commits on a feature branch — even if they phrase it as "my branch is a mess", "the history is ugly", "let's squash this down", "combine these commits", "fix up the commit log before I open a PR", "organize this into logical commits", "interactive rebase and group these", or "make the commits presentable for review". Trigger proactively when the user is about to open or push a PR and the branch has scrappy/WIP/"fix" commits that should be collapsed into meaningful units. Refuses to operate on default or release-shaped branches (main, master, develop, trunk, production, release, or the repo's configured default) — this is a feature-branch-only tool.
 ---
 
 # reorganize-branch-commits
@@ -17,9 +17,11 @@ Stop and report if any fail — don't paper over them.
 
 2. **Not mid-operation:**
    ```bash
-   git rev-parse --git-path rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD
+   GIT_DIR=$(git rev-parse --git-dir)
+   [ -d "$GIT_DIR/rebase-merge" ] || [ -d "$GIT_DIR/rebase-apply" ] \
+     || [ -f "$GIT_DIR/MERGE_HEAD" ] || [ -f "$GIT_DIR/CHERRY_PICK_HEAD" ]
    ```
-   If any resolve to an existing file/dir, stop — the user has in-progress state to resolve first.
+   If the test returns true (any of those paths exists), stop — the user has in-progress rebase/merge/cherry-pick state to resolve first. (Don't use `git rev-parse --git-path <path>` with multiple args here: `--git-path` takes a single path, so extra arguments are silently parsed as refs and the subsequent checks don't do what they look like.)
 
 3. **Signing config present if signing is expected:** `git config --get user.signingkey` and `commit.gpgsign`. Don't silently produce unsigned commits in a repo that signs.
 
@@ -170,24 +172,28 @@ Never auto-push on a non-empty diff.
 
 ### Strategy B — scripted interactive rebase
 
-Feed a pre-written todo non-interactively:
+Feed a pre-written todo non-interactively. Use a repo-scoped temp path so concurrent reorganizations in sibling worktrees don't clobber each other's todo file:
 
 ```bash
-cat > /tmp/rebase-todo <<'EOF'
+REBASE_TODO="$(git rev-parse --git-dir)/rebase-todo-skill"
+
+cat > "$REBASE_TODO" <<'EOF'
 pick   <sha1>   original subject
 exec   git commit -S --amend -m "<new subject for group 1>"
 fixup  <sha2>
 fixup  <sha3>
 pick   <sha4>   original subject
 exec   git commit -S --amend -m "<new subject for group 2>"
-squash <sha5>
+fixup  <sha5>
 EOF
 
-GIT_SEQUENCE_EDITOR="cp /tmp/rebase-todo" GIT_EDITOR="true" \
+GIT_SEQUENCE_EDITOR="cp $REBASE_TODO" GIT_EDITOR="true" \
   git -c commit.gpgsign=true rebase -i "$BASE"
 ```
 
-`GIT_EDITOR="true"` suppresses the message editor that `reword`/`squash` would normally pop. Using `exec git commit -S --amend -m` right after a `pick` is the cleanest way to rewrite subjects without interactive editing. Authorship from `pick` is preserved; `fixup` keeps its target's metadata.
+Prefer `fixup` over `squash` for any commit you want folded into the group above: `squash` opens the message editor, and with `GIT_EDITOR="true"` that editor exits immediately — the resulting message is the auto-concatenation of the two commits' original messages, not the subject you set via `exec ... --amend`. If you specifically need `squash` (to hand-edit the combined message), follow it with another `exec git commit -S --amend -m "..."` to restore the intended subject.
+
+`GIT_EDITOR="true"` suppresses the message editor that `reword`/`squash` would otherwise pop. Using `exec git commit -S --amend -m` right after a `pick` is the cleanest way to rewrite subjects without interactive editing. Authorship from `pick` is preserved; `fixup` keeps its target's metadata.
 
 Signing note: unlike Strategy A's explicit `-S` on every commit, rebase replay obeys `commit.gpgsign`, and `exec git commit --amend` is an independent commit that doesn't inherit the rebase's settings. So **both** are needed: `-c commit.gpgsign=true` on the rebase ensures every replayed `pick`/`fixup`/`squash` is signed, and `-S` on each `exec ... --amend` signs the subject rewrites. If the repo doesn't sign, drop both.
 
