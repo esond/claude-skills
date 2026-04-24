@@ -5,165 +5,113 @@ description: Reorganize the commits on a non-default git branch into a clean, lo
 
 # reorganize-branch-commits
 
-Restructure the commits on a non-default branch into a clean, logical history. This is a history-rewriting operation — the payoff is a reviewable log, but the cost is that every commit in the replayed range changes hash. Work through the steps carefully and stop at the checkpoints.
+Restructure the commits on a non-default branch into a clean, logical history. Two jobs: (1) propose a grouping grounded in the actual diffs, and (2) execute the rewrite safely — default branches refused, backup first, signing preserved, hooks run.
 
-The skill's job is two things: (1) propose a logical grouping of the branch's work, grounded in the actual diffs, and (2) execute the rewrite safely — backup first, signing preserved, hooks run, default branches refused.
+This is history-rewriting. Every commit from `BASE` forward gets a new hash, even ones not being restructured, because the rebase replays them all. Say so up front.
 
-## What this skill does and doesn't touch
+## Prerequisites
 
-- **Touches:** commits in `BASE..HEAD` on the current non-default branch, where `BASE` is the fork point with the repo's default branch (or an explicit base the user provides).
-- **Leaves alone:** the default branch itself, any commits before `BASE`, commits on other branches.
-- **Hard refusal:** if `HEAD` resolves to the default branch (or any common default-ish name), the skill stops immediately. This tool is for feature branches. Reorganizing `main` is not a scenario this skill supports — ask the user to point it at the right branch.
-- **Side effect to be honest about:** every commit from `BASE` forward gets a new hash, even commits that aren't being restructured, because the rebase replays them all. Tell the user up front.
+Stop and report if any fail — don't paper over them.
 
-## Prerequisites to verify before touching history
+1. **Clean working tree:** `git status --porcelain` must be empty. A dirty tree is dangerous both ways: rebase refuses unstaged tracked changes, and Strategy A's reset would silently blend uncommitted edits into the reorganized commits. If there are local changes, ask how to proceed (stash, commit, abandon).
 
-If any of these fail, stop and report — don't paper over them by rewriting anyway.
-
-1. **Working tree is clean.**
+2. **Not mid-operation:**
    ```bash
-   git status --porcelain
+   git rev-parse --git-path rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD
    ```
-   Must be empty. Rebase refuses to start otherwise. If there are local changes, ask the user how to proceed (stash, commit, abandon).
+   If any resolve to an existing file/dir, stop — the user has in-progress state to resolve first.
 
-2. **Not already mid-rebase / mid-merge / mid-cherry-pick.**
-   ```bash
-   git rev-parse --git-path rebase-merge
-   git rev-parse --git-path rebase-apply
-   git rev-parse --git-path MERGE_HEAD
-   git rev-parse --git-path CHERRY_PICK_HEAD
-   ```
-   If any of those paths exist as real files/dirs, stop — the user has in-progress state to resolve first.
+3. **Signing config present if signing is expected:** `git config --get user.signingkey` and `commit.gpgsign`. Don't silently produce unsigned commits in a repo that signs.
 
-3. **Signing config exists if the existing commits are signed.** The user's global CLAUDE.md may require signed commits. Check:
-   ```bash
-   git config --get user.signingkey
-   git config --get commit.gpgsign
-   ```
-   If signing is expected but misconfigured, stop and report — don't silently produce unsigned commits.
+## Step 1 — refuse the default branch
 
-## Step 1 — refuse to operate on the default branch
-
-This check is non-negotiable. Run it first, before anything else.
+Non-negotiable. Run first.
 
 ```bash
 CURRENT=$(git rev-parse --abbrev-ref HEAD)
 ```
 
-Determine the default branch name. Try in order:
+**Detached HEAD** (`CURRENT` == `"HEAD"`): stop. The backup ref, the rewrite, and the push all need a named branch. Ask the user to check out or create one.
 
-1. Remote HEAD symbolic ref:
-   ```bash
-   git symbolic-ref refs/remotes/origin/HEAD --short 2>/dev/null | sed 's@^origin/@@'
-   ```
-2. `gh` if available:
-   ```bash
-   gh repo view --json defaultBranchRef --jq .defaultBranchRef.name 2>/dev/null
-   ```
-3. Check which of `main`, `master`, `trunk`, `develop` exists locally as a fallback.
+**Danger list** (`main`, `master`, `trunk`, `develop`, `production`, `release`): stop regardless of what the repo's detected default is. These names are too load-bearing to ever touch from this skill.
 
-Call the result `DEFAULT`. Then:
+Then detect the default branch, trying in order:
 
-- If `CURRENT` equals `DEFAULT`: **stop**. Tell the user this skill refuses to rewrite the default branch, and ask them to check out a feature branch first.
-- If `CURRENT` is in the hardcoded danger list `{main, master, trunk, develop, production, release}` even when it's not the detected default: **stop**. Same message. These names are too load-bearing to ever touch without an explicit out-of-band instruction.
-- If `DEFAULT` could not be determined: stop and ask the user what the default branch is. Don't guess — getting this wrong means running the skill on the wrong branch.
+```bash
+git symbolic-ref refs/remotes/origin/HEAD --short 2>/dev/null | sed 's@^origin/@@'
+gh repo view --json defaultBranchRef --jq .defaultBranchRef.name 2>/dev/null
+# fallback: check which of main/master/trunk/develop exists locally
+```
 
-Only continue on a non-default, named feature branch.
+Call the result `DEFAULT`. If `CURRENT == DEFAULT`, stop. If `DEFAULT` couldn't be determined, ask — don't guess.
 
 ## Step 2 — pick the base
 
-The rebase base is where the feature branch diverged from the default. Prefer in order:
+Prefer in order:
 
-1. `git merge-base HEAD "$DEFAULT"` — the fork point.
-2. If the user has specified a different base (e.g., the branch was built on top of another feature branch), use that.
-3. If the upstream is meaningfully different (`git rev-parse --abbrev-ref '@{upstream}'`) and contains commits not in the local branch, surface that to the user — they may want to rebase against upstream first.
+1. `git merge-base HEAD "$DEFAULT"` (fork point)
+2. An explicit base the user supplies (e.g., branch stacked on another feature branch)
+3. If `@{upstream}` has commits the local branch doesn't, surface that — they may want to rebase against upstream first
 
-Capture:
-
-```bash
-BASE=<the chosen base SHA>
-```
-
-Show the user: `BASE`, `CURRENT`, and the commit count (`git rev-list --count "$BASE..HEAD"`). If the count is 0 or 1, stop — there's nothing to reorganize.
+Capture `BASE` and show the user `BASE`, `CURRENT`, and `git rev-list --count "$BASE..HEAD"`. If the count is 0 or 1, stop — nothing to reorganize.
 
 ## Step 3 — inventory the branch
 
-Before you can propose a grouping, you have to understand what's actually there. Collect:
-
 ```bash
-# commit log with authors and signature status
 git log --pretty='format:%H %G? %an <%ae> %ad %s' --date=short "$BASE..HEAD"
-
-# files touched across the whole range
-git diff --name-status "$BASE..HEAD"
-
-# per-commit file lists
 git log --name-status --pretty='format:=== %H %s' "$BASE..HEAD"
-
-# the full diff, so the grouping is grounded in real content not just filenames
-git diff "$BASE..HEAD"
 ```
 
-For large ranges, read the per-commit log first, then pull targeted diffs for commits you're unsure how to categorize rather than loading the full diff at once.
+Pull `git diff "$BASE..HEAD"` for any commit whose intent isn't obvious from the file list. For large ranges, do this selectively rather than loading the full diff.
 
-Note anything that will constrain the proposal:
-- **Multiple authors** — a soft-reset rebuild will re-attribute commits to the current user. If co-authors matter, the rewrite must use interactive rebase (Strategy B below) to preserve author metadata, or add `Co-authored-by:` trailers.
-- **Merge commits** in the range — a branch that contains merges from main partway through complicates the rebase. Surface this to the user and ask whether to flatten (default) or preserve merges.
+Flag anything that constrains the proposal:
+
+- **Multiple authors** — Strategy A re-attributes to the current user. Use Strategy B or `Co-authored-by:` trailers.
+- **Merge commits** (`git log --merges "$BASE..HEAD"`) — both strategies flatten them. This skill does not preserve merges during reorganization. If the user wants them preserved, stop — direct them to a hand-rolled `git rebase -i --rebase-merges "$BASE"`.
 - **Signed commits** — they'll need re-signing after the rewrite.
 
 ## Step 4 — propose logical groupings
 
-Draft a restructured commit list based on the diffs, not just the existing commit messages. The existing messages may be noisy ("wip", "fix typo", "oops"); the diffs are the ground truth.
+Ground the proposal in the diffs, not the existing messages ("wip", "fix typo", "oops" lie; the diffs don't).
 
-Good grouping heuristics:
-- **One logical change per commit.** A commit should be describable in one sentence without "and".
-- **Separate concerns by type:** feature code, tests for that feature, refactors, unrelated fixes, docs, config/tooling changes.
-- **Tests for a feature can live with the feature** (one commit) or immediately after (two commits) — ask the user's preference if it's not obvious from repo conventions.
-- **Pure refactors go before the feature that depends on them** so the feature commit stays focused.
-- **"fix typo", "address review", "wip"** commits should fold into the commit whose intent they serve.
-- **Mirror the repo's existing conventions.** Check recent commits on the default branch (`git log "$DEFAULT" -20 --oneline`) for subject style — conventional-commits prefixes, sentence case, scope prefixes, issue numbers, etc. Match what's there. Don't invent a new convention.
+Heuristics:
+- **One logical change per commit.** Describable in one sentence without "and".
+- **Separate by concern:** feature code, tests, refactors, unrelated fixes, docs, tooling.
+- **Pure refactors go before the feature that needs them.**
+- **"fix typo" / "address review" / "wip"** fold into the commit whose intent they serve.
+- **Mirror repo conventions.** Check `git log "$DEFAULT" -20 --oneline` for subject style (conventional-commits prefixes, scopes, issue refs). Don't invent a new convention.
 
-Present the proposal in this exact shape so the user can scan and edit it:
+Present exactly like this so the user can edit it:
 
 ```
 Proposed history (BASE → HEAD), N commits:
 
-1. <proposed subject>
+1. <subject>
    Rationale: <why these belong together>
-   Source commits: <short SHAs being folded in>
-   Files: <representative paths or prefixes>
+   Source commits: <short SHAs folded in>
+   Files: <representative paths/prefixes>
 
-2. <proposed subject>
+2. <subject>
    ...
 ```
 
-Include any notes about tradeoffs you made — e.g., "combined the two refactor commits because they both touch the same abstraction" or "kept the revert as its own commit because it's easier to spot in history".
+Call out any tradeoffs you made.
 
-## Step 5 — stop and get explicit approval
+## Step 5 — approval checkpoint
 
-Do not proceed without a clear yes. The user may want to:
-- Reword subjects
-- Split a proposed commit
-- Merge two proposed commits
-- Reorder
-- Exclude a commit from the rewrite entirely (pass it through as-is)
+No yes, no proceed. Iterate on the proposal until the user's satisfied (reword, split, merge, reorder, pass-through). Also lock in the answers you'll need later:
 
-Iterate on the proposal until the user is satisfied. Only then move on.
+- **Author preservation?** (Strategy choice hinges on this.)
+- **Signing?** (Usually yes if the repo signs; confirm rather than assume.)
+- **Force-push afterward?** (Step 10 — get the answer now.)
 
-Also confirm with the user:
-- **Co-authors / author preservation?** If multiple authors in range, how to handle.
-- **Signing expected on the output?** Almost always yes if the repo signs — but confirm rather than assume.
-- **Force-push afterward?** (See Step 9.) Get the answer now so you're not asking mid-flow.
-
-## Step 6 — create a safety backup
-
-Before rewriting anything, create a backup ref. This is cheap, local, and saves you if something goes wrong:
+## Step 6 — safety backup
 
 ```bash
 git branch "backup/${CURRENT}/$(date -u +%Y%m%dT%H%M%SZ)"
 ```
 
-Tell the user the backup branch name. If the rewrite goes sideways, recovery is `git reset --hard <backup-branch>`.
+Tell the user the backup branch name — recovery is `git reset --hard <backup-branch>`. Reflog retains the original HEAD ~90 days as a last-resort fallback, but don't plan around it.
 
 ## Step 7 — push safety check
 
@@ -171,148 +119,122 @@ Tell the user the backup branch name. If the rewrite goes sideways, recovery is 
 git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null
 ```
 
-If the branch has an upstream, it's been pushed. Stop and confirm:
-
-- Show the upstream ref.
-- Remind the user that completing this will require `git push --force-with-lease` to update the remote.
-- If there's an open PR, reviewers will see the force-push event; comments anchored to old line numbers may become orphaned.
-- Get an explicit "proceed" before Step 8.
-
-If no upstream, skip straight to Step 8.
+If there's an upstream, the branch is pushed. Stop and confirm with the user: show the upstream ref, note that finishing this requires `git push --force-with-lease`, and warn that PR review comments anchored to old line numbers may become orphaned. Get an explicit "proceed".
 
 ## Step 8 — rewrite history
 
-Pick the right strategy. Default to **Strategy A** (collapse-and-rebuild) unless you have a specific reason to use B.
-
-### Strategy A — collapse and rebuild (default)
-
-Use when the proposed grouping doesn't align with existing commit boundaries (the common case — that's usually why the user wants this skill).
+Capture the pre-rewrite HEAD so Step 9 has something to compare against:
 
 ```bash
-# move to the base, keep all file changes in the index
-git reset --soft "$BASE"
-
-# un-stage everything so we can re-stage per logical group
-git reset
+ORIG=$(git rev-parse HEAD)
 ```
 
-Now the working tree holds every change from `BASE..originalHEAD`, nothing is staged, and `HEAD` is at `BASE`. Build each approved commit in order:
+Default to **Strategy A**. Use **Strategy B** only when existing commit boundaries already match the desired groupings or author metadata must be preserved.
+
+### Strategy A — collapse and rebuild
+
+`git reset "$BASE"` (default `--mixed`) moves HEAD to `BASE`, resets the index to match, and leaves the working tree alone — so every change from `BASE..ORIG` is now an unstaged edit ready to be re-grouped.
 
 ```bash
-# group 1
+git reset "$BASE"
+
+# subject-only commit
 git add <paths for group 1>
-git commit -S -m "<approved subject for group 1>" \
-  $( [ -n "$BODY1" ] && printf -- '-m %s' "$BODY1" )
+git commit -S -m "<subject 1>"
 
-# group 2
+# subject + body (or Co-authored-by: trailers): use -F -
 git add <paths for group 2>
-git commit -S -m "<approved subject for group 2>"
+git commit -S -F - <<'EOF'
+<subject 2>
 
-# ... etc
+<body / issue refs / Co-authored-by: trailers>
+EOF
 ```
 
-Notes on this approach:
-- `-S` forces signing even if `commit.gpgsign` is toggled off somewhere. If the user doesn't sign in this repo, drop it.
-- **No `--no-verify`.** Hooks run normally. That's the point.
-- If a file has changes belonging to two different groups, use `git add -p <file>` to stage hunks instead of the whole file. Stop and walk the user through the hunks if the split isn't obvious from the diff.
-- Author metadata defaults to the current git user. If the original range had multiple authors and Step 5 said to preserve them, switch to Strategy B or add `Co-authored-by:` trailers to the relevant commits.
+- `-S` forces signing even if `commit.gpgsign` is off; drop it if the repo doesn't sign.
+- No `--no-verify`. Hooks run.
+- If a file has hunks belonging to two groups, `git add -p <file>`. If the split isn't obvious, walk it with the user.
 
-After all groups are committed, verify the tree matches what was there before:
+Verify the tree, then interpret:
 
 ```bash
-git diff "originalHEAD" HEAD   # should be empty
+git diff "$ORIG" HEAD
 ```
 
-If this diff is not empty, something was missed. Stop and report. Do not push.
+- **Empty** — clean rewrite. Go to Step 9.
+- **Non-empty** — investigate. Two legitimate causes:
+  - **Real miss:** a hunk didn't get staged into any group. Either stage it into a new commit or `git reset --hard <backup-branch>` and restart.
+  - **Hook-induced:** formatters/codegen/license-headers reshaped the tree. Expected if any original commit used `--no-verify`. Eyeball each hunk with the user — if it's all clearly formatter output, proceed; if any of it looks like user-authored content, stop.
 
-(You can capture `originalHEAD` as a variable at the start of Step 8 with `ORIG=$(git rev-parse HEAD)` before the `reset --soft`.)
+Never auto-push on a non-empty diff.
 
-### Strategy B — interactive rebase with a scripted todo
+### Strategy B — scripted interactive rebase
 
-Use when the existing commit boundaries already align with the desired groupings and you just need to squash/fixup/reword — or when author metadata must be preserved.
-
-Write the desired todo list to a file and use `GIT_SEQUENCE_EDITOR` to feed it in non-interactively:
+Feed a pre-written todo non-interactively:
 
 ```bash
 cat > /tmp/rebase-todo <<'EOF'
-pick   <sha1>   <new subject for group 1>
+pick   <sha1>   original subject
+exec   git commit --amend -m "<new subject for group 1>"
 fixup  <sha2>
 fixup  <sha3>
-pick   <sha4>   <new subject for group 2>
+pick   <sha4>   original subject
+exec   git commit --amend -m "<new subject for group 2>"
 squash <sha5>
 EOF
 
-GIT_SEQUENCE_EDITOR="cp /tmp/rebase-todo" \
-GIT_EDITOR="true" \
-  git rebase -i "$BASE"
+GIT_SEQUENCE_EDITOR="cp /tmp/rebase-todo" GIT_EDITOR="true" git rebase -i "$BASE"
 ```
 
-`GIT_EDITOR="true"` suppresses the message-editor that opens for `reword`/`squash`. That means subject changes need to happen differently: either rewrite after the rebase with `git commit --amend -m "..."` per commit (awkward for non-HEAD commits), or use `exec` lines in the todo to run `git commit --amend -m` right after each relevant pick. The cleanest pattern:
+`GIT_EDITOR="true"` suppresses the message editor that `reword`/`squash` would normally pop. Using `exec git commit --amend -m` right after a `pick` is the cleanest way to rewrite subjects without interactive editing. Authorship from `pick` is preserved; `fixup` keeps its target's metadata.
 
-```
-pick   <sha1>   original subject
-exec   git commit --amend -m "new subject for group 1"
-fixup  <sha2>
-...
-```
+If the rebase halts on a conflict, don't auto-resolve. Stop, report the conflicting paths, and let the user choose: resolve and `git rebase --continue`, or `git rebase --abort` (the backup from Step 6 is still there either way).
 
-If the rebase stops with a conflict, don't auto-resolve. Stop and report to the user with the conflicting files and paths, and let them decide (resolve + `git rebase --continue`, or abort with `git rebase --abort` which restores the original branch since you made a backup in Step 6).
+### If anything goes sideways
 
-### If things go sideways
-
-If anything errors during Step 8 and you're not sure how to recover: **stop**. Don't `git rebase --abort` reflexively — the user may want to inspect in-progress state first. The safety net is the backup branch from Step 6:
+Stop. Don't reflexively `git rebase --abort`. Offer the backup branch for a clean rewind:
 
 ```bash
 git reset --hard <backup-branch>
 ```
 
-restores the original HEAD exactly.
-
 ## Step 9 — verify
 
-After a successful rewrite, check:
-
-1. **Tree is identical to before** (if you didn't already, and you still have the `ORIG` SHA):
+1. **Tree matches ORIG** (Strategy A did this in-flow; Strategy B hasn't):
    ```bash
-   git diff "$ORIG" HEAD   # must be empty
+   git diff "$ORIG" HEAD
    ```
+   Same triage as Step 8 on a non-empty result.
 
-2. **Commit count matches the proposal:**
-   ```bash
-   git rev-list --count "$BASE..HEAD"
-   ```
-
-3. **Signatures look right on every commit:**
+2. **Signatures on every commit:**
    ```bash
    git log --pretty='format:%h %G? %s' "$BASE..HEAD"
    ```
-   Every row should show `G` (or whatever the expected status is for this repo's signing setup). Any `N` on a branch that's supposed to sign means something went wrong — report and stop.
+   Every row should show `G` (or the expected status for this repo). Any `N` on a signing repo means something's wrong — report and stop.
 
-4. **Subjects read well end-to-end:**
+3. **Subjects read well:**
    ```bash
    git log --oneline "$BASE..HEAD"
    ```
-   Show this to the user. If they want to tweak a subject, `git rebase -i "$BASE"` with `reword` handles that cleanly on the new history.
+   Show the user. For last-mile subject tweaks, `git rebase -i "$BASE"` with `reword` handles them cleanly on the new history.
 
-## Step 10 — push (user runs this themselves)
+## Step 10 — push (user runs this)
 
-If the branch has an upstream and the user approved force-push in Step 7, give them the command but don't run it yourself:
+Don't run the push. Suggest the command:
 
 ```bash
-git push --force-with-lease
+git push --force-with-lease   # with upstream, approved in Step 7
+git push -u origin "$CURRENT" # no upstream
 ```
 
-`--force-with-lease` is safer than `--force`: it refuses to overwrite the remote if someone else has pushed since your last fetch. Mention the lease variant first even if the user asks for plain `--force`.
-
-If there's no upstream, a plain `git push -u origin "$CURRENT"` is fine.
+Lead with `--force-with-lease` over plain `--force` — it refuses to overwrite the remote if someone else pushed since your last fetch. Mention this even if the user asks for plain `--force`.
 
 ## Things not to do
 
-- **Don't** run on `main`, `master`, `develop`, `trunk`, `production`, `release`, or the detected default branch. Ever. Step 1 is a hard stop, not a warning.
-- **Don't** use `--no-verify` / `-n`. Hooks must run. If a hook fails on the new commits, that's a real signal the groupings are wrong or the tree has a problem — fix it, don't skip it.
-- **Don't** force-push on the user's behalf. That's their call and their command to run.
-- **Don't** skip the backup branch in Step 6. It's three seconds of typing for unlimited undo.
-- **Don't** propose a grouping based only on commit messages — read the actual diffs. Messages lie; diffs don't.
-- **Don't** silently drop commits. If a commit in `BASE..HEAD` isn't represented somewhere in the proposal, that's a bug in the proposal — call it out explicitly rather than hoping the user notices.
-- **Don't** invent a commit message convention. Mirror what the repo already uses.
-- **Don't** try to recover from a failed rebase by guessing. Stop, tell the user the backup branch name, and let them decide.
+- **Don't** run on any default branch (`main`, `master`, `develop`, `trunk`, `production`, `release`, or the detected default). Step 1 is a hard stop.
+- **Don't** use `--no-verify`. A failing hook is signal; fix the content.
+- **Don't** force-push on the user's behalf. Their call, their command.
+- **Don't** propose groupings from commit messages alone — diffs are the ground truth.
+- **Don't** silently drop commits. Every commit in `BASE..HEAD` must be accounted for in the proposal, even if "pass through unchanged".
+- **Don't** invent a commit-message convention. Mirror the repo's.
+- **Don't** try to recover from a failed rebase by guessing. Stop, surface the backup branch name, let the user decide.
