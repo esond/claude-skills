@@ -1,6 +1,6 @@
 {
   "name": "esond",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Eric's personal Claude Code skills, agents, and commands.",
   "author": {
     "name": "Eric Sondergard",
@@ -11,6 +11,7 @@
     "./skills/permission-consolidator",
     "./skills/plan-repl",
     "./skills/pr-review-resolver",
+    "./skills/reorganize-branch-commits",
     "./skills/sign-unsigned-commits"
   ]
 }
