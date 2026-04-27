@@ -16,20 +16,21 @@ loses that record.
 
 ## Step 1 — pick the task
 
-If the user named one ("resume webhook-retries"), check that `tasks/{that-name}/` exists.
-If it doesn't, stop and tell the user — list whatever's actually under `tasks/` so they can
-correct a typo, and mention that if they meant to start fresh, `plan-repl` is the skill for
-that.
+If the user named one ("resume webhook-retries"), check that `tasks/{that-name}/` both
+exists *and* contains at least one of the expected files (`research.md`, `plan.md`,
+`todo.md`). If the directory is missing or empty, stop and tell the user — list the
+directories actually under `tasks/` so they can correct a typo, and mention that if they
+meant to start fresh, `plan-repl` is the skill for that.
 
-Otherwise list candidates:
+Otherwise list candidates (directories only — stray files like `.DS_Store` aren't tasks):
 
 ```bash
-ls -1 tasks/ 2>/dev/null
+for d in tasks/*/; do [ -d "$d" ] && basename "$d"; done 2>/dev/null
 ```
 
-If no `tasks/` directory or it's empty, stop. Tell the user there's nothing to resume and
-point them at `plan-repl` if they wanted to start a new task. If exactly one task exists,
-confirm it's the one. If several, show the list and ask which.
+If no `tasks/` directory or no task directories exist, stop. Tell the user there's nothing
+to resume and point them at `plan-repl` if they wanted to start a new task. If exactly one
+task exists, confirm it's the one. If several, show the list and ask which.
 
 ## Step 2 — read the persisted files
 
@@ -50,7 +51,18 @@ Files alone don't tell you whether implementation work has actually landed. Chec
 git rev-parse --abbrev-ref HEAD
 git status --porcelain
 git log --oneline @{upstream}..HEAD 2>/dev/null || git log --oneline -20
-git diff --stat $(git merge-base HEAD origin/HEAD 2>/dev/null || git merge-base HEAD main 2>/dev/null || echo HEAD)..HEAD
+
+# Detect the default branch, then show files changed since the fork point. If the base
+# can't be determined, surface that — don't fall back to HEAD..HEAD, which silently
+# produces an empty diff and a false "no work landed" signal.
+DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD --short 2>/dev/null | sed 's@^origin/@@')
+[ -z "$DEFAULT" ] && DEFAULT=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name 2>/dev/null)
+MERGE_BASE=$(git merge-base HEAD "origin/${DEFAULT:-main}" 2>/dev/null || git merge-base HEAD "${DEFAULT:-main}" 2>/dev/null)
+if [ -n "$MERGE_BASE" ]; then
+  git diff --stat "$MERGE_BASE..HEAD"
+else
+  echo "Could not determine a base ref — ask the user which branch to compare against."
+fi
 ```
 
 You want a picture of: which branch the user is on, whether the working tree is dirty,
@@ -65,7 +77,6 @@ lookup — it's a starting point. Trust the evidence you actually have.
 
 | Evidence | Likely phase |
 |---|---|
-| No files in the task dir | Task hasn't really started — fall through to `plan-repl` Phase 1 |
 | `research.md` only | Phase 1 done, ready for Phase 2 (planning) |
 | `research.md` + `plan.md` with unaddressed `> NOTE:` / `> note:` markers | Phase 3 (annotation cycle), notes pending |
 | `research.md` + `plan.md`, no notes, no `todo.md` | Phase 3 done, ready for Phase 4 (task breakdown) |
@@ -109,6 +120,11 @@ prove you loaded the right state — not to start work.
 Once the user confirms, continue with the appropriate `plan-repl` phase exactly as
 documented there. Don't rerun earlier phases unless the user asks for it. The reading you
 did in Steps 2–3 has already grounded you.
+
+If your context was cleared before this skill was invoked (the primary use case), you have
+no cached memory of `plan-repl`'s phase mechanics — re-read `skills/plan-repl/SKILL.md` so
+the phase descriptions, note format, and stop-checkpoints are loaded fresh before you
+continue.
 
 If during the handoff the user wants to revise an earlier phase ("the research missed X"),
 re-enter that phase normally — `plan-repl`'s files are append/edit-friendly.
