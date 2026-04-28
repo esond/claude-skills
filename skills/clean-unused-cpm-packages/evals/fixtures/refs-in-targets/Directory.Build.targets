@@ -1,8 +1,0 @@
-<Project>
-  <ItemGroup>
-    <PackageReference
-      Include="Microsoft.SourceLink.GitHub"
-      PrivateAssets="all"
-      IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-  </ItemGroup>
-</Project>
