@@ -41,18 +41,27 @@ Stop and report if any fail.
 2. **Working tree is clean for the files this skill will touch.**
 
    ```bash
-   git status --porcelain -- '*Directory.Packages.props'
+   git status --porcelain -- ':(glob)**/Directory.Packages.props'
    ```
 
-   If a `Directory.Packages.props` already has uncommitted edits, ask before mixing in the skill's changes.
+   The `:(glob)` magic is required so the pathspec crosses directory boundaries — without it, nested `Directory.Packages.props` files aren't checked. If any have uncommitted edits, ask before mixing in the skill's changes.
 
-3. **`dotnet` is on PATH** for the verification step:
+3. **`dotnet` is on PATH.** The Step 6 verification depends on it; the skill does not run without it:
 
    ```bash
    dotnet --version
    ```
 
-   If not installed, the cleanup can still proceed but the user must verify another way — flag this up front and skip Step 6.
+   If `dotnet` is missing or fails, stop and ask the user to install/fix it before re-running.
+
+4. **No `.fsproj` or `.vbproj` projects in the repo.** This skill only scans `.csproj`. References held by F#/VB projects won't be counted, and `PackageVersion` entries used only by them would be wrongly flagged as unused:
+
+   ```bash
+   find . -type f \( -name '*.fsproj' -o -name '*.vbproj' \) \
+     -not -path '*/node_modules/*' -not -path '*/bin/*' -not -path '*/obj/*'
+   ```
+
+   If any are found, warn the user that references in those projects won't be detected and ask whether to proceed regardless.
 
 ## Step 1 — collect every `PackageVersion` and `GlobalPackageReference`
 
@@ -70,9 +79,11 @@ Search in:
 - All `.csproj` files.
 - All `.props` and `.targets` files **other than** `Directory.Packages.props` files.
 
-For each file, find every `<PackageReference>` element and pull its `Include` (or `Update`) attribute value. `Update` modifies metadata of an existing reference and still counts as a reference. Use multiline-aware matching: `<PackageReference>` attributes can spill across lines.
+Exclude build output and dependency directories: `bin/`, `obj/`, `node_modules/`, `.git/`. Files under those (e.g. `obj/*.g.props`) hold generated `PackageReference` entries that don't reflect actual project intent and would mask legitimately-unused entries.
 
-Build a deduped set of referenced package IDs. Use case-sensitive comparison: NuGet IDs are case-insensitive on the wire, but `Directory.Packages.props` and projects in practice agree on casing, and case-insensitive matching risks false positives on unrelated tokens. If a casing-mismatch false positive surfaces in Step 6, revisit then.
+For each remaining file, find every `<PackageReference>` element and pull its `Include` (or `Update`) attribute value. `Update` modifies metadata of an existing reference and still counts as a reference. Use multiline-aware matching: `<PackageReference>` attributes can spill across lines.
+
+Build a deduped set of referenced package IDs. Compare case-insensitively: NuGet package IDs are case-insensitive, so a `Directory.Packages.props` entry of `Microsoft.Extensions.Hosting` and a project file with `microsoft.extensions.hosting` describe the same package — they must match. Keep the original casing for any displayed names and for the line edits in Step 5.
 
 ## Step 3 — compute the unused set
 
@@ -131,11 +142,10 @@ If restore succeeds, the cleanup is verified. Summarize what was removed and sto
 
 If restore fails, the cause is almost always one of:
 
-- **Reference lives somewhere the scan missed** — `.fsproj`/`.vbproj` (this skill is `.csproj`-only), an MSBuild SDK imported from outside the repo, `.targets` generated at build time, or props injected by another NuGet package.
+- **Reference lives somewhere the scan missed** — `.fsproj`/`.vbproj` (this skill is `.csproj`-only — Prereq 4 should have surfaced this), an MSBuild SDK imported from outside the repo, `.targets` generated at build time, or props injected by another NuGet package.
 - **Reference is constructed dynamically by MSBuild** — `PackageReference` items added inside a `<Target>` or via a conditional `<ItemGroup>` evaluated only at build time. Grep doesn't see those.
-- **Casing mismatch** — Step 2 compares case-sensitively; a project file with `microsoft.extensions.hosting` and a `Directory.Packages.props` with `Microsoft.Extensions.Hosting` won't match.
 
-Restore the wrongly-removed entry from git (`git checkout -- <file>` or re-add by hand) and tell the user which package was wrongly flagged so the edge case is visible.
+Re-add the specific wrongly-removed entry by hand. Use `git diff <file>` to see what was removed and selectively restore just that line. **Don't** `git checkout -- <file>` — that discards every correctly-removed entry along with the false positive. Tell the user which package was wrongly flagged so the edge case is visible.
 
 ## Things not to do
 
