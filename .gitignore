@@ -6,6 +6,9 @@
 .claude/statsig/
 .claude/worktrees/
 
+# skill-creator transient eval workspaces (per-skill, sibling of the skill dir)
+skills/*-workspace/
+
 # IDE and Editor files
 .vs/
 .vscode/
