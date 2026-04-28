@@ -1,0 +1,116 @@
+{
+  "skill_name": "clean-unused-cpm-packages",
+  "evals": [
+    {
+      "id": 0,
+      "name": "simple-unused-with-global",
+      "fixture": "evals/fixtures/simple/",
+      "prompt": "I have a .NET solution that uses Central Package Management. The Directory.Packages.props file at the root has accumulated some entries that aren't actually referenced by any project anymore. Please clean those out. The solution has been copied to your working directory — work on the copy in place, don't modify the originals. Skip the dotnet restore step (no network here); just do the detection and edits.",
+      "expected_output": "Directory.Packages.props with Polly and AutoFixture entries removed. Newtonsoft.Json, Serilog, FluentAssertions, xunit, Microsoft.NET.Test.Sdk PackageVersion entries kept verbatim. Microsoft.SourceLink.GitHub GlobalPackageReference entry kept verbatim. The two grouping comments (`<!-- Runtime dependencies -->`, `<!-- Test dependencies -->`, `<!-- Source-link applied to every project -->`) preserved. ItemGroup structure preserved.",
+      "assertions": [
+        {
+          "name": "Polly entry removed",
+          "check": "no line in Directory.Packages.props matches /PackageVersion[^>]*Include=\"Polly\"/"
+        },
+        {
+          "name": "AutoFixture entry removed",
+          "check": "no line in Directory.Packages.props matches /PackageVersion[^>]*Include=\"AutoFixture\"/"
+        },
+        {
+          "name": "Newtonsoft.Json entry kept",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"Newtonsoft\\.Json\"/"
+        },
+        {
+          "name": "Serilog entry kept",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"Serilog\"/"
+        },
+        {
+          "name": "FluentAssertions entry kept",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"FluentAssertions\"/"
+        },
+        {
+          "name": "xunit entry kept",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"xunit\"/"
+        },
+        {
+          "name": "Microsoft.NET.Test.Sdk entry kept",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"Microsoft\\.NET\\.Test\\.Sdk\"/"
+        },
+        {
+          "name": "GlobalPackageReference for SourceLink kept (not flagged as unused)",
+          "check": "Directory.Packages.props contains /GlobalPackageReference[^>]*Include=\"Microsoft\\.SourceLink\\.GitHub\"/"
+        },
+        {
+          "name": "Grouping comments preserved",
+          "check": "Directory.Packages.props contains all three comments: 'Runtime dependencies', 'Test dependencies', 'Source-link applied to every project'"
+        },
+        {
+          "name": "Project files unchanged",
+          "check": "MyApp/MyApp.csproj and MyApp.Tests/MyApp.Tests.csproj are byte-identical to the originals"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "nested-props-files",
+      "fixture": "evals/fixtures/nested-props/",
+      "prompt": "This .NET solution uses Central Package Management with two Directory.Packages.props files — one at the root and one under Tools/ for the build tools. Please remove any PackageVersion entries that aren't referenced by any project anywhere in the repo. The solution has been copied to your working directory — work on the copy in place. Skip the dotnet restore step (no network here); just do the detection and edits.",
+      "expected_output": "Root Directory.Packages.props: Microsoft.AspNetCore.OpenApi and Swashbuckle.AspNetCore entries removed; Microsoft.Extensions.Hosting kept. Tools/Directory.Packages.props: System.CommandLine entry removed; Spectre.Console kept. Project files untouched.",
+      "assertions": [
+        {
+          "name": "Root: Microsoft.AspNetCore.OpenApi removed",
+          "check": "no line in ./Directory.Packages.props matches /PackageVersion[^>]*Include=\"Microsoft\\.AspNetCore\\.OpenApi\"/"
+        },
+        {
+          "name": "Root: Swashbuckle.AspNetCore removed",
+          "check": "no line in ./Directory.Packages.props matches /PackageVersion[^>]*Include=\"Swashbuckle\\.AspNetCore\"/"
+        },
+        {
+          "name": "Root: Microsoft.Extensions.Hosting kept",
+          "check": "./Directory.Packages.props contains /PackageVersion[^>]*Include=\"Microsoft\\.Extensions\\.Hosting\"/"
+        },
+        {
+          "name": "Nested: System.CommandLine removed",
+          "check": "no line in Tools/Directory.Packages.props matches /PackageVersion[^>]*Include=\"System\\.CommandLine\"/"
+        },
+        {
+          "name": "Nested: Spectre.Console kept",
+          "check": "Tools/Directory.Packages.props contains /PackageVersion[^>]*Include=\"Spectre\\.Console\"/"
+        },
+        {
+          "name": "Project files unchanged",
+          "check": "ApiService/ApiService.csproj and Tools/CodeGenerator/CodeGenerator.csproj are byte-identical to the originals"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "refs-in-targets",
+      "fixture": "evals/fixtures/refs-in-targets/",
+      "prompt": "Clean up unused PackageVersion entries from Directory.Packages.props in this .NET solution. Note that some PackageReferences live in Directory.Build.targets, not in the .csproj files — those still count as references. The solution has been copied to your working directory — work on the copy in place. Skip the dotnet restore step (no network here); just do the detection and edits.",
+      "expected_output": "Directory.Packages.props with MediatR removed. Serilog kept (referenced by MyLib.csproj). Microsoft.SourceLink.GitHub kept (referenced by Directory.Build.targets — must NOT be flagged as unused). Comments preserved.",
+      "assertions": [
+        {
+          "name": "MediatR removed",
+          "check": "no line in Directory.Packages.props matches /PackageVersion[^>]*Include=\"MediatR\"/"
+        },
+        {
+          "name": "Serilog kept",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"Serilog\"/"
+        },
+        {
+          "name": "Microsoft.SourceLink.GitHub kept (referenced from Directory.Build.targets, multi-line PackageReference)",
+          "check": "Directory.Packages.props contains /PackageVersion[^>]*Include=\"Microsoft\\.SourceLink\\.GitHub\"/"
+        },
+        {
+          "name": "Directory.Build.targets unchanged",
+          "check": "Directory.Build.targets is byte-identical to the original"
+        },
+        {
+          "name": "Project file unchanged",
+          "check": "MyLib/MyLib.csproj is byte-identical to the original"
+        }
+      ]
+    }
+  ]
+}
