@@ -97,22 +97,34 @@ If the unresolved-thread query returns zero rows and the general-comment scan su
 
 ## Step 3: Assess and triage
 
-Go through each comment and decide whether it's actionable. For each comment,
-consider:
+Engage with each comment critically. Your job is to form a real opinion about
+whether the reviewer is right — not to default to agreement. Reviewers miss
+context, push stylistic preferences, suggest premature abstractions, raise
+out-of-scope concerns, and sometimes just get things wrong. The goal of code
+review is better code, not every comment satisfied.
 
-- Is this a concrete suggestion or requested change?
-- Does it point out an actual bug, oversight, or improvement?
-- Or is it a stylistic preference, a question that's already answered, or something
-  you disagree with?
+For each comment, ask:
 
-**When you believe a comment is not worth addressing, ask the user for confirmation
-before skipping it.** Present the comment and your reasoning — the user is the
-final judge. For example:
+- Is the reviewer correct about the problem? Did they misread the code?
+- Would the suggested change actually improve things, or make them worse
+  (more abstract, more verbose, more coupled, harder to follow)?
+- Is it in scope for this PR, or a separate concern that belongs elsewhere?
+- Is it a stylistic preference that conflicts with the codebase's conventions?
+- Does the reviewer have context you don't — a constraint, downstream impact,
+  or domain knowledge that makes the comment land harder than it looks?
+
+If you disagree, say so concretely. "I don't think this is worth addressing
+because X" is a real position; silently fixing a comment you don't believe in
+is capitulation, not collaboration.
+
+**When you decide a comment isn't worth addressing — whether because it's
+wrong, out of scope, low-value, or stylistic — present it to the user with
+your reasoning before skipping.** The user is the final judge.
 
 > This comment suggests X. I don't think this needs addressing because Y.
 > Should I skip it, or would you like me to fix it?
 
-Only skip a comment after the user explicitly agrees.
+Only skip after explicit user agreement.
 
 ## Step 4: Fix the code
 
@@ -188,6 +200,7 @@ No reply needed — the commit message serves as the record.
 ## Things not to do
 
 - **Don't** silently skip a comment you think isn't worth addressing. Present it to the user with your reasoning and only skip on explicit agreement — the reviewer is not in the room and you don't get to overrule them unilaterally.
+- **Don't** capitulate to a comment you don't believe in just to make it go away. Quietly fixing a comment you think is wrong is the inverse failure of silently skipping — it pollutes the codebase to satisfy a single review. If you disagree, say so concretely and let the user decide.
 - **Don't** resolve a thread without a commit to back it up. Every resolve should cite a real hash. Resolving without a fix signals to the reviewer that their feedback was ignored.
 - **Don't** reply using the GraphQL node `id` — see Step 6 for why. Replies use `databaseId`; only the resolve mutation takes the node ID.
 - **Don't** force-push or rewrite history as part of this skill. This is a forward-merge workflow — new commits land on top. History rewriting belongs to a different skill.
