@@ -132,6 +132,10 @@ user — you'll need both when posting the replies.
 
 ## Step 4: Fix the code
 
+If every comment was declined in Step 3, there's nothing to fix and nothing to
+commit — skip Steps 4 and 5 and go directly to Step 6 to post the
+justifications.
+
 Read the relevant files, understand the context, and make the fixes. For review
 thread comments, the `path` and `line` fields tell you exactly where to look.
 For general comments, you may need to identify the relevant code yourself.
@@ -209,6 +213,12 @@ but with the justification text instead of a commit hash:
 gh api "repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies" \
   -f body="$JUSTIFICATION"
 ```
+
+`$COMMENT_ID` follows the same convention as the fix-reply path above — the
+`databaseId` of the first comment in the thread from the Step 2 GraphQL
+response, not the GraphQL node `id`. The endpoint is thread-scoped, so any
+comment ID in the thread routes the reply correctly; sticking with the first
+comment keeps both reply paths consistent.
 
 Don't run the `resolveReviewThread` mutation. Don't include a commit hash —
 there's no commit to cite, and the reply should read as a position, not a
