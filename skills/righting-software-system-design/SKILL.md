@@ -1,6 +1,6 @@
 ---
 name: righting-software-system-design
-description: Heavyweight, opt-in, collaborative system-design workflow based on Juval Löwy's iDesign methodology in *Righting Software*. Conducts a multi-phase interview (framing → use cases → volatility analysis → component definition → call-chain validation → recommendation report) that actively surfaces unknown-unknowns and produces a written recommendation at `decompositions/{system-name}/report.md`. **Run only when the user explicitly invites this workflow** — not for general architecture questions, lightweight design conversations, or quick "where should X live?" questions. Triggers include: the user names the skill directly, references *Righting Software* / Juval Löwy / iDesign / "The Method" / volatility-based decomposition by name, asks for a "deep" or "structured" or "Löwy-style" system design session, or accepts a suggestion to run this workflow. Suggesting the skill is fine — when the user describes architectural ambiguity, recurring "every change touches everything" pain, or asks "how should I break this up?", offer this workflow as one option but do not auto-launch it. Wait for an explicit yes before entering Phase 0. This skill is collaborative and interrogative — it conducts a back-and-forth interview challenging each volatility candidate and proposing candidates the user hasn't considered, rather than producing a one-shot artifact.
+description: Heavyweight, opt-in, collaborative system-design workflow based on Juval Löwy's iDesign methodology in *Righting Software*. Conducts a multi-phase interview (framing → use cases → volatility analysis → component definition → call-chain validation → recommendation report) that actively surfaces unknown-unknowns and produces a written recommendation at `decompositions/{system-name}/report.md`. **Run only when the user explicitly invites this workflow** — not for general architecture questions, lightweight design conversations, or quick "where should X live?" questions. Valid triggers are limited to: the user names the skill directly, references *Righting Software* / Juval Löwy / iDesign / "The Method" / volatility-based decomposition by name and asks to run a full session, asks for a "deep" or "structured" or "Löwy-style" system design session, or accepts a prior suggestion to run this workflow. Wait for an explicit yes before entering Phase 0. This skill is collaborative and interrogative — it conducts a back-and-forth interview challenging each volatility candidate and proposing candidates the user hasn't considered, rather than producing a one-shot artifact. Guidance on when it's appropriate to *suggest* this skill lives in the skill body, not in this trigger description.
 ---
 
 # Righting Software: System Decomposition
@@ -155,6 +155,13 @@ All persistent artifacts live in `decompositions/{system-name}/`:
 
 Write everything important to `report.md` as the session progresses.
 Chat is the conversation surface; the file is the durable record.
+
+If a decomposition was previously run on this system — whether with
+this skill or the deprecated `volatility-decomposition` skill — pick
+a distinct system name (`order-pipeline-v2`, `order-pipeline-rework`,
+etc.) so the prior report isn't overwritten. The directory layout is
+intentional: each session gets its own `decompositions/{system-name}/`
+subtree.
 
 ---
 

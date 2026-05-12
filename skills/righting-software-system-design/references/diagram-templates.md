@@ -293,7 +293,8 @@ diagram per subsystem).
        gap=10. -->
 
   <!-- (Component rects + labels go here, generated from the
-       component list — see the demo HTML for a concrete example) -->
+       component list. Each is a <rect> + centered <text> pair with
+       the matching box-{layer} class.) -->
 
   <!-- Utilities sidebar (use box-utility class) -->
   <text x="868" y="20" class="label">UTILITIES</text>
