@@ -644,12 +644,13 @@ block-beta
     columns 1
     %% Cross-cutting infrastructure, consumed from any layer
   end
-
-  client --> managers
-  managers --> engines
-  engines --> accessors
-  accessors --> resources
 ```
+
+**No arrows on the static diagram.** Layer membership already conveys
+the call direction (Managers above Engines means Managers call into
+Engines). Per-component arrows would clutter without adding
+information. Save arrows for the call-chain diagrams in Phase 4, where
+they show the specific path of one use case.
 
 Populate every layer with at least one block before rendering — some
 `block-beta` renderers drop the layer label on empty layers.
@@ -920,22 +921,35 @@ Then reference the rendered SVGs from `report.md` with relative paths:
 ![Match Tradesman call chain](diagrams/callchain-match-tradesman.svg)
 ```
 
-**Step C: SVG fallback (no `d2` installed)**
+**Step C: `d2` not installed — pause or fall back**
 
-Tell the user once, then proceed:
+D2 is the preferred final format because it's **codified source that
+can be modified after the fact**. The SVG fallback produces the same
+visual output but is awkward to edit later (hand-tweaking SVG paths
+vs. editing readable D2 source).
 
-> "I'm rendering the final diagrams as embedded SVG since `d2` isn't on
-> PATH. The visual output is the same; you can install d2 later via
-> `winget install terrastruct.d2` / `brew install d2` and the skill
-> will use it next time."
+Use `AskUserQuestion` to offer two paths:
 
-Write SVG directly to the same `diagrams/` directory using the SVG
-templates in `references/diagram-templates.md` (same coordinate map,
-just emitted as SVG instead of D2 source).
+> `d2` isn't on PATH, so the final diagrams can't be emitted in their
+> preferred (editable) form. Two options:
+>
+> 1. **Pause and install** — `winget install terrastruct.d2` (Windows)
+>    or `brew install d2` (macOS), then restart the shell and tell me
+>    to continue. This is the recommended path; D2 output is editable
+>    going forward.
+> 2. **Fall back to embedded SVG** — visually identical, but harder
+>    to modify after the report is written. Pick this only if D2
+>    install is genuinely not an option.
 
-**Don't mix formats in the final report.** If you fall back to SVG for
-the static diagram, use SVG for every call chain too. Consistency is
-the point.
+If the user picks option 1, stop and wait. When they resume, retry
+Step A.
+
+If the user picks option 2, write SVG directly to `diagrams/` using
+the SVG templates in `references/diagram-templates.md` (same
+coordinate map, just emitted as SVG).
+
+**Don't mix formats in the final report.** Pick one and use it for
+the static diagram and every call chain. Consistency is the point.
 
 ### Open questions and risks
 

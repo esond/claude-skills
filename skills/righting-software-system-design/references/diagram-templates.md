@@ -109,14 +109,10 @@ utilities: {
   logger: "Logger"
 }
 
-# Layer-level arrows — top-down only, drawn between the grids, not
-# between individual components. Layer membership conveys per-component
-# routing.
-grid.client -> grid.managers
-grid.managers -> grid.engines
-grid.engines -> grid.access
-grid.managers -> grid.access
-grid.access -> grid.resources
+# No arrows on the static diagram. Layer membership conveys the call
+# direction (top layer calls into the layer below it; everything can
+# call Utilities). Arrows are reserved for call-chain diagrams where
+# they show the specific path of one use case.
 ```
 
 ### `callchain-{usecase-slug}.d2` — Per-use-case call chain
@@ -301,11 +297,8 @@ diagram per subsystem).
   <text x="868" y="20" class="label">UTILITIES</text>
   <!-- (Utility rects + labels at x=830, width=120, stepping y by 44) -->
 
-  <!-- Layer-level arrows (vertical center, top-down only) -->
-  <line x1="455" y1="68"  x2="455" y2="86"  class="arrow"/>
-  <line x1="455" y1="128" x2="455" y2="146" class="arrow"/>
-  <line x1="455" y1="188" x2="455" y2="206" class="arrow"/>
-  <line x1="455" y1="248" x2="455" y2="276" class="arrow"/>
+  <!-- No arrows on the static diagram. Layer membership conveys the
+       call direction; arrows are reserved for call-chain diagrams. -->
 </svg>
 ```
 
