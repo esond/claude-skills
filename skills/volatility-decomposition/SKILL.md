@@ -15,7 +15,7 @@ refactor of an existing one.
 
 The deeper goal is graceful handling of **unknown unknowns**: by encapsulating
 each axis of change behind its own stable interface, the system can absorb
-future requirement, technology, integration, data, and policy changes without
+future requirements, technology, integration, data, and policy changes without
 rippling them across components. You can't predict what will change, but you
 can predict *what kinds of things* change — and structure accordingly.
 
@@ -291,6 +291,10 @@ Listing them makes it clear what the system talks *to* (Resources: databases,
 partner APIs) and what it talks *through* (Clients: web, API, scheduler,
 inbound webhooks).
 
+Populate every inner block with at least one node before rendering — some
+`block-beta` renderers drop the layer label (Client, Managers, …) on blocks
+that contain only comments.
+
 ```mermaid
 block-beta
   columns 2
@@ -460,6 +464,12 @@ For existing systems, add a `## Current → Target` mapping:
 - Note coupling that has to break first (shared databases, peer calls,
   skip-level calls)
 - Recommend an extraction order that minimizes intermediate breakage
+- If the existing system has infrastructure-named components
+  (`LambdaInvoker`, `SQSQueueProcessor`, `RedisCache`, etc.), propose
+  volatility-axis renames as part of the mapping. The forbidden-vocabulary
+  rule from Phase 3 governs new components; on a refactor, existing ones
+  need the same treatment or the boundary survives only until the next
+  platform swap.
 
 ### Open questions and risks
 
@@ -473,7 +483,8 @@ Surface anything you couldn't resolve:
 
 Tell the user:
 
-> "`decompositions/{system-name}/report.md` is the recommendation. It's
+> "`decompositions/{system-name}/report.md` is the recommendation (with
+> raw process walkthroughs in `processes.md` if that file was created). It's
 > structured so you can hand it to a team to either build from or refactor
 > toward. Want me to draft an ADR or a kickoff doc from it, or are we done?"
 
