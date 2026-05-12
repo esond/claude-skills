@@ -450,13 +450,16 @@ Activities that change for the *same reason* belong together;
 activities that change for *different reasons* belong apart, even if
 they look related.
 
-This list is the input to Phase 3. A single component will often own
-several entries from it when they ripple together (e.g., a Manager
-owning the workflow volatility of a whole use-case family), but a
-component owning one standalone axis is also valid. Don't pre-merge
-here — leave each axis named so the report's audit trail back from
-components to volatilities stays intact, and let Phase 3 decide what
-groups.
+This list is the input to Phase 3, which is where components get
+named. A single component will often own several entries from this
+list when they ripple together (e.g., a Manager owning the workflow
+volatility of a whole use-case family), though a component owning one
+standalone axis is also valid. Cluster axes here when they share a
+reason for change — that's exactly what this step is for — but don't
+assign component boundaries yet. Leave each clustered axis named so
+the report's audit trail from volatilities to components stays
+intact, and let Phase 3 decide which clusters become which
+components.
 
 ### Step 2g: Write Phase 2
 
@@ -754,9 +757,9 @@ volatility shows up somewhere.
 ### Managers
 | Component      | Encapsulates (volatility clusters)                                                    | Notes |
 |----------------|---------------------------------------------------------------------------------------|-------|
-| MarketManager  | Managing projects; matching tradesmen to projects; charging fees for the match  | Three logically related use-case families share one orchestrator; only sequence volatility lives here |
+| MarketManager  | Managing projects; matching tradesmen to projects; charging fees for the match | Three logically related use-case families share one orchestrator; only sequence volatility lives here |
 | MembershipManager | Membership management (add/remove, benefits, discounts); dispute resolution | Two related but distinct workflow families under one orchestrator |
-| EducationManager  | Education workflow                                                           | Example of a single-volatility Manager — also valid when no other family is related enough to share orchestration |
+| EducationManager  | Education workflow                                                           | Single-volatility Manager; no other workflow family shares its orchestration axis |
 
 ### Engines
 | Component        | Encapsulates                                | Depends on                |
