@@ -184,8 +184,8 @@ code chip that copies on click.
 
 Structure `research.html` with these affordances HTML enables:
 
-- **One collapsible section per area researched**, each with an `id` so the
-  in-page table of contents links to it
+- **One section per area researched**, each with an `id` so the in-page
+  table of contents links to it
 - **A sticky left-rail ToC** for jumping between sections
 - **File/line references rendered as styled code chips** — use the `.code-ref`
   class from the scaffold; the JS makes them copyable
@@ -294,7 +294,7 @@ The widget exports this shape — keep it stable, the JS depends on it:
   "annotations": [
     {
       "section_id": "auth-middleware-flow",
-      "section_excerpt": "First ~100 chars of the section, for context",
+      "section_excerpt": "First ~120 chars of the section, for context",
       "note": "the user's note text, may be multiline"
     }
   ],

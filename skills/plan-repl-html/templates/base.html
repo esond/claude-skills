@@ -6,13 +6,15 @@
 <!--
   plan-repl-html base scaffold.
 
-  Fill in the placeholders marked PLACEHOLDER. Do not change the body's
-  data-* attributes or the toolbar markup — the annotation widget loaded
-  from .repl-assets/annotations.js depends on them. Phase-specific content
-  goes inside <main>. Each annotatable section MUST have a stable,
-  descriptive [data-annot-id].
+  Replace every PLACEHOLDER value with the real one (title, task/phase,
+  page-title, TL;DR). Keep the data-* attribute names and structure
+  unchanged — only the values are placeholders. Don't touch the toolbar
+  markup or the <script src> path either; the annotation widget loaded
+  from .repl-assets/annotations.js depends on them. Phase-specific
+  content goes inside <main>. Each annotatable section MUST have a
+  stable, descriptive [data-annot-id].
 
-  Shared CSS + JS live in .repl-assets/ alongside this page. The Phase 1
+  Shared CSS + JS live in .repl-assets/ alongside this page. The Phase 0
   setup in SKILL.md copies them there from the skill directory on first
   use. Add phase-specific CSS in the <style> block below — keep it short
   and only for rules the shared sheet doesn't cover.
@@ -51,8 +53,8 @@
 
 <div class="toolbar" role="region" aria-label="Annotation toolbar">
   <span class="count" id="annot-count">0 notes</span>
-  <button class="btn" id="annot-clear" title="Clear all notes on this page">Clear</button>
-  <button class="btn primary" id="annot-export">Export annotations</button>
+  <button type="button" class="btn" id="annot-clear" title="Clear all notes on this page">Clear</button>
+  <button type="button" class="btn primary" id="annot-export">Export annotations</button>
 </div>
 
 <script src=".repl-assets/annotations.js"></script>
