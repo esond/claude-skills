@@ -51,6 +51,15 @@ single chain.
 
 direction: down
 
+classes: {
+  client:   { style: { fill: "#d1fae5"; stroke: "#1f2937" } }
+  manager:  { style: { fill: "#fef9c3"; stroke: "#1f2937" } }
+  engine:   { style: { fill: "#fed7aa"; stroke: "#1f2937" } }
+  access:   { style: { fill: "#e5e7eb"; stroke: "#1f2937" } }
+  resource: { style: { fill: "#dbeafe"; stroke: "#1f2937" } }
+  utility:  { style: { fill: "#f3e8ff"; stroke: "#1f2937" } }
+}
+
 grid: {
   grid-rows: 5
   grid-gap: 24
@@ -59,54 +68,54 @@ grid: {
   client: {
     label: "CLIENT"
     grid-columns: 4
-    tradesman-portal: "Tradesman Portal"
-    contractors-portal: "Contractors Portal"
-    marketplace-app: "Marketplace App"
-    timer: "Timer"
+    tradesman-portal:   { label: "Tradesman Portal";   class: client }
+    contractors-portal: { label: "Contractors Portal"; class: client }
+    marketplace-app:    { label: "Marketplace App";    class: client }
+    timer:              { label: "Timer";              class: client }
   }
 
   managers: {
     label: "MANAGERS"
     grid-columns: 3
-    membership-manager: "Membership Manager"
-    market-manager: "Market Manager"
-    education-manager: "Education Manager"
+    membership-manager: { label: "Membership Manager"; class: manager }
+    market-manager:     { label: "Market Manager";     class: manager }
+    education-manager:  { label: "Education Manager";  class: manager }
   }
 
   engines: {
     label: "ENGINES"
     grid-columns: 2
-    regulation-engine: "Regulation Engine"
-    search-engine: "Search Engine"
+    regulation-engine:  { label: "Regulation Engine";  class: engine }
+    search-engine:      { label: "Search Engine";      class: engine }
   }
 
   access: {
     label: "RESOURCE ACCESS"
     grid-columns: 5
-    members-access: "Members Access"
-    projects-access: "Projects Access"
-    payments-access: "Payments Access"
-    regulations-access: "Regulations Access"
-    workflows-access: "Workflows Access"
+    members-access:     { label: "Members Access";     class: access }
+    projects-access:    { label: "Projects Access";    class: access }
+    payments-access:    { label: "Payments Access";    class: access }
+    regulations-access: { label: "Regulations Access"; class: access }
+    workflows-access:   { label: "Workflows Access";   class: access }
   }
 
   resources: {
     label: "RESOURCES"
     grid-columns: 5
-    members: { shape: cylinder; label: "Members" }
-    projects: { shape: cylinder; label: "Projects" }
-    payments: { shape: cylinder; label: "Payments" }
-    regulations: { shape: cylinder; label: "Regulations" }
-    workflows: { shape: cylinder; label: "Workflows" }
+    members:     { shape: cylinder; label: "Members";     class: resource }
+    projects:    { shape: cylinder; label: "Projects";    class: resource }
+    payments:    { shape: cylinder; label: "Payments";    class: resource }
+    regulations: { shape: cylinder; label: "Regulations"; class: resource }
+    workflows:   { shape: cylinder; label: "Workflows";   class: resource }
   }
 }
 
 utilities: {
   label: "UTILITIES"
   grid-rows: 4
-  security: "Security"
-  message-bus: "Message Bus"
-  logger: "Logger"
+  security:    { label: "Security";    class: utility }
+  message-bus: { label: "Message Bus"; class: utility }
+  logger:      { label: "Logger";      class: utility }
 }
 
 # No arrows on the static diagram. Layer membership conveys the call
@@ -123,31 +132,24 @@ Same grid layout as `static.d2`, with two changes:
    arrows).
 
 ```d2
-# Add Tradesman call chain. Notice the grid IS IDENTICAL to static.d2
-# — only the styling and the arrow set differ.
+# Add Tradesman call chain. The grid is IDENTICAL to static.d2 —
+# same components in the same positions with the same layer colors.
+# Only the active/faded overlay and the arrow set differ.
 
 direction: down
 
 classes: {
-  active: {
-    style: {
-      fill: "#dbeafe"
-      stroke: "#1f2937"
-      stroke-width: 2
-    }
-  }
-  faded: {
-    style: {
-      opacity: 0.35
-    }
-  }
-  bus-active: {
-    style: {
-      fill: "#fef3c7"
-      stroke: "#1f2937"
-      stroke-width: 2
-    }
-  }
+  # Layer base colors (same as static.d2)
+  client:   { style: { fill: "#d1fae5"; stroke: "#1f2937" } }
+  manager:  { style: { fill: "#fef9c3"; stroke: "#1f2937" } }
+  engine:   { style: { fill: "#fed7aa"; stroke: "#1f2937" } }
+  access:   { style: { fill: "#e5e7eb"; stroke: "#1f2937" } }
+  resource: { style: { fill: "#dbeafe"; stroke: "#1f2937" } }
+  utility:  { style: { fill: "#f3e8ff"; stroke: "#1f2937" } }
+
+  # Call-chain overlays stacked on top of a layer class
+  active:   { style: { stroke-width: 2.5 } }
+  faded:    { style: { opacity: 0.35 } }
 }
 
 grid: {
@@ -158,57 +160,57 @@ grid: {
   client: {
     label: "CLIENT"
     grid-columns: 4
-    tradesman-portal: { label: "Tradesman Portal"; class: active }
-    contractors-portal: { label: "Contractors Portal"; class: faded }
-    marketplace-app: { label: "Marketplace App"; class: faded }
-    timer: { label: "Timer"; class: faded }
+    tradesman-portal:   { label: "Tradesman Portal";   classes: [client, active] }
+    contractors-portal: { label: "Contractors Portal"; classes: [client, faded] }
+    marketplace-app:    { label: "Marketplace App";    classes: [client, faded] }
+    timer:              { label: "Timer";              classes: [client, faded] }
   }
 
   managers: {
     label: "MANAGERS"
     grid-columns: 3
-    membership-manager: { label: "Membership Manager"; class: active }
-    market-manager: { label: "Market Manager"; class: faded }
-    education-manager: { label: "Education Manager"; class: faded }
+    membership-manager: { label: "Membership Manager"; classes: [manager, active] }
+    market-manager:     { label: "Market Manager";     classes: [manager, faded] }
+    education-manager:  { label: "Education Manager";  classes: [manager, faded] }
   }
 
   engines: {
     label: "ENGINES"
     grid-columns: 2
-    regulation-engine: { label: "Regulation Engine"; class: active }
-    search-engine: { label: "Search Engine"; class: faded }
+    regulation-engine:  { label: "Regulation Engine"; classes: [engine, active] }
+    search-engine:      { label: "Search Engine";     classes: [engine, faded] }
   }
 
   access: {
     label: "RESOURCE ACCESS"
     grid-columns: 5
-    members-access: { label: "Members Access"; class: active }
-    projects-access: { label: "Projects Access"; class: faded }
-    payments-access: { label: "Payments Access"; class: active }
-    regulations-access: { label: "Regulations Access"; class: active }
-    workflows-access: { label: "Workflows Access"; class: active }
+    members-access:     { label: "Members Access";     classes: [access, active] }
+    projects-access:    { label: "Projects Access";    classes: [access, faded] }
+    payments-access:    { label: "Payments Access";    classes: [access, active] }
+    regulations-access: { label: "Regulations Access"; classes: [access, active] }
+    workflows-access:   { label: "Workflows Access";   classes: [access, active] }
   }
 
   resources: {
     label: "RESOURCES"
     grid-columns: 5
-    members: { shape: cylinder; label: "Members" }
-    projects: { shape: cylinder; label: "Projects"; class: faded }
-    payments: { shape: cylinder; label: "Payments" }
-    regulations: { shape: cylinder; label: "Regulations" }
-    workflows: { shape: cylinder; label: "Workflows" }
+    members:     { shape: cylinder; label: "Members";     classes: [resource, active] }
+    projects:    { shape: cylinder; label: "Projects";    classes: [resource, faded] }
+    payments:    { shape: cylinder; label: "Payments";    classes: [resource, active] }
+    regulations: { shape: cylinder; label: "Regulations"; classes: [resource, active] }
+    workflows:   { shape: cylinder; label: "Workflows";   classes: [resource, active] }
   }
 }
 
 utilities: {
   label: "UTILITIES"
   grid-rows: 4
-  security: { label: "Security"; class: faded }
-  message-bus: { label: "Message Bus"; class: bus-active }
-  logger: { label: "Logger"; class: faded }
+  security:    { label: "Security";    classes: [utility, faded] }
+  message-bus: { label: "Message Bus"; classes: [utility, active] }
+  logger:      { label: "Logger";      classes: [utility, faded] }
 }
 
-# Specific call path.  Solid = synchronous, "queued" label + dashed
+# Specific call path. Solid = synchronous, "queued" label + dashed
 # style = queued/async.
 grid.client.tradesman-portal -> utilities.message-bus: "queued" {
   style.stroke-dash: 4
@@ -258,18 +260,16 @@ diagram per subsystem).
 ```xml
 <svg width="980" height="380" viewBox="0 0 980 380" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, system-ui, sans-serif" font-size="11">
   <style>
-    .box { fill: white; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
+    /* Per-layer base colors */
+    .box-client   { fill: #d1fae5; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
+    .box-manager  { fill: #fef9c3; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
+    .box-engine   { fill: #fed7aa; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
+    .box-access   { fill: #e5e7eb; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
+    .box-resource { fill: #dbeafe; stroke: #1f2937; stroke-width: 1.5; rx: 0; }
+    .box-utility  { fill: #f3e8ff; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
     .label { fill: #6b7280; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; }
-    .util-box { fill: #fef3c7; stroke: #1f2937; stroke-width: 1.5; rx: 4; }
-    .res { fill: #f3f4f6; stroke: #1f2937; stroke-width: 1.5; rx: 0; }
-    .arrow { stroke: #1f2937; stroke-width: 1.5; fill: none; marker-end: url(#arr); }
     text { dominant-baseline: middle; text-anchor: middle; }
   </style>
-  <defs>
-    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#1f2937"/>
-    </marker>
-  </defs>
 
   <!-- Layer labels (left column) -->
   <text x="32" y="48"  class="label" text-anchor="start">CLIENT</text>
@@ -286,16 +286,19 @@ diagram per subsystem).
   <line x1="110" y1="290" x2="800" y2="290" stroke="#e5e7eb" stroke-dasharray="2,2"/>
 
   <!-- COMPONENTS: emit one <rect>+<text> pair per component in each
-       layer. Position x = 130 + (column_index * (box_width + gap)).
-       For 5-wide layers: box_width=125, gap=10.
-       For 4-wide layers: box_width=160, gap=10. -->
+       layer with the matching layer class (box-client, box-manager,
+       box-engine, box-access, box-resource). Position x = 130 +
+       (column_index * (box_width + gap)). For 5-wide layers:
+       box_width=125, gap=10. For 4-wide layers: box_width=160,
+       gap=10. -->
 
   <!-- (Component rects + labels go here, generated from the
        component list — see the demo HTML for a concrete example) -->
 
-  <!-- Utilities sidebar -->
+  <!-- Utilities sidebar (use box-utility class) -->
   <text x="868" y="20" class="label">UTILITIES</text>
-  <!-- (Utility rects + labels at x=830, width=120, stepping y by 44) -->
+  <!-- (Utility rects + labels at x=830, width=120, stepping y by 44,
+       class="box-utility") -->
 
   <!-- No arrows on the static diagram. Layer membership conveys the
        call direction; arrows are reserved for call-chain diagrams. -->
@@ -304,25 +307,31 @@ diagram per subsystem).
 
 ### `callchain-{slug}.svg` template
 
-Identical to `static.svg` but with three changes:
-1. Active components use `class="box-active"` (filled blue) or
-   `class="util-box"` (filled amber for active Utilities).
-2. Inactive components wrap in `<g class="faded">` (35% opacity).
-3. Layer-level arrows are replaced by **per-component arrows** showing
-   the actual call path.
+Identical to `static.svg` (same component positions, same layer
+colors) plus three additions:
+1. Active components add the `active` class on top of their layer
+   class — e.g., `class="box-manager active"` for an active Manager.
+2. Faded components add the `faded` class — e.g.,
+   `class="box-manager faded"`.
+3. **Per-component arrows** showing the actual call path.
 
-Additional styles:
+Additional styles to layer on top of the static template:
 
 ```xml
 <style>
-  .box-active     { fill: #dbeafe; stroke: #1f2937; stroke-width: 2; rx: 4; }
-  .res-active     { fill: #f3f4f6; stroke: #1f2937; stroke-width: 2; rx: 0; }
-  .util-box-active { fill: #fef3c7; stroke: #1f2937; stroke-width: 2; rx: 4; }
-  .arrow-queued   { stroke: #6b7280; stroke-width: 1.5; fill: none;
-                    stroke-dasharray: 5,3; marker-end: url(#arr-gray); }
-  .faded          { opacity: 0.35; }
+  .active { stroke-width: 2.5; }
+  .faded  { opacity: 0.35; }
+
+  .arrow        { stroke: #1f2937; stroke-width: 1.5; fill: none;
+                  marker-end: url(#arr); }
+  .arrow-queued { stroke: #6b7280; stroke-width: 1.5; fill: none;
+                  stroke-dasharray: 5,3; marker-end: url(#arr-gray); }
 </style>
 <defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5"
+          markerWidth="8" markerHeight="8" orient="auto">
+    <path d="M0,0 L10,5 L0,10 Z" fill="#1f2937"/>
+  </marker>
   <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5"
           markerWidth="8" markerHeight="8" orient="auto">
     <path d="M0,0 L10,5 L0,10 Z" fill="#6b7280"/>
@@ -397,18 +406,37 @@ sequenceDiagram
 
 ### Color palette
 
-The skill uses a consistent palette across both formats:
+The skill uses a consistent palette across all three diagram formats.
+Components are colored by **layer**, not by active state — the same
+component always wears its layer color in every diagram. Active vs.
+faded is conveyed by stroke width and opacity, not by changing fill.
 
-| Use                        | Color     |
-|----------------------------|-----------|
-| Box stroke / arrows / text | `#1f2937` |
-| Layer separators / faded   | `#e5e7eb` |
-| Layer labels / dashed gray | `#6b7280` |
-| Active component fill      | `#dbeafe` |
-| Active utility fill        | `#fef3c7` |
-| Resource fill              | `#f3f4f6` |
+**Per-layer fills:**
 
-Don't introduce additional colors. The visual vocabulary should be:
-black/gray for structure and call paths, one blue for active service
-components, one amber for active utilities/buses, neutral gray for
-Resources.
+| Layer            | Color     | Looks like  |
+|------------------|-----------|-------------|
+| Client           | `#d1fae5` | Soft green  |
+| Managers         | `#fef9c3` | Soft yellow |
+| Engines          | `#fed7aa` | Soft orange |
+| ResourceAccess   | `#e5e7eb` | Light grey  |
+| Resources        | `#dbeafe` | Light blue  |
+| Utilities        | `#f3e8ff` | Lavender    |
+
+**Structural colors:**
+
+| Use                            | Color     |
+|--------------------------------|-----------|
+| Box strokes / text / sync arrows | `#1f2937` |
+| Layer separators               | `#e5e7eb` |
+| Layer labels / queued arrows   | `#6b7280` |
+
+**Call-chain state:**
+
+| State  | Effect                              |
+|--------|-------------------------------------|
+| Active | Layer base fill + stroke-width 2.5  |
+| Faded  | Layer base fill + opacity 0.35      |
+
+Don't introduce additional colors. The visual vocabulary is: layer
+identity from fill, call-chain participation from stroke and opacity,
+arrow type from solid (sync) vs dashed gray (queued).

@@ -614,36 +614,49 @@ block-beta
   block:main:1
     columns 1
 
-    block:client["Client"]
+    block:client["CLIENT"]
       columns 4
       %% Entry points — web, API, scheduler, inbound webhooks
+      %% Fill in actual components and apply: class id1,id2 client
     end
 
-    block:managers["Managers"]
+    block:managers["MANAGERS"]
       columns 3
       %% Workflow orchestrators — one per major workflow family
+      %% Apply: class id1,id2 manager
     end
 
-    block:engines["Engines"]
+    block:engines["ENGINES"]
       columns 5
       %% Business logic, rules, calculations
+      %% Apply: class id1,id2 engine
     end
 
-    block:accessors["Resource Access"]
+    block:accessors["RESOURCE ACCESS"]
       columns 4
       %% Wrap data + external integrations; expose atomic business verbs
+      %% Apply: class id1,id2 access
     end
 
-    block:resources["Resource"]
+    block:resources["RESOURCES"]
       columns 5
       %% Databases, partner APIs, external systems
+      %% Apply: class id1,id2 resource
     end
   end
 
-  block:utilities["Utilities"]:1
+  block:utilities["UTILITIES"]:1
     columns 1
     %% Cross-cutting infrastructure, consumed from any layer
+    %% Apply: class id1,id2 utility
   end
+
+  classDef client   fill:#d1fae5,stroke:#1f2937
+  classDef manager  fill:#fef9c3,stroke:#1f2937
+  classDef engine   fill:#fed7aa,stroke:#1f2937
+  classDef access   fill:#e5e7eb,stroke:#1f2937
+  classDef resource fill:#dbeafe,stroke:#1f2937
+  classDef utility  fill:#f3e8ff,stroke:#1f2937
 ```
 
 **No arrows on the static diagram.** Layer membership already conveys
@@ -651,6 +664,13 @@ the call direction (Managers above Engines means Managers call into
 Engines). Per-component arrows would clutter without adding
 information. Save arrows for the call-chain diagrams in Phase 4, where
 they show the specific path of one use case.
+
+**Layer colors are consistent across every diagram in the session**
+(Mermaid here, D2 and SVG in Phase 5): green for Client, yellow for
+Managers, orange for Engines, grey for Access, light blue for
+Resources, lavender for Utilities. The same component always uses the
+same color and stays in the same row/column position across all
+diagrams — that's what makes the Phase 4 symmetry check legible.
 
 Populate every layer with at least one block before rendering — some
 `block-beta` renderers drop the layer label on empty layers.
@@ -736,14 +756,14 @@ spend effort polishing diagrams here. Example:
 
 ```mermaid
 flowchart TD
-  Client[Tradesman Portal]
-  Bus[MessageBus]
-  Mgr[MembershipManager]
-  Eng[RegulationEngine]
-  AccM[MembersAccess]
-  AccP[PaymentsAccess]
-  Members[(Members)]
-  Payments[(Payments)]
+  Client[Tradesman Portal]:::client
+  Bus[MessageBus]:::utility
+  Mgr[MembershipManager]:::manager
+  Eng[RegulationEngine]:::engine
+  AccM[MembersAccess]:::access
+  AccP[PaymentsAccess]:::access
+  Members[(Members)]:::resource
+  Payments[(Payments)]:::resource
 
   Client -. queued .-> Bus
   Bus --> Mgr
@@ -752,6 +772,13 @@ flowchart TD
   Mgr --> AccP
   AccM --> Members
   AccP --> Payments
+
+  classDef client   fill:#d1fae5,stroke:#1f2937
+  classDef manager  fill:#fef9c3,stroke:#1f2937
+  classDef engine   fill:#fed7aa,stroke:#1f2937
+  classDef access   fill:#e5e7eb,stroke:#1f2937
+  classDef resource fill:#dbeafe,stroke:#1f2937
+  classDef utility  fill:#f3e8ff,stroke:#1f2937
 ```
 
 Add a brief narrative under each diagram: which Manager owns the
