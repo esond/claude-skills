@@ -52,6 +52,23 @@ weight on the right problems and drowns lighter ones.
 
 Once the user opts in, proceed to *Starting a session* below.
 
+## Dependencies
+
+The skill has one optional-but-recommended external dependency:
+
+- **[D2](https://d2lang.com)** (CLI, free single binary) — used in
+  Phase 5 to render the final architecture and call-chain diagrams.
+  Without it, the skill falls back to embedded hand-written SVG, which
+  produces the same visual output but with more verbose source.
+  Install via `winget install terrastruct.d2` (Windows),
+  `brew install d2` (macOS), or download from <https://d2lang.com>.
+
+Phases 0–4 use only Mermaid (renders in any markdown viewer), so D2 is
+not required to start a session — only to produce the final report's
+polished diagrams. The skill will check D2 availability when it reaches
+Phase 5 and tell the user once if it's missing, then continue with the
+SVG fallback.
+
 ## The first principles (non-negotiable)
 
 These four rules govern every decision in the session. Refer back to them
@@ -710,7 +727,11 @@ For each core use case, draw the interaction:
 - The call chain *superimposes* on the layered diagram — don't redraw,
   just highlight
 
-Mermaid `flowchart` works for these. Example:
+Use Mermaid `flowchart` here. Mermaid is the **iteration format** — it
+renders inline in markdown, costs nothing to regenerate as the design
+shifts, and is good enough for the symmetry/composability checks in this
+phase. Final-report rendering switches to D2 or SVG in Phase 5; don't
+spend effort polishing diagrams here. Example:
 
 ```mermaid
 flowchart TD
@@ -853,6 +874,69 @@ for new features", "support deep customization across markets",
 interactions as direct synchronous calls and let the team mature into
 the more elaborate patterns later.
 
+### Render polished diagrams
+
+Before finalizing the report, regenerate the static architecture and
+each call chain in a higher-fidelity format. Mermaid is fine during
+iteration but doesn't preserve component positions across diagrams,
+which makes the Phase 4 symmetry check hard to read visually.
+
+**Step A: Check `d2` availability**
+
+```bash
+d2 --version
+```
+
+If the command succeeds, proceed to Step B. If it fails with
+"command not found", continue to Step C.
+
+If you're on Windows and the user told you they just installed D2 but
+the command isn't found, suggest restarting the shell to pick up the
+new PATH before falling back.
+
+**Step B: Generate D2 source and render**
+
+Write D2 source under `decompositions/{system-name}/diagrams/`:
+- One `static.d2` for the layered architecture
+- One `callchain-{usecase-slug}.d2` per core use case (use the same
+  filename slug for every diagram referencing the use case)
+
+Use the canonical templates in `references/diagram-templates.md`. The
+templates enforce a **stable component coordinate map** — the same
+component always sits in the same row/column across every diagram,
+which is what makes Phase 4's symmetry check easy to verify by eye.
+
+Render each:
+
+```bash
+d2 diagrams/static.d2 diagrams/static.svg
+d2 diagrams/callchain-match-tradesman.d2 diagrams/callchain-match-tradesman.svg
+```
+
+Then reference the rendered SVGs from `report.md` with relative paths:
+
+```markdown
+![Static architecture](diagrams/static.svg)
+![Match Tradesman call chain](diagrams/callchain-match-tradesman.svg)
+```
+
+**Step C: SVG fallback (no `d2` installed)**
+
+Tell the user once, then proceed:
+
+> "I'm rendering the final diagrams as embedded SVG since `d2` isn't on
+> PATH. The visual output is the same; you can install d2 later via
+> `winget install terrastruct.d2` / `brew install d2` and the skill
+> will use it next time."
+
+Write SVG directly to the same `diagrams/` directory using the SVG
+templates in `references/diagram-templates.md` (same coordinate map,
+just emitted as SVG instead of D2 source).
+
+**Don't mix formats in the final report.** If you fall back to SVG for
+the static diagram, use SVG for every call chain too. Consistency is
+the point.
+
 ### Open questions and risks
 
 Surface anything you couldn't resolve:
@@ -876,7 +960,7 @@ Tell the user:
 
 ## Reference: when to consult the extra material
 
-This skill is mostly self-contained, but two reference files cover
+This skill is mostly self-contained, but four reference files cover
 deeper material that doesn't belong inline:
 
 - **`references/volatility-techniques.md`** — extended techniques for
@@ -891,6 +975,9 @@ deeper material that doesn't belong inline:
   from the book (event publishing rules, queue rules, layer-call
   rules). Consult during Phase 3 component definition and during Phase
   4 validation as a checklist.
+- **`references/diagram-templates.md`** — canonical component
+  coordinate map and source templates for both D2 and SVG output.
+  Consult in Phase 5 when rendering the final diagrams.
 
 ---
 
