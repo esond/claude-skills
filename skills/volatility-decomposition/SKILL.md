@@ -1,9 +1,35 @@
 ---
 name: volatility-decomposition
-description: Collaborative, interview-driven analysis of how to decompose a system using Juval Löwy's iDesign volatility-based decomposition. Walks the user through their business processes, identifies axes of change (requirements, technology, integration, data, policy), maps volatile activities to the iDesign service hierarchy (Managers → Engines → Accessors → Utilities), validates the result against real change scenarios, and produces a written recommendation report at `decompositions/{system-name}/report.md` that can be used to scaffold a new system or guide a refactor of an existing one. Use this skill whenever the user wants to think through how to structure a new system, decompose a complex domain, refactor a monolith, identify service boundaries, plan a microservices extraction, evaluate whether to split a component, or apply iDesign / Löwy / volatility-based decomposition — even if they phrase it as "how should I break this up", "what services do I need", "what are my service boundaries", "I'm trying to figure out how to organize this", "we keep coupling things that shouldn't be coupled", or "every change touches three services". Trigger proactively when the user describes architectural ambiguity, frequent cross-component change, or asks the question "what changes when X changes?". Also trigger when the user references iDesign, Juval Löwy, "Righting Software", Manager/Engine/Accessor/Utility terminology, or asks how to handle "unknown unknowns" as a system evolves. This skill is collaborative — it conducts a back-and-forth interview rather than producing a one-shot artifact, so suggest it when the user signals they want to think out loud about architecture, not just receive a generated design.
+description: DEPRECATED — superseded by `righting-software-system-design`, a more faithful and complete implementation of Juval Löwy's iDesign methodology from *Righting Software*. The new skill corrects this skill's volatility-axis framing (two axes per the book, not five), fixes the ResourceAccess naming (`Access` suffix, not `Accessor`), and adds the Four Questions heuristic, core-use-case identification, almost-expendable Manager test, solutions-masquerading-as-requirements peeling, and call-chain validation. **Do not invoke this skill for new decomposition sessions.** The only valid trigger is when the user explicitly asks to continue an in-progress decomposition they started with this specific skill before its deprecation (e.g., "let's pick up the volatility-decomposition session I started", "continue my old decomposition", or names this skill by its exact slug `volatility-decomposition`). For everything else — including all references to iDesign, Juval Löwy, *Righting Software*, "The Method", volatility-based decomposition, axes of change, Manager/Engine/Access/Accessor/Utility terminology, architectural ambiguity, "how should I break this up?", monolith extraction, microservices design, or unknown-unknowns — defer to `righting-software-system-design`.
 ---
 
-# Volatility-Based Decomposition
+# Volatility-Based Decomposition (DEPRECATED)
+
+> [!WARNING]
+> **This skill is deprecated.** Use
+> [`righting-software-system-design`](../righting-software-system-design/SKILL.md)
+> instead — a more faithful and complete implementation of Juval Löwy's
+> iDesign methodology from *Righting Software*.
+>
+> What the new skill corrects and adds:
+> - **Volatility axes**: Löwy's book defines two axes (same customer
+>   over time / different customers at the same point in time), not the
+>   five (Requirements / Technology / Integration / Data / Policy) that
+>   this skill uses. The five-axes framework appears to be a community
+>   / conference-talk artifact, not from the book.
+> - **Naming**: the suffix is `Access` (e.g., `PaymentsAccess`), not
+>   `Accessor`. This skill uses `Accessor` throughout, which doesn't
+>   match the book.
+> - **Missing methodology**: the new skill adds the
+>   Vision → Objectives → Mission framing, the Four Questions,
+>   core-use-case identification, solutions-masquerading-as-requirements
+>   peeling, the longevity heuristic, design-for-your-competitors
+>   framing, the almost-expendable Manager test, the M:E ratio
+>   heuristic, and call-chain validation — all from the book.
+>
+> This skill remains in the marketplace only so users can finish an
+> in-progress decomposition started with it before deprecation. For
+> new sessions, run `righting-software-system-design`.
 
 A collaborative iDesign-style decomposition session. The skill interviews the
 user about how their business actually works, surfaces axes of change, maps
