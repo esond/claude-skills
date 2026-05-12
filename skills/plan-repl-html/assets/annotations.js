@@ -36,6 +36,8 @@
   const syncers = [];
   sections.forEach(section => {
     const id = section.dataset.annotId;
+    const heading = section.querySelector("h2, h3");
+    const sectionLabel = heading ? heading.textContent.trim() : id;
     const box = document.createElement("div");
     box.className = "annot-box";
     box.innerHTML = `
@@ -53,6 +55,7 @@
     section.appendChild(box);
 
     const textarea = box.querySelector("[data-textarea]");
+    textarea.setAttribute("aria-label", `Notes for: ${sectionLabel}`);
     const statusEl = box.querySelector(".annot-box-status");
     const editBtn = box.querySelector('[data-action="edit"]');
     const clearBtn = box.querySelector('[data-action="clear"]');
@@ -74,7 +77,7 @@
         clearBtn.hidden = !has;
         cancelBtn.hidden = true;
         saveBtn.hidden = has;             // hidden in Saved state
-        saveBtn.disabled = !has && !stored.trim();
+        saveBtn.disabled = !has;
       }
     };
     syncers.push(sync);
@@ -119,13 +122,25 @@
   });
 
   // ---- code-ref click-to-copy ----
+  // navigator.clipboard requires a secure context and may be absent under
+  // file:// in some browsers. On failure, surface a visible "copy failed"
+  // hint instead of silently dropping the action.
+  const flashState = (el, cls) => {
+    el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), 800);
+  };
   document.querySelectorAll(".code-ref").forEach(el => {
     el.addEventListener("click", async () => {
+      if (!navigator.clipboard?.writeText) {
+        flashState(el, "copy-failed");
+        return;
+      }
       try {
         await navigator.clipboard.writeText(el.textContent);
-        el.classList.add("copied");
-        setTimeout(() => el.classList.remove("copied"), 800);
-      } catch {}
+        flashState(el, "copied");
+      } catch {
+        flashState(el, "copy-failed");
+      }
     });
   });
 
@@ -160,9 +175,14 @@
   document.getElementById("annot-export").addEventListener("click", () => {
     const annotations = Object.entries(state.notes).map(([section_id, note]) => {
       const section = document.querySelector(`section.annot[data-annot-id="${section_id}"]`);
-      const excerpt = section
-        ? section.textContent.replace(/\s+/g, " ").trim().slice(0, 120)
-        : "";
+      let excerpt = "";
+      if (section) {
+        // Clone and strip the injected notes box so its UI text doesn't
+        // leak into the excerpt ("Notes ● saved Edit Clear Cancel Save").
+        const clone = section.cloneNode(true);
+        clone.querySelector(".annot-box")?.remove();
+        excerpt = clone.textContent.replace(/\s+/g, " ").trim().slice(0, 120);
+      }
       return { section_id, section_excerpt: excerpt, note };
     });
     const payload = {
@@ -173,11 +193,13 @@
       checks: state.checks
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = `${taskName}.${phase}.annotations.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
+    URL.revokeObjectURL(url);
   });
 })();

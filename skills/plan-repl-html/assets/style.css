@@ -80,9 +80,8 @@ header.hero p.tldr {
 section.annot {
   padding: 4px 0 12px;
   margin: 24px 0;
-  border-top: 1px solid var(--border);
 }
-section.annot:first-of-type { border-top: 0; }
+section.annot ~ section.annot { border-top: 1px solid var(--border); }
 section.annot h2 { font-size: 19px; margin: 12px 0 8px; }
 section.annot h3 { font-size: 16px; margin: 16px 0 6px; }
 .annot-box {
@@ -183,6 +182,8 @@ code, .code-ref {
 .code-ref { cursor: pointer; border: 1px solid var(--border); }
 .code-ref:hover { background: var(--accent-soft); border-color: var(--accent); }
 .code-ref.copied { background: #dcfce7; border-color: #16a34a; }
+.code-ref.copy-failed { background: #fee2e2; border-color: var(--risk-high); }
+.code-ref.copy-failed::after { content: " — copy failed"; font-size: 11px; color: var(--risk-high); }
 pre {
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -259,6 +260,13 @@ ul.todos li {
   align-items: flex-start;
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
+}
+ul.todos li label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex: 1;
+  cursor: pointer;
 }
 ul.todos input[type=checkbox] { margin-top: 5px; }
 ul.todos li.done { color: var(--fg-muted); text-decoration: line-through; }
