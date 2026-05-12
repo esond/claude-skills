@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!--
+  plan-repl-html: canonical markup examples.
+
+  Read this file as a reference when generating a phase page. Every
+  affordance the SKILL.md mentions has one fully-populated example below.
+  Copy the markup pattern, swap the content for your case, keep the
+  classes and attributes exactly as written — that's how the shared CSS
+  and the annotation widget hook in.
+
+  Open this page directly in a browser to see how each affordance
+  actually renders. The page links to the skill's own assets directory
+  via ../assets/, so it shows the shared design tokens unchanged.
+
+  Do NOT copy this entire file as the basis for a phase page. The page
+  shell (head, link, toolbar, script tag) lives in base.html. This is a
+  content reference only.
+-->
+<title>plan-repl-html · affordance examples</title>
+<link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body data-task="examples" data-phase="reference">
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <ol id="toc-list"></ol>
+  </nav>
+  <main>
+    <header class="hero">
+      <div class="crumbs">plan-repl-html · examples</div>
+      <h1>Canonical affordance examples</h1>
+      <p class="tldr">One worked example of every affordance the SKILL.md
+      mentions. Each section below uses the exact markup pattern you should
+      reuse — copy the structure, swap the content, leave the classes and
+      attribute names alone.</p>
+    </header>
+
+    <section class="annot" id="annot-section" data-annot-id="annot-section">
+      <h2>Annotatable section</h2>
+      <p>Every section that the user might annotate uses this exact shape.
+      The <code>id</code> drives the in-page anchor and ToC entry; the
+      <code>data-annot-id</code> drives the export payload. Use the same
+      value for both unless you have a reason not to.</p>
+      <pre><code>&lt;section class="annot" id="auth-middleware-flow" data-annot-id="auth-middleware-flow"&gt;
+  &lt;h2&gt;Auth middleware flow&lt;/h2&gt;
+  &lt;p&gt;Body of the section.&lt;/p&gt;
+&lt;/section&gt;</code></pre>
+      <p>The widget appends the notes box automatically — don't add one
+      yourself. The ToC entry is built from the first <code>&lt;h2&gt;</code>
+      or <code>&lt;h3&gt;</code> inside the section.</p>
+    </section>
+
+    <section class="annot" id="callouts" data-annot-id="callouts">
+      <h2>Callouts</h2>
+      <p>Three variants. Use the plain <code>.callout</code> for neutral
+      asides, <code>.callout-warning</code> for pitfalls or "watch out for"
+      content, <code>.callout-question</code> for open questions or
+      autonomous-run assumptions (see below).</p>
+      <div class="callout">
+        <div class="label">Note</div>
+        <p>Plain callout. Useful for "by the way" content that isn't a
+        warning or a question.</p>
+      </div>
+      <div class="callout callout-warning">
+        <div class="label">Watch out</div>
+        <p>Warning callout. Use sparingly — if everything is a warning,
+        nothing is.</p>
+      </div>
+      <div class="callout callout-question">
+        <div class="label">Open question</div>
+        <p>Question callout. The annotation widget can't attach to a
+        callout directly; if you want this question to be annotatable,
+        wrap the whole section it lives in with <code>data-annot-id</code>.</p>
+      </div>
+    </section>
+
+    <section class="annot" id="autonomous-run" data-annot-id="autonomous-run">
+      <h2>Autonomous-run assumption (Non-interactive mode)</h2>
+      <p>When no human is available to answer a question, replace the
+      question with this exact pattern. Drop it at the top of the relevant
+      section so reviewers can annotate it directly.</p>
+      <div class="callout callout-question">
+        <div class="label">Autonomous-run assumption</div>
+        <p>No user was present to answer "which areas should I research?".
+        I assumed the relevant code is the four <code>SKILL.md</code> files
+        under <code>skills/</code> plus <code>.claude-plugin/plugin.json</code>.
+        If a reviewer disagrees, annotate this section to redirect.</p>
+      </div>
+    </section>
+
+    <section class="annot" id="code-refs" data-annot-id="code-refs">
+      <h2>Code references and code blocks</h2>
+      <p>Inline file references use <code>.code-ref</code> — the JS makes
+      them click-to-copy. For multi-line code, use a regular
+      <code>&lt;pre&gt;&lt;code&gt;</code> block.</p>
+      <p>Example: see <span class="code-ref">skills/plan-repl/SKILL.md:42</span>
+      for the original transition convention, or
+      <span class="code-ref">templates/base.html</span> for the page shell.</p>
+      <pre><code>// multi-line code goes in pre+code, no .code-ref class
+function example() {
+  return "use code-ref for inline file paths, this for code blocks";
+}</code></pre>
+    </section>
+
+    <section class="annot" id="risk-table" data-annot-id="risk-table">
+      <h2>Risk table</h2>
+      <p>Three-column table for tight tabular risk data. The likelihood
+      column gets a <code>.pill</code> with one of three severity classes.
+      Don't expand the table to four or more columns — at that point a
+      vertical list of cards is easier to scan.</p>
+      <table class="risks">
+        <thead>
+          <tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Migration runs against a dirty working tree.</td>
+            <td><span class="pill risk-high">High</span></td>
+            <td>Refuse to start when <code>git status</code> shows changes.</td>
+          </tr>
+          <tr>
+            <td>Annotation IDs drift between regenerations.</td>
+            <td><span class="pill risk-med">Med</span></td>
+            <td>Use descriptive slugs; audit before each regen.</td>
+          </tr>
+          <tr>
+            <td><code>localStorage</code> growth on long-lived tasks.</td>
+            <td><span class="pill risk-low">Low</span></td>
+            <td>Clear after each annotation round.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="annot" id="timeline" data-annot-id="timeline">
+      <h2>Phased timeline</h2>
+      <p>Ordered list of phase cards. The CSS numbers them automatically;
+      use <code>&lt;h3&gt;</code> for the phase title so the heading lines up
+      with the badge. Nested lists inside a phase don't get numbered — the
+      <code>&gt; li</code> selector keeps the counter at the top level.</p>
+      <ol class="timeline">
+        <li>
+          <h3>Survey the call sites</h3>
+          <p>Read every skill that uses the snippet; record which ones run
+          the fallback and which assume <code>origin/HEAD</code> exists.</p>
+          <ul>
+            <li><code>plan-repl-resume/SKILL.md</code> — full fallback chain</li>
+            <li><code>reorganize-branch-commits/SKILL.md</code> — same chain</li>
+          </ul>
+        </li>
+        <li>
+          <h3>Extract the helper</h3>
+          <p>Move the snippet to a shared reference file the skills can link
+          to from their bash steps.</p>
+        </li>
+        <li>
+          <h3>Migrate consumers</h3>
+          <p>Replace each in-place copy with a link to the shared snippet.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="annot" id="todos" data-annot-id="todos">
+      <h2>Todo list with checkboxes</h2>
+      <p>For <code>todo.html</code> only. Each checkbox needs
+      <code>data-todo-id</code> so its state persists to
+      <code>localStorage</code> and rides along in the annotation export
+      under <code>checks</code>.</p>
+      <ul class="todos">
+        <li>
+          <label>
+            <input type="checkbox" data-todo-id="todo-survey" />
+            <span>Survey call sites and record fallback behavior per skill.</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox" data-todo-id="todo-extract" />
+            <span>Extract the shared snippet to <code>shared/default-branch.md</code>.</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox" data-todo-id="todo-migrate" />
+            <span>Migrate each consumer to the new shared file.</span>
+          </label>
+        </li>
+      </ul>
+    </section>
+
+    <section class="annot" id="svg" data-annot-id="svg">
+      <h2>Inline SVG diagram</h2>
+      <p>Hand-author SVG when the change involves multiple components
+      interacting, or you need a data-flow / sequence picture markdown
+      can't render. Reuse the design tokens with a small inline
+      <code>&lt;style&gt;</code> inside the SVG so colors stay consistent.</p>
+      <svg viewBox="0 0 360 120" width="360" height="120" role="img"
+           aria-label="Two consumers reading from a shared helper">
+        <style>
+          .node { fill: var(--bg-elev); stroke: var(--accent); stroke-width: 1.5; }
+          .node-label { fill: var(--fg); font: 12px var(--sans); }
+          .edge { stroke: var(--fg-muted); stroke-width: 1.2; fill: none;
+                  marker-end: url(#arrow); }
+        </style>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--fg-muted)" />
+          </marker>
+        </defs>
+        <rect class="node" x="130" y="10"  width="100" height="28" rx="4" />
+        <text class="node-label" x="180" y="29" text-anchor="middle">shared snippet</text>
+        <rect class="node" x="30"  y="80" width="100" height="28" rx="4" />
+        <text class="node-label" x="80"  y="99" text-anchor="middle">skill A</text>
+        <rect class="node" x="230" y="80" width="100" height="28" rx="4" />
+        <text class="node-label" x="280" y="99" text-anchor="middle">skill B</text>
+        <path class="edge" d="M170,38 L100,80" />
+        <path class="edge" d="M190,38 L260,80" />
+      </svg>
+    </section>
+
+  </main>
+</div>
+
+<div class="toolbar" role="region" aria-label="Annotation toolbar">
+  <span class="count" id="annot-count">0 notes</span>
+  <button class="btn" id="annot-clear" title="Clear all notes on this page">Clear</button>
+  <button class="btn primary" id="annot-export">Export annotations</button>
+</div>
+
+<script src="../assets/annotations.js"></script>
+</body>
+</html>
