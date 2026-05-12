@@ -1,6 +1,6 @@
 {
   "name": "esond",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Eric's personal Claude Code skills, agents, and commands.",
   "author": {
     "name": "Eric Sondergard",
@@ -15,6 +15,7 @@
     "./skills/plan-repl-resume",
     "./skills/pr-review-resolver",
     "./skills/reorganize-branch-commits",
-    "./skills/sign-unsigned-commits"
+    "./skills/sign-unsigned-commits",
+    "./skills/volatility-decomposition"
   ]
 }

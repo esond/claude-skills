@@ -41,6 +41,7 @@ installs the `esond` plugin from it.
 | [`pr-review-resolver`](skills/pr-review-resolver/SKILL.md)                   | Fetches unresolved GitHub PR review threads and general comments, fixes each in code, commits, replies with the commit hash, and resolves the threads.                                                       |
 | [`reorganize-branch-commits`](skills/reorganize-branch-commits/SKILL.md)     | Rewrites a non-default branch's history into clean, logical commits — proposes groupings from the actual diffs, gets approval, backs up, then rebuilds via `git reset` + re-commit (or scripted `git rebase -i`) with re-signing and hooks run.  |
 | [`sign-unsigned-commits`](skills/sign-unsigned-commits/SKILL.md)             | Retroactively signs unsigned commits on the current branch that were authored by the current git user, via a targeted rebase that only amends matching commits.                                              |
+| [`volatility-decomposition`](skills/volatility-decomposition/SKILL.md)       | Collaborative iDesign-style decomposition session: interviews the user about business processes, surfaces axes of change, maps volatile activities to Managers/Engines/Accessors/Utilities, validates against change scenarios, and writes a recommendation report for new builds or refactors. |
 
 Each skill's `description` field enumerates the natural-language phrases that
 trigger it — you don't invoke them by name, Claude picks them up from how you
