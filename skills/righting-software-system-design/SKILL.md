@@ -450,6 +450,17 @@ Activities that change for the *same reason* belong together;
 activities that change for *different reasons* belong apart, even if
 they look related.
 
+This list is the input to Phase 3, which is where components get
+named. A single component will often own several entries from this
+list when they ripple together (e.g., a Manager owning the workflow
+volatility of a whole use-case family), though a component owning one
+standalone axis is also valid. Cluster axes here when they share a
+reason for change — that's exactly what this step is for — but don't
+assign component boundaries yet. Leave each clustered axis named so
+the report's audit trail from volatilities to components stays
+intact, and let Phase 3 decide which clusters become which
+components.
+
 ### Step 2g: Write Phase 2
 
 Add a `## Volatility Analysis` section to `report.md`:
@@ -485,6 +496,54 @@ For deeper coverage of volatility-discovery techniques, see
 
 **Goal**: Map the validated volatility list to the iDesign service
 hierarchy, using the Four Questions as a check.
+
+### Volatility-to-component mapping isn't 1:1
+
+A component can encapsulate one volatility or several. Both are valid;
+the choice depends on whether the volatilities genuinely ripple
+together. *Righting Software* is explicit that many-to-one is common —
+the TradeMe `MarketManager` owns three volatilities (managing projects,
+matching tradesmen to projects, charging fees for the match) because
+they're a family of logically related use cases sharing one
+workflow-sequence axis. The same book also shows single-volatility
+Managers: TradeMe's `EducationManager` encapsulates only the education
+workflow, with searching and regulatory compliance pushed to other
+components.
+
+There's a **directional bias toward consolidation**, driven by the
+smallest-set principle (first principles #4). The book frames this as
+minimizing the amount of work in detailed design and implementation:
+1 component is too few (a monolith hides complexity inside) and 300
+components is too many (integration cost explodes). The right answer
+lives around an order of magnitude of 10. The bias has a hard limit:
+**cohesion**. Volatilities that change for related reasons belong
+together; volatilities that change for unrelated reasons stay apart
+even when merging them would lower the count. Cramming unrelated axes
+into one component isn't consolidation — it's functional decomposition
+with a smaller N.
+
+Common shapes (per *Righting Software*, Ch. 3 and Ch. 5):
+
+- A **Manager** often owns the sequence volatility of a *family* of
+  related use cases — frequently 2–4 listed volatilities sharing the
+  same workflow-orchestration axis. A Manager owning one volatility is
+  also valid when no other workflow family is related enough to share
+  orchestration with it (e.g., TradeMe's `EducationManager`).
+- An **Engine** has more restricted scope than a Manager, encapsulating
+  business rules and activities. Single-axis Engines are normal; the
+  book's `RegulationEngine` and `SearchEngine` are each one activity
+  volatility.
+- A **ResourceAccess** typically owns *both* the volatility of how the
+  Resource is accessed AND volatility of the Resource itself —
+  *"Resource changes invariably change ResourceAccess as well"* (Löwy).
+  Splitting these into separate components is a common
+  over-decomposition mistake.
+
+If your Phase 2 list has 15 volatilities and your Phase 3 proposal has
+15 components, the design probably hasn't done any consolidation work —
+look for related axes that could share a component. But don't force
+merges; an N-to-N mapping that genuinely reflects N unrelated axes is
+better than a low count built on weak cohesion.
 
 ### The hierarchy
 
@@ -689,11 +748,18 @@ wants a subsystem split.
 
 Beneath the diagram:
 
+List **every volatility cluster** a component owns in the `Encapsulates`
+column — don't compress a multi-volatility component into a single
+phrase. The audit trail back to Phase 2 only works if each accepted
+volatility shows up somewhere.
+
 ```markdown
 ### Managers
-| Component         | Encapsulates                          | Notes                          |
-|-------------------|---------------------------------------|--------------------------------|
-| MembershipManager | Membership workflow volatility        | Orchestrates onboarding, dispute resolution, termination |
+| Component      | Encapsulates (volatility clusters)                                                    | Notes |
+|----------------|---------------------------------------------------------------------------------------|-------|
+| MarketManager  | Managing projects; matching tradesmen to projects; charging fees for the match | Three logically related use-case families share one orchestrator; only sequence volatility lives here |
+| MembershipManager | Membership management (add/remove, benefits, discounts); dispute resolution | Two related but distinct workflow families under one orchestrator |
+| EducationManager  | Education workflow                                                           | Single-volatility Manager; no other workflow family shares its orchestration axis |
 
 ### Engines
 | Component        | Encapsulates                                | Depends on                |
@@ -702,9 +768,9 @@ Beneath the diagram:
 | SearchEngine     | Match-algorithm volatility                  | MembersAccess, ProjectsAccess |
 
 ### ResourceAccess
-| Component        | Encapsulates                                | Atomic business verbs          |
-|------------------|---------------------------------------------|--------------------------------|
-| PaymentsAccess   | Payment provider + storage volatility       | Pay, Refund, Reconcile         |
+| Component        | Encapsulates                                                                  | Atomic business verbs    |
+|------------------|-------------------------------------------------------------------------------|--------------------------|
+| PaymentsAccess   | Payment provider choice; payment storage backend; reconciliation protocol     | Pay, Refund, Reconcile   |
 
 ### Resources
 | Component | Notes |
