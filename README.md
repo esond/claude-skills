@@ -1,7 +1,7 @@
 # claude-skills
 
 Eric's personal [Claude Code](https://claude.ai/code) plugin marketplace,
-published as a single plugin (`esond`) containing skills, agents, and commands.
+published as a single plugin (`esond`) containing skills.
 
 ## Installation
 
@@ -42,6 +42,7 @@ installs the `esond` plugin from it.
 | [`reorganize-branch-commits`](skills/reorganize-branch-commits/SKILL.md)     | Rewrites a non-default branch's history into clean, logical commits — proposes groupings from the actual diffs, gets approval, backs up, then rebuilds via `git reset` + re-commit (or scripted `git rebase -i`) with re-signing and hooks run.  |
 | [`righting-software-system-design`](skills/righting-software-system-design/SKILL.md) | Heavyweight, opt-in, interview-driven system design session faithful to Juval Löwy's *Righting Software*. Walks framing → use cases → interrogative volatility analysis → iDesign component mapping (Manager/Engine/ResourceAccess/Utility) → call-chain validation, surfacing unknown-unknowns along the way and producing a written recommendation report. |
 | [`sign-unsigned-commits`](skills/sign-unsigned-commits/SKILL.md)             | Retroactively signs unsigned commits on the current branch that were authored by the current git user, via a targeted rebase that only amends matching commits.                                              |
+| [`sync-repo-docs`](skills/sync-repo-docs/SKILL.md)                           | Creates or audits a repo's three core doc files — README.md, CLAUDE.md, REVIEW.md — in that dependency order. Missing files are generated from the codebase; existing files are audited for accuracy and fixed after confirmation. README is checked for effective newcomer orientation, CLAUDE.md defers to `/init`/`claude-md-improver`, and REVIEW.md holds reviewer guidance kept distinct from CLAUDE.md. |
 | [`volatility-decomposition`](skills/volatility-decomposition/SKILL.md)       | **Deprecated** — superseded by [`righting-software-system-design`](skills/righting-software-system-design/SKILL.md), which is a more faithful and complete implementation of the same methodology from Löwy's *Righting Software*. Kept in the marketplace only so users can finish in-progress decompositions started before deprecation. |
 
 Each skill's `description` field enumerates the natural-language phrases that
