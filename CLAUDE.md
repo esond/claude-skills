@@ -46,7 +46,9 @@ The `description` field is the discovery mechanism — Claude reads it to decide
 whether a user's request matches this skill. Write descriptions that enumerate
 triggering phrases and scenarios explicitly (see existing skills for the
 pattern: "Use this skill whenever the user says X, Y, or Z — even if they phrase
-it as..."). A vague description means the skill never fires.
+it as..."). A vague description means the skill never fires. Keep the
+description under ~1024 characters, though — marketplace upload validation
+rejects longer ones, so enumerate triggers but trim to fit.
 
 The body of `SKILL.md` is the runbook Claude follows once invoked. Conventions
 used throughout this repo:

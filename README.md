@@ -1,7 +1,7 @@
 # claude-skills
 
 Eric's personal [Claude Code](https://claude.ai/code) plugin marketplace,
-published as a single plugin (`esond`) containing skills, agents, and commands.
+published as a single plugin (`esond`) containing skills.
 
 ## Installation
 
