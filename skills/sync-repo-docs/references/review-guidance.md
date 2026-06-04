@@ -2,24 +2,30 @@
 
 ## What REVIEW.md is for
 
-REVIEW.md is **reviewer-facing** guidance — context for someone (or some agent)
-reviewing a change, used by `/code-review`, `/security-review`, and `/review`. It
-answers: *when reviewing this codebase, what deserves extra scrutiny, what must
-stay true, and what looks alarming but is fine?*
+REVIEW.md is **reviewer-facing** guidance — context for whoever reviews a change,
+human or automated code review agent. It answers: *when reviewing this codebase,
+what deserves extra scrutiny, what must stay true, and what looks alarming but is
+fine?*
 
-This is a different moment from authoring. CLAUDE.md guides Claude while it
-*writes* code; REVIEW.md guides whoever *reviews* it. Keeping them separate is the
-whole point of this file (see "The no-overlap rule" below).
+Keep REVIEW.md agent-agnostic. Don't tie it to any one vendor's review tool or
+slash commands — write it for any code review agent that supports this spec, so the
+guidance stays portable across whatever tooling the team adopts.
 
-### How the review commands actually consume guidance
+This is a different moment from authoring. The repo's authoring-guidance file —
+**CLAUDE.md**, or **AGENTS.md** for tools that use the agents.md convention —
+guides an agent while it *writes* code; REVIEW.md guides whoever *reviews* it.
+Keeping them separate is the whole point of this file (see "The no-overlap rule"
+below).
 
-Worth knowing, so expectations are honest: the official `/code-review` command
-reads the repo's **CLAUDE.md** files for guideline-compliance checks — it does not
-automatically discover a REVIEW.md. REVIEW.md is therefore most useful as a
-purpose-built guidance document a reviewer or review command is **pointed at**, and
+### How review agents actually consume guidance
+
+Worth knowing, so expectations are honest: review tools don't necessarily
+auto-discover a REVIEW.md — many read a repo's authoring-guidance file
+(**CLAUDE.md**, or **AGENTS.md**) for guideline-compliance checks instead. REVIEW.md is therefore most useful as a
+purpose-built guidance document a reviewer or review agent is **pointed at**, and
 as the natural companion to a security review. Write it as the place that holds
-review priorities the team has agreed on, independent of whether a given command
-auto-loads it. Don't claim in the file that any command reads it automatically.
+review priorities the team has agreed on, independent of whether a given tool
+auto-loads it. Don't claim in the file that any tool reads it automatically.
 
 ## Recommended structure
 
@@ -45,6 +51,9 @@ Keep each item concrete and tied to real locations in the code. Vague advice
 already know.
 
 ## The no-overlap rule
+
+(Throughout this section, "CLAUDE.md" stands for whichever authoring-guidance file
+the repo uses — CLAUDE.md or AGENTS.md.)
 
 REVIEW.md must not duplicate CLAUDE.md. They are read at different times for
 different purposes, and overlap is the main way REVIEW.md goes wrong — it drifts

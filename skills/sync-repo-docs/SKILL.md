@@ -1,6 +1,6 @@
 ---
 name: sync-repo-docs
-description: Create or audit a repo's three core doc files — README.md, CLAUDE.md, and REVIEW.md — in that dependency order. If a file is missing, generate it from the actual codebase; if it exists, audit it against the current code and apply targeted fixes after confirmation. README.md gets a developer from clone to a running debug build; CLAUDE.md captures coding guidance for Claude (delegating to /init or the claude-md-improver skill); REVIEW.md holds reviewer-facing guidance for /code-review, /security-review, and /review without duplicating CLAUDE.md. Target files with --readme, --claude, and --review, or run all three by default. Use whenever the user wants to set up, bootstrap, scaffold, refresh, audit, update, or sync a repo's docs, or says things like "create a README", "is my README still accurate", "write a CLAUDE.md", "audit our docs", or "get this repo ready for contributors" — even if they name only one of the three files. Prefer it over claude-md-improver alone when README or REVIEW are also in scope.
+description: Create or audit a repo's three core doc files — README.md, CLAUDE.md, and REVIEW.md — in that dependency order. If a file is missing, generate it from the actual codebase; if it exists, audit it against the current code and apply targeted fixes after confirmation. README.md gets a developer from clone to a running debug build; CLAUDE.md captures coding guidance for Claude (delegating to /init or the claude-md-improver skill); REVIEW.md holds reviewer-facing guidance for automated code review agents without duplicating CLAUDE.md. Target files with --readme, --claude, and --review, or run all three by default. Use whenever the user wants to set up, bootstrap, scaffold, refresh, audit, update, or sync a repo's docs, or says things like "create a README", "is my README still accurate", "write a CLAUDE.md", "audit our docs", or "get this repo ready for contributors" — even if they name only one of the three files. Prefer it over claude-md-improver alone when README or REVIEW are also in scope.
 ---
 
 # sync-repo-docs
@@ -9,7 +9,7 @@ Create or audit the three documentation files that orient a developer (and Claud
 
 - **README.md** — for humans. Gets a developer from a fresh clone to a running debug build.
 - **CLAUDE.md** — for Claude. Coding guidance and project context used while *writing* code.
-- **REVIEW.md** — for reviewers. Guidance used while *reviewing* code, for `/code-review`, `/security-review`, and `/review`.
+- **REVIEW.md** — for reviewers. Guidance used while *reviewing* code, by humans or automated code review agents.
 
 For each file: if it's missing, create it from the actual codebase; if it exists, audit it for accuracy and propose targeted fixes. Creating a file is a normal write; changing an existing file is gated behind a confirmation checkpoint, because the user may have written something deliberately that looks wrong from the outside.
 
@@ -71,7 +71,7 @@ Either way, this step keeps the skill's standard rhythm: for an existing file, r
 
 ## Step 3 — REVIEW.md
 
-Read [references/review-guidance.md](references/review-guidance.md) first. REVIEW.md is reviewer-facing guidance for `/code-review`, `/security-review`, and `/review`: what to scrutinize in this codebase, security-sensitive surfaces, invariants that must hold, and known false-positive patterns reviewers should not flag.
+Read [references/review-guidance.md](references/review-guidance.md) first. REVIEW.md is reviewer-facing guidance for whoever reviews a change — a human or an automated code review agent: what to scrutinize in this codebase, security-sensitive surfaces, invariants that must hold, and known false-positive patterns reviewers should not flag.
 
 The defining constraint: **REVIEW.md must not duplicate CLAUDE.md.** They serve different moments — CLAUDE.md guides writing code, REVIEW.md guides reviewing it. Before writing or accepting any REVIEW.md content, check it against the CLAUDE.md settled in Step 2 and drop anything already covered there. The guidance file explains how to keep the two cleanly separated.
 
