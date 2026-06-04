@@ -1,13 +1,13 @@
 ---
 name: sync-repo-docs
-description: Create or audit a repo's three core doc files — README.md, CLAUDE.md, and REVIEW.md — in that dependency order. If a file is missing, generate it from the actual codebase; if it exists, audit it against the current code and apply targeted fixes after confirmation. README.md gets a developer from clone to a running debug build; CLAUDE.md captures coding guidance for Claude (delegating to /init or the claude-md-improver skill); REVIEW.md holds reviewer-facing guidance for automated code review agents without duplicating CLAUDE.md. Target files with --readme, --claude, and --review, or run all three by default. Use whenever the user wants to set up, bootstrap, scaffold, refresh, audit, update, or sync a repo's docs, or says things like "create a README", "is my README still accurate", "write a CLAUDE.md", "audit our docs", or "get this repo ready for contributors" — even if they name only one of the three files. Prefer it over claude-md-improver alone when README or REVIEW are also in scope.
+description: Create or audit a repo's three core doc files — README.md, CLAUDE.md, and REVIEW.md — in that dependency order. If a file is missing, generate it from the actual codebase; if it exists, audit it against the current code and apply targeted fixes after confirmation. README.md gets a developer from clone to running the project; CLAUDE.md captures coding guidance for Claude (delegating to /init or the claude-md-improver skill); REVIEW.md holds reviewer-facing guidance for automated code review agents without duplicating CLAUDE.md. Target files with --readme, --claude, and --review, or run all three by default. Use whenever the user wants to set up, bootstrap, scaffold, refresh, audit, update, or sync a repo's docs, or says things like "create a README", "is my README still accurate", "write a CLAUDE.md", "audit our docs", or "get this repo ready for contributors" — even if they name only one of the three files. Prefer it over claude-md-improver alone when README or REVIEW are also in scope.
 ---
 
 # sync-repo-docs
 
 Create or audit the three documentation files that orient a developer (and Claude) to a repository:
 
-- **README.md** — for humans. Gets a developer from a fresh clone to a running debug build.
+- **README.md** — for humans. Gets a developer from a fresh clone to running the project — a debug build for an app, install-and-use for a library or tool.
 - **CLAUDE.md** — for Claude. Coding guidance and project context used while *writing* code.
 - **REVIEW.md** — for reviewers. Guidance used while *reviewing* code, by humans or automated code review agents.
 
@@ -63,7 +63,7 @@ Read [references/readme-guidance.md](references/readme-guidance.md) first. The R
 
 CLAUDE.md is Claude's working context: build/test commands, architecture, conventions, and non-obvious gotchas — concise, project-specific, every line earning its place. Reuse the facts settled in Step 1 (purpose, commands, structure) rather than rediscovering them.
 
-**Create (file absent):** Do what `/init` does — analyze the codebase and write a fresh CLAUDE.md. If the **claude-md-improver** skill (from the `claude-md-management` plugin) is installed, you may hand off to it after creation to refine the result. Keep it concise and actionable: commands that copy-paste cleanly, real paths, a brief architecture map, and the gotchas a new session would otherwise stumble on. Skip generic best-practice advice — it isn't project-specific and wastes the context window.
+**Create (file absent):** Analyze the codebase and write a fresh CLAUDE.md — replicating what `/init` would do (this is descriptive, not an instruction to invoke the slash command). If the **claude-md-improver** skill (from the `claude-md-management` plugin) is installed, you may hand off to it after creation to refine the result. Keep it concise and actionable: commands that copy-paste cleanly, real paths, a brief architecture map, and the gotchas a new session would otherwise stumble on. Skip generic best-practice advice — it isn't project-specific and wastes the context window.
 
 **Audit (file present):** Do what the **claude-md-improver** skill does. If that skill is installed, invoke it. If it isn't, follow its workflow inline: score the file (commands, architecture clarity, non-obvious patterns, conciseness, currency, actionability), output a quality report, stop for confirmation, then apply targeted additions/fixes — flagging stale commands, deleted-file references, outdated tech versions, and undocumented gotchas. Don't pad the file with obvious or generic content.
 
@@ -73,7 +73,7 @@ Either way, this step keeps the skill's standard rhythm: for an existing file, r
 
 Read [references/review-guidance.md](references/review-guidance.md) first. REVIEW.md is reviewer-facing guidance for whoever reviews a change — a human or an automated code review agent: what to scrutinize in this codebase, security-sensitive surfaces, invariants that must hold, and known false-positive patterns reviewers should not flag.
 
-The defining constraint: **REVIEW.md must not duplicate CLAUDE.md.** They serve different moments — CLAUDE.md guides writing code, REVIEW.md guides reviewing it. Before writing or accepting any REVIEW.md content, check it against the CLAUDE.md settled in Step 2 and drop anything already covered there. The guidance file explains how to keep the two cleanly separated.
+The defining constraint: **REVIEW.md must not duplicate CLAUDE.md.** They serve different moments — CLAUDE.md guides writing code, REVIEW.md guides reviewing it. Before writing or accepting any REVIEW.md content, check it against the CLAUDE.md settled in Step 2 and drop anything already covered there. If `--review` ran alone and Step 2 didn't execute this session, read the existing CLAUDE.md from disk to perform this check. The guidance file explains how to keep the two cleanly separated.
 
 **Create:** Derive review priorities from the codebase — trust boundaries, auth/crypto/input-handling code, concurrency, money/units math, and other places where a subtle change does real damage — and write REVIEW.md per the recommended structure.
 

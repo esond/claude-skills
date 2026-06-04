@@ -67,6 +67,10 @@ A simple test for which file a line belongs in:
 - **"What should I scrutinize in someone's change, and what must not break?"** →
   REVIEW.md (risk areas, invariants, false positives).
 
+The same separation applies to README.md: onboarding and setup content —
+prerequisites, install/run steps, the project description — belongs in README.md,
+not REVIEW.md. If it has crept into REVIEW.md, flag it for removal.
+
 When creating REVIEW.md, read the current CLAUDE.md first and deliberately exclude
 anything it already covers — link to it instead of restating it. When auditing an
 existing REVIEW.md, check for overlap that has crept in against the current

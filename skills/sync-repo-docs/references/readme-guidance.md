@@ -68,6 +68,8 @@ Read the repo to learn what a newcomer actually needs before writing anything:
 - **Stack and tooling** — language/runtime and version, package manager, build
   system. Infer from `package.json`, `*.csproj` / `*.sln` / build scripts,
   `Makefile`, `pyproject.toml`, `go.mod`, `Cargo.toml`, Dockerfiles, CI workflows.
+  If the repo has none of these — a dotfiles, config, plugin, or pure-content
+  repo with no build — describe what it contains and how it's consumed instead.
 - **Commands** — the real build/test/run commands, pulled from scripts and build
   files rather than assumed.
 - **Prerequisites** — SDK/runtime versions, required global tools, package sources,
