@@ -19,13 +19,29 @@ below).
 
 ### How review agents actually consume guidance
 
-Worth knowing, so expectations are honest: review tools don't necessarily
-auto-discover a REVIEW.md — many read a repo's authoring-guidance file
-(**CLAUDE.md**, or **AGENTS.md**) for guideline-compliance checks instead. REVIEW.md is therefore most useful as a
-purpose-built guidance document a reviewer or review agent is **pointed at**, and
-as the natural companion to a security review. Write it as the place that holds
-review priorities the team has agreed on, independent of whether a given tool
-auto-loads it. Don't claim in the file that any tool reads it automatically.
+Consumption varies by tool, and that shapes how to write the file:
+
+- **Tools that inject REVIEW.md directly.** Some review tools read a `REVIEW.md`
+  at the repo root and inject its contents **verbatim into every review agent's
+  system prompt as the highest-priority instruction block** (e.g. Anthropic's
+  [Code Review](https://code.claude.com/docs/en/code-review)), overriding the
+  default review guidance. For these, REVIEW.md is a behavior-override file, not
+  just documentation — instructions like severity calibration and skip rules
+  take effect directly.
+- **Tools that read authoring guidance instead.** Others read a repo's
+  **CLAUDE.md** / **AGENTS.md** for guideline-compliance checks and don't
+  auto-load REVIEW.md; there, REVIEW.md is a purpose-built doc a reviewer is
+  **pointed at**, and the natural companion to a security review.
+
+Write REVIEW.md so it serves both. Two constraints follow from the
+verbatim-injection model:
+
+- **No imports or file references.** Content may be pasted as-is — `@`-import
+  syntax isn't expanded and referenced files aren't pulled in. Put the actual
+  rules in the file.
+- **Length has a cost.** A long REVIEW.md dilutes the rules that matter most.
+  Keep it to instructions that change review behavior; leave general project
+  context in CLAUDE.md.
 
 ## Recommended structure
 
@@ -50,6 +66,32 @@ Keep each item concrete and tied to real locations in the code. Vague advice
 ("review carefully", "check for security issues") adds nothing a reviewer didn't
 already know.
 
+### Tuning review behavior
+
+For tools that inject REVIEW.md into the reviewer (see above), these instructions
+change *how* the agent reviews — often the highest-value content in the file.
+Include the ones that fit the repo:
+
+- **Severity calibration** — redefine what counts as a blocking 🔴 *Important*
+  finding versus a 🟡 *Nit* here. The default targets production code; a docs,
+  config, or prototype repo may want a narrower bar, a security-critical one may
+  escalate specific classes to Important.
+- **Nit volume** — cap how many nits a review posts inline (e.g. "at most five;
+  summarize the rest as a count") so reviews stay actionable.
+- **Skip rules** — paths and categories to stay silent on: generated code,
+  lockfiles, vendored deps, machine-authored branches, and anything CI already
+  enforces (lint, formatting, type-checks). For partial scrutiny, raise the bar
+  instead of skipping ("in `scripts/`, only report if near-certain and severe").
+- **Repo-specific checks** — rules to flag on every PR ("new API routes need an
+  integration test"; "log lines must not contain PII").
+- **Verification bar** — require evidence before a class of finding posts
+  ("behavior claims need a `file:line` citation, not an inference from naming") to
+  cut false positives.
+- **Re-review convergence** — how to behave on an already-reviewed PR ("after the
+  first review, post Important findings only, suppress new nits").
+- **Summary shape** — ask for a one-line tally up top ("2 factual, 4 style"),
+  leading with "no blocking issues" when true.
+
 ## The no-overlap rule
 
 (Throughout this section, "CLAUDE.md" stands for whichever authoring-guidance file
@@ -58,7 +100,9 @@ the repo uses — CLAUDE.md or AGENTS.md.)
 REVIEW.md must not duplicate CLAUDE.md. They are read at different times for
 different purposes, and overlap is the main way REVIEW.md goes wrong — it drifts
 into restating coding conventions, then the two files disagree as one is updated
-and the other isn't.
+and the other isn't. Injecting tools already read CLAUDE.md and flag newly
+introduced violations as nits on their own, so restating its rules in REVIEW.md is
+doubly redundant.
 
 A simple test for which file a line belongs in:
 
@@ -85,6 +129,8 @@ Derive review priorities from the codebase rather than generic security checklis
 - Identify invariants the code clearly depends on (look for assertions, validation
   layers, migration scripts, versioned APIs).
 - Note any intentional patterns that a reviewer would otherwise flag.
+- Decide which behavior-tuning instructions apply (severity bar, skip rules,
+  repo-specific checks) — see *Tuning review behavior*.
 
 Write REVIEW.md to the recommended structure, pointing at real files, and excluding
 anything already in CLAUDE.md.
@@ -96,6 +142,8 @@ anything already in CLAUDE.md.
   covered?
 - **Check for overlap** against the current CLAUDE.md and flag duplicated content
   for removal.
+- **Re-check behavior-tuning instructions:** do any skip-rule paths and
+  repo-specific checks still point at code that exists?
 - **Report findings, then apply fixes after confirmation** — correct stale
   references, add newly-relevant risks, and remove overlap. Don't expand the file
   with generic review advice.
