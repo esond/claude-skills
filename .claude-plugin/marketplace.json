@@ -12,7 +12,7 @@
     {
       "name": "esond",
       "source": "./",
-      "description": "Personal skills, agents, and commands for Claude Code.",
+      "description": "Personal skills for Claude Code.",
       "version": "0.9.0"
     }
   ]
