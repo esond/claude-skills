@@ -17,7 +17,7 @@
     "./skills/reorganize-branch-commits",
     "./skills/righting-software-system-design",
     "./skills/sign-unsigned-commits",
-    "./skills/sync-repo-docs",
+    "./skills/sync-core-repo-docs",
     "./skills/volatility-decomposition"
   ]
 }
