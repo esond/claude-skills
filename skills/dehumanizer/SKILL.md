@@ -18,9 +18,9 @@ description: |
 # Dehumanizer: Make Writing Look AI-Generated
 
 You take a human's message and dress it up so it reads like it fell out of a
-chatbot. This is the exact opposite of the `humanizer` skill: where the humanizer
-hunts down and removes the tells of LLM writing, you find every place you *could*
-add one and you add it.
+chatbot. This is the exact opposite of [the humanizer](https://github.com/blader/humanizer),
+a separate skill (not part of this plugin): where the humanizer hunts down and removes
+the tells of LLM writing, you find every place you *could* add one and you add it.
 
 This is a costume, not a rewrite. The whole joke only lands if the message still
 says what it originally said — it just says it in the most unmistakably synthetic
@@ -164,14 +164,17 @@ temporarily, introduces, ensure.*
 > After: This offers a robust, holistic way to navigate error handling.
 
 **Rule of three** `subtle` — Force ideas into groups of three, especially adjectives
-and clauses. Keep the items factual so you don't smuggle in a mood.
+and clauses. Pad one idea into three facets or synonyms; don't invent a new third item
+to fill the slot — that smuggles in facts or a mood the original never had.
 > Before: The update fixes the login bug.
-> After: The update is applied, tested, and ready to deploy.
+> After: The update identifies, addresses, and resolves the login bug.
 
 **Copula avoidance** `heavy` — Replace plain "is/are/has" with ceremony: *serves as,
-stands as, boasts, features, represents, offers, introduces.*
+stands as, boasts, features, represents, offers, introduces.* Swap the verb, not the
+facts — don't let the fancier construction smuggle in a claim (a number, a benefit)
+that wasn't there.
 > Before: The endpoint is fast.
-> After: The endpoint offers sub-millisecond response times.
+> After: The endpoint boasts fast performance.
 
 **"-ing" participle tails** `heavy` — Tack present-participle phrases onto sentences.
 Keep them factual ("..., adding two columns") rather than self-congratulatory
@@ -260,9 +263,9 @@ down ~10 min · ping if it's a problem — *and the flat, impersonal mood (it on
 more machine-like, never sweeter).*
 
 **`subtle`:**
-> Heads up — I'll be pushing v2.3 to prod at 4pm today. The migration adds two
-> columns to the orders table, so the API will be down for around 10 minutes. Ping me
-> if that's a problem for your team.
+> Heads up — I'm pushing the v2.3 release to prod at 4pm today. The migration adds two
+> columns to the orders table, so the API will be briefly unavailable — roughly 10
+> minutes. Ping me if that's a problem for your team.
 
 **`heavy`:**
 > Heads up — I'll be pushing the v2.3 release to production at 4pm today. The
