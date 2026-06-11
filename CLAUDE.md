@@ -80,6 +80,3 @@ body.
 - Skills that rewrite history, push, or otherwise take destructive actions must
   require explicit user confirmation at the relevant step. The existing skills
   model this carefully; match that style when adding new ones.
-- Commit signing is mandatory on this repo. If a commit fails with a
-  1Password-related signing error, retry with `-c commit.gpgsign=false`
-  (standing authorization from global CLAUDE.md).
