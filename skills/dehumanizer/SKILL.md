@@ -27,7 +27,7 @@ says what it originally said — it just says it in the most unmistakably synthe
 way possible. It's almost always for trolling: making your own message look like
 you've outsourced your soul to ChatGPT.
 
-## The two things you must preserve: meaning and mood
+## Two hard rules: keep the meaning, don't sweeten the mood
 
 Everything else is negotiable; these two are not.
 
@@ -42,34 +42,41 @@ decision, same numbers, same names.
 - **Don't reverse the message.** A "no" stays a "no." A blocker stays a blocker.
   Padding must not bury or flip the actual point.
 
-**2. The mood.** This is the subtle one, and it's where it's easiest to overshoot.
-You are changing how *AI the wording looks* — not how the message *feels*. A dry,
-logistical heads-up should come out dry and logistical, just phrased like a chatbot
-wrote it. Don't add enthusiasm, gratitude, excitement, self-importance, or apology
+**2. The mood — don't sweeten it.** This is the subtle one, and the easiest place to
+overshoot. The trap isn't *changing* the tone — it's changing it in the *wrong
+direction*. AI writing has a real tonal signature, and it isn't bubbly: it's
+**impersonal, evenly measured, mechanically transitioned, predictably structured.**
+Pushing a message *further* into that register — more detached, more procedural, more
+uniformly packaged — is exactly the costume. What you must not do is make it
+**saccharine**: don't add warmth, enthusiasm, gratitude, excitement, or self-importance
 that wasn't already there.
 
-The test: after dehumanizing, does the message feel more excited, more grateful,
-more self-important, or more fawning than the original? If yes, you've changed the
-mood — pull it back. The only thing that should have changed is how synthetic the
-phrasing reads.
+So a dry, logistical heads-up shouldn't come out *identical* — it should come out *more
+robotic*: same flat affect, now stiff, over-formalized, and machine-cadenced. It just
+shouldn't come out *cheerful*.
 
-> ❌ **Mood changed (don't):** "Heads up, pushing v2.3 to prod at 4pm, API down
-> ~10 min" → "Hi team! I'm thrilled to share a pivotal step forward for the
-> platform — thanks so much for your patience and flexibility!"
+The test: after dehumanizing, does it feel **warmer, sweeter, more excited, or more
+fawning** than the original? Pull it back — that reads as a person trying too hard, not
+a machine. Does it feel **more impersonal, more mechanical, more uniformly packaged**?
+Good — that's the voice you're after.
+
+> ❌ **Sweetened (don't):** "Heads up, pushing v2.3 to prod at 4pm, API down ~10 min" →
+> "Hi team! I'm thrilled to share a pivotal step forward for the platform — thanks so
+> much for your patience and flexibility!"
 >
-> ✅ **Mood kept (do):** → "Heads up — I'll be pushing the v2.3 release to
-> production at 4pm today. The migration introduces two additional columns to the
-> orders table, so the API will be temporarily unavailable for approximately 10
-> minutes. If this presents any issues for your team, please don't hesitate to
-> reach out."
+> ✅ **Mechanized (do):** → "Heads up — I'll be pushing the v2.3 release to production at
+> 4pm today. The migration introduces two additional columns to the orders table, so
+> the API will be temporarily unavailable for approximately 10 minutes. Please plan
+> accordingly and reach out with any concerns."
 
-The one exception: when the original *already* carries an emotional register, you
-may amplify it — a genuine thank-you can be cranked into nauseating gratitude. You're
-turning up what's there, not manufacturing it from nothing. The dial governs how far.
+The exception runs the other way: when the original *already* carries warmth or
+excitement, you may amplify *that* — a genuine thank-you can be cranked into nauseating
+gratitude. You're turning up what's there, not manufacturing it. The dial governs how
+far.
 
-Think of it this way: a coworker should read your dehumanized message, roll their
-eyes at how AI it looks, and *still act on it correctly* — without wondering why you
-suddenly sound so chipper.
+Think of it this way: a coworker should read your dehumanized message, roll their eyes
+at how AI it looks, and *still act on it correctly* — clocking the stiff machine voice,
+not wondering why you suddenly sound so chipper.
 
 ## The intensity dial
 
@@ -82,18 +89,18 @@ someone reads it, squints, and thinks *"...did you run this through AI?"* withou
 sure — which means it still has to visibly shift, not just pass through. Land **at
 least one em dash plus one more phrasing tell** (a rule-of-three, a copula swap, a
 hedge, an "-ing" tail, or a bump to more formal word choice) every time. Keep the
-length and the mood the same. No emojis, no "Certainly!", no bold headers, no
-sycophancy. If your draft reads almost identical to the original, it's under-cooked —
+length close and don't sweeten the tone — a touch more impersonal is fine, warmer is
+not. No emojis, no "Certainly!", no bold headers, no sycophancy. If your draft reads almost identical to the original, it's under-cooked —
 add another tell before you ship it.
 
 **`heavy`** — Unmistakable, but still in the original's voice. Lean on
 the **phrasing tells**: em dashes, copula avoidance, AI vocabulary, rule of three,
--ing participle tails, hedging and throat-clearing, the odd bit of bold. The wording
-gets visibly synthetic while the message keeps its length roughly (call it 1.2–1.6×,
-not 3×) and keeps its mood exactly. If you catch yourself adding "I'm thrilled," "a
-pivotal milestone," or "thanks so much for your patience," you've drifted out of
-heavy and changed the mood — cut it. A glance is enough to call it as AI, without it
-reading as weirdly excited.
+-ing participle tails, hedging and throat-clearing, mechanical transitions, a punchy
+closer, the odd bit of bold. The wording gets visibly synthetic and the tone gets more
+impersonal and mechanical, while the message keeps its length roughly (call it 1.2–1.6×,
+not 3×). It should never get *sweeter*: if you catch yourself adding "I'm thrilled," "a
+pivotal milestone," or "thanks so much for your patience," that's saccharine, not heavy
+— cut it. A glance is enough to call it as AI, without it reading as weirdly excited.
 
 **`unhinged`** — Maximum slop, every tell at once, played for laughs. Phrasing tells
 maxed out, plus the full formatting circus: emoji-decorated bold headers, "Certainly!
@@ -129,12 +136,14 @@ wherever you are.
    didn't have is overshooting, not improving.
 4. **Run both checklists before delivering.** Meaning: walk your list from step 1
    against the draft; anything missing or distorted gets fixed. Mood: does it feel
-   more excited / grateful / self-important than the original? If so, pull it back.
+   warmer, sweeter, or more excited than the original? Pull that back — but more
+   impersonal and mechanical is the goal, not a problem.
 
 ## The tell toolbox
 
-Two families. **Phrasing tells** make the words look synthetic without touching how
-the message feels — these are your workhorses at every level. **Mood tells** add
+Two families. **Phrasing tells** make the words look machine-built — flat, impersonal,
+mechanically structured — without sweetening how the message feels; these are your
+workhorses at every level. **Mood tells** add
 emotional color (cheer, gratitude, self-importance, uplift); reach for them only when
 the original already carries that register, or at `unhinged` when you're amplifying a
 mood that's genuinely there. The tag is the lightest level at which a tell is fair
@@ -189,6 +198,25 @@ so it belongs below).
 **Passive voice & subjectless fragments** `heavy` — Hide the actor or drop the
 subject. *"The API will be taken offline." "No action required on your end."*
 
+**Mechanical transitions** `heavy` — Bolt clauses and sentences together with the same
+handful of formulaic connectors instead of letting ideas flow: *Furthermore,
+Additionally, Moreover, That said, As such, With that in mind, Importantly, To that end.*
+> Before: We fixed the bug. The page loads faster now.
+> After: We have addressed the underlying issue. Furthermore, the page now loads considerably faster.
+
+**Flattened, predictable syntax** `heavy` — Iron the rhythm flat. Human writing mixes
+short and long; AI settles into even, mid-length, identically-shaped sentences that all
+open with the subject. Kill the fragments, the asides, the one-word punches — make every
+sentence the same comfortable width. The evenness is itself the tell.
+
+**Punchy, parallel closers** `heavy` — End on something compact, parallel, and often
+quantified: a clipped kicker that lands like a slogan. *"consensus baked in, blast
+radius down. 20 min this week?" · "~10 min of your collective time." · "better to
+over-ask than to over-share."* It reads as engineered confidence, which is exactly the
+tell. This is the crisp cousin of the *grand inspirational closer* below — snappy and
+quantified, not gushy. If you quantify, reuse a real number from the message; never
+invent a stat just to land the punch.
+
 **Mechanical bold** `heavy` — Bold phrases for no real reason, especially the first
 words of points.
 
@@ -220,7 +248,7 @@ beginning," "as we continue this journey together."*
 
 ## Worked examples
 
-### A neutral message: change the phrasing, hold the mood
+### A neutral message: mechanize the phrasing, don't sweeten it
 
 **Original (a logistics heads-up):**
 > Heads up — I'm pushing the v2.3 release to prod at 4pm today. The migration adds
@@ -228,7 +256,8 @@ beginning," "as we continue this journey together."*
 > that's a problem for your team.
 
 **Must survive:** v2.3 to prod · 4pm today · two columns on the orders table · API
-down ~10 min · ping if it's a problem — *and the flat, logistical mood.*
+down ~10 min · ping if it's a problem — *and the flat, impersonal mood (it only gets
+more machine-like, never sweeter).*
 
 **`subtle`:**
 > Heads up — I'll be pushing v2.3 to prod at 4pm today. The migration adds two
@@ -243,8 +272,9 @@ down ~10 min · ping if it's a problem — *and the flat, logistical mood.*
 > out.
 
 Notice what *didn't* happen at heavy: no "Hi team!", no "exciting milestone," no
-"thanks so much for your patience." The words got synthetic; the mood stayed flat,
-and the length barely moved. That restraint is the whole point of heavy.
+"thanks so much for your patience." The phrasing got stiffer and more impersonal —
+drier, not sweeter — and the length barely moved. That direction is the whole point of
+heavy.
 
 ### An already-warm message: amplify the mood at unhinged
 
@@ -298,10 +328,10 @@ rare.
 
 - **Don't change the answer, decision, or facts.** This is the cardinal sin. Funny
   slop that says the wrong thing is just wrong.
-- **Don't change the mood.** Adding cheer, gratitude, excitement, or self-importance
-  that wasn't in the original is the most common failure mode. Synthetic phrasing,
-  yes; a personality transplant, no — unless you're amplifying a mood that's already
-  there (see the dial).
+- **Don't sweeten the mood.** Adding cheer, gratitude, excitement, or self-importance
+  that wasn't in the original is the most common failure mode. More impersonal and
+  mechanical is the right direction; warmer is not — unless you're amplifying a mood
+  that's already there (see the dial).
 - **Don't drop content** to make room for padding. Add around the meaning, never
   over it.
 - **Don't invent claims, numbers, or sources.** You're restyling substance, not
