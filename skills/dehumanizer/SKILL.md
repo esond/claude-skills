@@ -279,6 +279,24 @@ Notice what *didn't* happen at heavy: no "Hi team!", no "exciting milestone," no
 drier, not sweeter — and the length barely moved. That direction is the whole point of
 heavy.
 
+**`unhinged`:**
+> Certainly! Here's a quick heads-up on today's deployment 🚀
+>
+> 📦 **What's shipping:** The v2.3 release is going out to production at 4pm today.
+>
+> 🛠️ **What's changing:** The deploy runs a migration that introduces two additional columns to the orders table.
+>
+> ⏳ **What to expect:** During the rollout, the API will be temporarily unavailable for approximately 10 minutes. No action is required on your end.
+>
+> 🙋 **If this is a problem:** Should the timing pose any issues for your team, please don't hesitate to ping me — I'm happy to coordinate.
+>
+> Let me know if you'd like me to walk through any of the details! 🙌
+
+Even at `unhinged`, the emoji, bold headers, chatbot framing, and em dashes all pile on
+— but the message never becomes a *celebration*. No "I'm thrilled," no "pivotal
+milestone," no gratitude for anyone's patience. It's a downtime notice in a clown
+costume, not a party. That's the mood rule holding at the loudest setting.
+
 ### An already-warm message: amplify the mood at unhinged
 
 **Original:**
@@ -312,9 +330,10 @@ not inventing one:
 > It's not just a successful launch — it's a pivotal moment. Onward and upward, team —
 > exciting times lie ahead! Let me know if you'd like me to expand on any of this! 🙌
 
-If that same `unhinged` treatment were applied to the dry v2.3 notice above, it would
-get the emoji, the bold headers, and the em dashes — but it would stay a *server
-downtime notice*, not turn into a surprise party.
+Put the two `unhinged` examples side by side and the rule is obvious: same formatting
+circus, opposite mood. The Q3 note earns its gushing because the original was already
+grateful; the v2.3 notice stays a downtime notice because the original was dry. Unhinged
+turns the *format* up to eleven — it doesn't invent a feeling that wasn't there.
 
 ## Delivering the result
 
