@@ -18,10 +18,16 @@ Three files drive discovery; changing one without the others will break loading:
   plugins. Each plugin entry has `name`, `source` (relative path to plugin
   root), `description`, `version`.
 - `.claude-plugin/plugin.json` — declares the plugin itself. `skills` is an
-  array of paths to skill directories. `name` and `version` must match the
+  array of paths to skill directories; `agents` (optional) is an array of paths
+  to bundled subagent definition files. `name` and `version` must match the
   corresponding marketplace entry.
 - `skills/<skill-name>/SKILL.md` — the skill. One per directory. The directory
   name is the skill name.
+- `agents/<name>.md` — a subagent bundled for a skill to spawn (e.g.
+  `orchestrate` bundles `worker`). Frontmatter sets its
+  `name`, `description`, `tools`, and a pinned `model`; the file body is the
+  agent's prompt. Listed in `plugin.json` under `agents`, and invoked by a skill
+  via `subagent_type` rather than by the user.
 
 When adding or removing a skill, update both `plugin.json` (add to `skills`
 array) and — if the plugin's surface area changed meaningfully — bump `version`
@@ -29,6 +35,10 @@ in both `plugin.json` and the matching `marketplace.json` plugin entry together.
 Also update the "Skills included" table in `README.md`: add the new skill in
 alphabetical order with a one-line summary of what it does, or remove the row
 on deletion.
+
+When a skill bundles a subagent, add its file under `agents/`, list it in
+`plugin.json`'s `agents` array, and add a row to the "Agents included" table in
+`README.md`.
 
 ## Authoring skills
 

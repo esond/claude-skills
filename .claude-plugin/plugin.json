@@ -1,6 +1,6 @@
 {
   "name": "esond",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Eric's personal Claude Code skills.",
   "author": {
     "name": "Eric Sondergard",
@@ -10,6 +10,7 @@
   "skills": [
     "./skills/clean-unused-cpm-packages",
     "./skills/dehumanizer",
+    "./skills/orchestrate",
     "./skills/permission-consolidator",
     "./skills/plan-repl",
     "./skills/plan-repl-html",
@@ -20,5 +21,8 @@
     "./skills/sign-unsigned-commits",
     "./skills/sync-core-repo-docs",
     "./skills/volatility-decomposition"
+  ],
+  "agents": [
+    "./agents/worker.md"
   ]
 }
