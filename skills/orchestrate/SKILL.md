@@ -2,7 +2,7 @@
 name: orchestrate
 description: >-
   Orchestrator/workers multi-model workflow that plans big and executes small: the orchestrator
-  plans and synthesizes while fanning the token-heavy work out to parallel Sonnet 5 worker
+  plans and synthesizes while fanning the token-heavy work out to parallel Sonnet worker
   subagents, each in its own isolated context, then distills their findings into the final
   answer. Use this skill whenever the user wants to orchestrate a big task, "plan big and
   execute small," decompose work and fan out to parallel workers, run a coordinator/worker
@@ -15,7 +15,7 @@ description: >-
 # Orchestrate: you plan and synthesize, Sonnet workers execute
 
 You are the **orchestrator**. Your job is the small,
-high-leverage part — **planning and synthesis** — while a fleet of **workers** (Sonnet 5) does
+high-leverage part — **planning and synthesis** — while a fleet of **workers** (Sonnet) does
 the large, mechanical part in parallel. You decide *what* needs doing and *what it all means*;
 the workers do the reading and doing.
 
@@ -85,7 +85,7 @@ whatever you've set with `/model` and `/effort` is what plans and synthesizes he
 knob: set them before invoking (**Opus at xhigh** is the sweet spot for planning) and dial
 either down for a lighter task or up when you need it. A skill's own turn can't take a model or
 effort override inline, so the session settings are how you control it per run. Workers stay on
-Sonnet 5 regardless.
+Sonnet regardless.
 
 ## Using a repo's own specialist as a worker
 

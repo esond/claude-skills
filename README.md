@@ -35,7 +35,7 @@ installs the `esond` plugin from it.
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`clean-unused-cpm-packages`](skills/clean-unused-cpm-packages/SKILL.md)     | Removes unused `<PackageVersion>` entries from `Directory.Packages.props` files in a .NET CPM repo by scanning every `.csproj`/`.props`/`.targets` for `PackageReference` includes, then verifies via `dotnet restore`. |
 | [`dehumanizer`](skills/dehumanizer/SKILL.md)                                 | Makes a message look AI-generated — the inverse of [the `humanizer`](https://github.com/blader/humanizer), a separate external skill. Injects LLM "tells" (em dashes, rule of three, copula avoidance, AI vocabulary, emoji bold headers) while preserving both the original meaning and its mood, on an intensity dial (`subtle` default, `heavy`, `unhinged`). Mostly for trolling. |
-| [`orchestrate`](skills/orchestrate/SKILL.md)                                 | Orchestrator/workers workflow on the "plan big, execute small" pattern. The orchestrator runs on your session model/effort (set `/model` + `/effort` before invoking; Opus at xhigh recommended) and fans the token-heavy work out to parallel Sonnet 5 [`worker`](agents/worker.md) subagents in isolated contexts, then distills their findings. Workers stay on Sonnet; a repo's own specialist can stand in as a worker. |
+| [`orchestrate`](skills/orchestrate/SKILL.md)                                 | Orchestrator/workers workflow on the "plan big, execute small" pattern. The orchestrator runs on your session model/effort (set `/model` + `/effort` before invoking; Opus at xhigh recommended) and fans the token-heavy work out to parallel Sonnet [`worker`](agents/worker.md) subagents in isolated contexts, then distills their findings. Workers stay on Sonnet; a repo's own specialist can stand in as a worker. |
 | [`permission-consolidator`](skills/permission-consolidator/SKILL.md)         | Reviews a Claude Code `settings.json` allow list, proposes consolidations for `Bash(...)` entries that share a command prefix, and flags one-off or stale entries for pruning.                               |
 | [`plan-repl`](skills/plan-repl/SKILL.md)                                     | Research → plan → annotate → implement workflow for non-trivial tasks. Writes research and a plan to `tasks/{name}/`, iterates on the plan via inline `> NOTE:` blockquotes until approved, then implements. |
 | [`plan-repl-html`](skills/plan-repl-html/SKILL.md)                           | Experimental HTML variant of `plan-repl`. Each phase generates a self-contained interactive HTML page with an in-browser annotation widget that exports notes as JSON for Claude to read on the next turn.   |
@@ -54,12 +54,12 @@ phrase the request.
 ## Agents included
 
 The `orchestrate` skill bundles its own subagent, which lives in [`agents/`](agents/) and runs
-on a pinned model (Sonnet 5) rather than the session model. The skill spawns it at the right
+on a pinned model (Sonnet) rather than the session model. The skill spawns it at the right
 moments; you don't invoke it directly.
 
 | Agent                          | Model    | Used by                                          | What it does                                                                                                                                    |
 | ------------------------------ | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`worker`](agents/worker.md)   | Sonnet 5 | [`orchestrate`](skills/orchestrate/SKILL.md)     | Executes one self-contained sub-task in an isolated context and returns distilled findings, not raw dumps.                                       |
+| [`worker`](agents/worker.md)   | Sonnet | [`orchestrate`](skills/orchestrate/SKILL.md)     | Executes one self-contained sub-task in an isolated context and returns distilled findings, not raw dumps.                                       |
 
 ## Commands included
 
