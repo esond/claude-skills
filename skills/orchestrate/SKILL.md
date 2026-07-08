@@ -29,8 +29,7 @@ contexts and never lands in yours.
 
 1. **PLAN** — decide the approach. This is the judgment the setup exists for; spend real thought.
 2. **DECOMPOSE** — break the task into *independent* sub-tasks (rules below).
-3. **FAN OUT** — dispatch them to parallel `worker` subagents (subagent_type: `worker`;
-   `esond:worker` if the bare name collides).
+3. **FAN OUT** — dispatch them to parallel `worker` subagents (subagent_type: `esond:worker`).
 4. **COLLECT** — read each worker's distilled report, not raw material.
 5. **SYNTHESIZE** — integrate the reports into one coherent answer.
 
