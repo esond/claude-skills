@@ -1,22 +1,20 @@
 ---
 name: orchestrate
 description: >-
-  Orchestrator/workers multi-model workflow that plans big and executes small: plan and
-  synthesize on Opus 4.8 while fanning the token-heavy work out to parallel Sonnet 5 worker
-  subagents, each in its own isolated context, then distill their findings into the final
+  Orchestrator/workers multi-model workflow that plans big and executes small: the orchestrator
+  plans and synthesizes while fanning the token-heavy work out to parallel Sonnet 5 worker
+  subagents, each in its own isolated context, then distills their findings into the final
   answer. Use this skill whenever the user wants to orchestrate a big task, "plan big and
   execute small," decompose work and fan out to parallel workers, run a coordinator/worker
   or manager/worker pattern, farm out independent sub-tasks and synthesize the results, or
   split a broad research/refactor/audit across many agents — even if they just say
   "orchestrate this," "fan this out," or "break this up and parallelize it." The task to
   carry out is the argument.
-model: claude-opus-4-8
-effort: xhigh
 ---
 
-# Orchestrate: you plan on Opus, Sonnet workers execute
+# Orchestrate: you plan and synthesize, Sonnet workers execute
 
-You are the **orchestrator**, pinned to Opus 4.8 at xhigh effort. Your job is the small,
+You are the **orchestrator**. Your job is the small,
 high-leverage part — **planning and synthesis** — while a fleet of **workers** (Sonnet 5) does
 the large, mechanical part in parallel. You decide *what* needs doing and *what it all means*;
 the workers do the reading and doing.
@@ -81,11 +79,12 @@ items). If the premise is itself uncertain, spend one delegation verifying it.
 
 ## Choosing the planner model and effort
 
-The orchestrator runs on **Opus 4.8 at xhigh effort** (its frontmatter). Both are properties of
-this skill's own turn, so — unlike a spawned subagent — they're fixed once the turn starts and
-can't be set per-invocation. To change either (plan on Fable 5 while you have access, or dial
-effort down for a lighter task), edit that frontmatter line and reload. Workers stay on Sonnet 5
-either way.
+The orchestrator runs on **your session model and effort** — this skill doesn't pin them, so
+whatever you've set with `/model` and `/effort` is what plans and synthesizes here. That's the
+knob: set them before invoking (**Opus at xhigh** is the sweet spot for planning) and dial
+either down for a lighter task or up when you need it. A skill's own turn can't take a model or
+effort override inline, so the session settings are how you control it per run. Workers stay on
+Sonnet 5 regardless.
 
 ## Using a repo's own specialist as a worker
 
