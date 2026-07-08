@@ -33,8 +33,10 @@ installs the `esond` plugin from it.
 
 | Skill                                                                        | What it does                                                                                                                                                                                                 |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`advise`](skills/advise/SKILL.md)                                           | Advisor/executor multi-model workflow. Does the work on Sonnet 5 and consults a bundled Opus 4.8 [`advisor`](agents/advisor.md) subagent for strategy at decision points — before non-trivial work, at design forks, and when stuck. The advisor model is overridable per-invocation, and a repo's own specialist can stand in as the advisor (pinned to Opus). |
 | [`clean-unused-cpm-packages`](skills/clean-unused-cpm-packages/SKILL.md)     | Removes unused `<PackageVersion>` entries from `Directory.Packages.props` files in a .NET CPM repo by scanning every `.csproj`/`.props`/`.targets` for `PackageReference` includes, then verifies via `dotnet restore`. |
 | [`dehumanizer`](skills/dehumanizer/SKILL.md)                                 | Makes a message look AI-generated — the inverse of [the `humanizer`](https://github.com/blader/humanizer), a separate external skill. Injects LLM "tells" (em dashes, rule of three, copula avoidance, AI vocabulary, emoji bold headers) while preserving both the original meaning and its mood, on an intensity dial (`subtle` default, `heavy`, `unhinged`). Mostly for trolling. |
+| [`orchestrate`](skills/orchestrate/SKILL.md)                                 | Orchestrator/workers workflow on the "plan big, execute small" pattern. Plans and synthesizes on Opus 4.8, fans the token-heavy work out to parallel Sonnet 5 [`worker`](agents/worker.md) subagents in isolated contexts, then distills their findings. Planner model is set in frontmatter (swap to Fable 5 while available); workers stay on Sonnet, and a repo's own specialist can stand in as a worker. |
 | [`permission-consolidator`](skills/permission-consolidator/SKILL.md)         | Reviews a Claude Code `settings.json` allow list, proposes consolidations for `Bash(...)` entries that share a command prefix, and flags one-off or stale entries for pruning.                               |
 | [`plan-repl`](skills/plan-repl/SKILL.md)                                     | Research → plan → annotate → implement workflow for non-trivial tasks. Writes research and a plan to `tasks/{name}/`, iterates on the plan via inline `> NOTE:` blockquotes until approved, then implements. |
 | [`plan-repl-html`](skills/plan-repl-html/SKILL.md)                           | Experimental HTML variant of `plan-repl`. Each phase generates a self-contained interactive HTML page with an in-browser annotation widget that exports notes as JSON for Claude to read on the next turn.   |
@@ -49,6 +51,17 @@ installs the `esond` plugin from it.
 Each skill's `description` field enumerates the natural-language phrases that
 trigger it — you don't invoke them by name, Claude picks them up from how you
 phrase the request.
+
+## Agents included
+
+Two skills bundle their own subagents, which live in [`agents/`](agents/) and run on a
+pinned model regardless of the session model. The skills spawn them at the right moments;
+you don't invoke them directly.
+
+| Agent                          | Model    | Used by                                          | What it does                                                                                                                                    |
+| ------------------------------ | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`advisor`](agents/advisor.md) | Opus 4.8 | [`advise`](skills/advise/SKILL.md)               | Read-only staff-level advisor. Returns a recommendation, short plan, risks, and course-correction at a decision point without implementing.      |
+| [`worker`](agents/worker.md)   | Sonnet 5 | [`orchestrate`](skills/orchestrate/SKILL.md)     | Executes one self-contained sub-task in an isolated context and returns distilled findings, not raw dumps.                                       |
 
 ## Commands included
 
