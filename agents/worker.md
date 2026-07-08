@@ -6,7 +6,7 @@ description: >-
   isolated context, then returns only distilled findings — never raw dumps. Invoked
   deliberately by the orchestrator (subagent_type: worker); not a general-purpose agent for
   unrelated tasks.
-model: claude-sonnet-5
+model: sonnet
 tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch, WebFetch
 ---
 
