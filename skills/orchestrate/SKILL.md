@@ -11,12 +11,12 @@ description: >-
   "orchestrate this," "fan this out," or "break this up and parallelize it." The task to
   carry out is the argument.
 model: claude-opus-4-8
-effort: high
+effort: xhigh
 ---
 
 # Orchestrate: you plan on Opus, Sonnet workers execute
 
-You are the **orchestrator**, pinned to Opus 4.8 at high effort. Your job is the small,
+You are the **orchestrator**, pinned to Opus 4.8 at xhigh effort. Your job is the small,
 high-leverage part — **planning and synthesis** — while a fleet of **workers** (Sonnet 5) does
 the large, mechanical part in parallel. You decide *what* needs doing and *what it all means*;
 the workers do the reading and doing.
@@ -79,12 +79,13 @@ gaps with a follow-up worker. Don't just concatenate. One trap: the split can ve
 *delegated* fact yet rest on a wrong *premise* (workers confirm details about the wrong set of
 items). If the premise is itself uncertain, spend one delegation verifying it.
 
-## Choosing the planner model
+## Choosing the planner model and effort
 
-The orchestrator defaults to **Opus 4.8** (its frontmatter). Because it's this skill's own turn,
-the model is fixed once the turn starts and can't be overridden per-invocation like a subagent —
-to plan on a different model (e.g. Fable 5 while you have access), change that one frontmatter
-line. Workers stay on Sonnet 5 either way.
+The orchestrator runs on **Opus 4.8 at xhigh effort** (its frontmatter). Both are properties of
+this skill's own turn, so — unlike a spawned subagent — they're fixed once the turn starts and
+can't be set per-invocation. To change either (plan on Fable 5 while you have access, or dial
+effort down for a lighter task), edit that frontmatter line and reload. Workers stay on Sonnet 5
+either way.
 
 ## Using a repo's own specialist as a worker
 
