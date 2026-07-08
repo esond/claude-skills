@@ -4,7 +4,7 @@ description: >-
   Execution worker for the `orchestrate` skill's orchestrator. Runs on Sonnet and does
   the token-heavy reading, editing, and running for ONE self-contained sub-task in its own
   isolated context, then returns only distilled findings — never raw dumps. Invoked
-  deliberately by the orchestrator (subagent_type: worker); not a general-purpose agent for
+  deliberately by the orchestrator (subagent_type: esond:worker); not a general-purpose agent for
   unrelated tasks.
 model: sonnet
 tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch, WebFetch
