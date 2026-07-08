@@ -138,7 +138,7 @@ jobs:
             if [ -f "$file" ]; then
               frontmatter=$(awk '/^---$/{c++; next} c==1' "$file")
               skill_name=$(printf '%s\n' "$frontmatter" | grep -m1 "^name:" | sed 's/^name: *//')
-              skill_desc=$(printf '%s\n' "$frontmatter" | grep -m1 "^description:" | sed 's/^description: *//' | head -c 200)
+              skill_desc=$(printf '%s\n' "$frontmatter" | awk '/^description:/{v=$0;sub(/^description:[ \t]*/,"",v);if(v~/^[|>][0-9+-]*[ \t]*$/)v="";d=v;f=1;next} f&&/^[^ \t]/{f=0} f{s=$0;sub(/^[ \t]+/,"",s);if(s!="")d=(d==""?s:d" "s)} END{print d}' | head -c 200)
               echo "- \`$skill_name\`: ${skill_desc}" >> notes.md
             fi
           done
