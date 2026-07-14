@@ -13,7 +13,7 @@
       "name": "esond",
       "source": "./",
       "description": "Personal skills for Claude Code.",
-      "version": "0.12.0"
+      "version": "0.13.0"
     }
   ]
 }
