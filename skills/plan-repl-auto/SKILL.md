@@ -4,7 +4,7 @@ description: >-
   Automated multi-model variant of `plan-repl`: a coordinator fans token-heavy research out to
   parallel Sonnet subagents, synthesizes the findings into an implementation plan on the session
   model, then a Fable subagent arbitrates it — replacing plan-repl's human `> NOTE:` loop with a
-  cheap→mid→expensive model cascade. Explicit-only: invoke via the `/plan-repl-auto` command or by
+  cheap→mid→expensive model cascade. Explicit-only: invoke via the `/esond:plan-repl-auto` command or by
   name. Do NOT auto-suggest or fire it on general planning/refactor requests — `plan-repl` is the
   default; use this ONLY when the user explicitly asks for `plan-repl-auto` or the automated
   multi-model plan cascade. Flags: `--implement` (fan out Sonnet subagents to build the approved
@@ -117,7 +117,9 @@ and `plan.md` and critique the plan: soundness, risks, missed edge cases, simple
 alternatives, and a verdict on the remaining `[judgment]` calls. Ask for a prioritized critique, not
 a rewrite.
 
-Write the critique to `tasks/{task-name}/review.md` and relay the key points to the user. The
+Append the critique to `tasks/{task-name}/review.md` under a heading for this round (don't
+overwrite earlier rounds — the file keeps the full arbitration history) and relay the key points to
+the user. The
 critique is **advisory — the user decides what to act on and when the plan is good enough**. For
 points worth addressing, revise `plan.md` yourself, then optionally send the revised plan back to a
 fresh arbiter subagent for another round. Loop until the user accepts.
