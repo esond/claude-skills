@@ -35,7 +35,6 @@ installs the `esond` plugin from it.
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`clean-unused-cpm-packages`](skills/clean-unused-cpm-packages/SKILL.md)     | Removes unused `<PackageVersion>` entries from `Directory.Packages.props` files in a .NET CPM repo by scanning every `.csproj`/`.props`/`.targets` for `PackageReference` includes, then verifies via `dotnet restore`. |
 | [`dehumanizer`](skills/dehumanizer/SKILL.md)                                 | Makes a message look AI-generated — the inverse of [the `humanizer`](https://github.com/blader/humanizer), a separate external skill. Injects LLM "tells" (em dashes, rule of three, copula avoidance, AI vocabulary, emoji bold headers) while preserving both the original meaning and its mood, on an intensity dial (`subtle` default, `heavy`, `unhinged`). Mostly for trolling. |
-| [`orchestrate`](skills/orchestrate/SKILL.md)                                 | Orchestrator/workers workflow on the "plan big, execute small" pattern. The orchestrator runs on your session model/effort (set `/model` + `/effort` before invoking; Opus at xhigh recommended) and fans the token-heavy work out to parallel Sonnet [`worker`](agents/worker.md) subagents in isolated contexts, then distills their findings. Workers stay on Sonnet; a repo's own specialist can stand in as a worker. |
 | [`permission-consolidator`](skills/permission-consolidator/SKILL.md)         | Reviews a Claude Code `settings.json` allow list, proposes consolidations for `Bash(...)` entries that share a command prefix, and flags one-off or stale entries for pruning.                               |
 | [`plan-repl`](skills/plan-repl/SKILL.md)                                     | Research → plan → annotate → implement workflow for non-trivial tasks. Writes research and a plan to `tasks/{name}/`, iterates on the plan via inline `> NOTE:` blockquotes until approved, then implements. |
 | [`plan-repl-html`](skills/plan-repl-html/SKILL.md)                           | Experimental HTML variant of `plan-repl`. Each phase generates a self-contained interactive HTML page with an in-browser annotation widget that exports notes as JSON for Claude to read on the next turn.   |
@@ -45,21 +44,10 @@ installs the `esond` plugin from it.
 | [`righting-software-system-design`](skills/righting-software-system-design/SKILL.md) | Heavyweight, opt-in, interview-driven system design session faithful to Juval Löwy's *Righting Software*. Walks framing → use cases → interrogative volatility analysis → iDesign component mapping (Manager/Engine/ResourceAccess/Utility) → call-chain validation, surfacing unknown-unknowns along the way and producing a written recommendation report. |
 | [`sign-unsigned-commits`](skills/sign-unsigned-commits/SKILL.md)             | Retroactively signs unsigned commits on the current branch that were authored by the current git user, via a targeted rebase that only amends matching commits.                                              |
 | [`sync-core-repo-docs`](skills/sync-core-repo-docs/SKILL.md)                 | Creates or audits a repo's three core doc files — README.md, CLAUDE.md, REVIEW.md — in that dependency order. Missing files are generated from the codebase; existing files are audited for accuracy and fixed after confirmation. README is checked for effective newcomer orientation, CLAUDE.md defers to `/init`/`claude-md-improver`, and REVIEW.md holds reviewer guidance kept distinct from CLAUDE.md. |
-| [`volatility-decomposition`](skills/volatility-decomposition/SKILL.md)       | **Deprecated** — superseded by [`righting-software-system-design`](skills/righting-software-system-design/SKILL.md), which is a more faithful and complete implementation of the same methodology from Löwy's *Righting Software*. Kept in the marketplace only so users can finish in-progress decompositions started before deprecation. |
 
 Each skill's `description` field enumerates the natural-language phrases that
 trigger it — you don't invoke them by name, Claude picks them up from how you
 phrase the request.
-
-## Agents included
-
-The `orchestrate` skill bundles its own subagent, which lives in [`agents/`](agents/) and runs
-on a pinned model (Sonnet) rather than the session model. The skill spawns it at the right
-moments; you don't invoke it directly.
-
-| Agent                          | Model    | Used by                                          | What it does                                                                                                                                    |
-| ------------------------------ | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`worker`](agents/worker.md)   | Sonnet | [`orchestrate`](skills/orchestrate/SKILL.md)     | Executes one self-contained sub-task in an isolated context and returns distilled findings, not raw dumps.                                       |
 
 ## Commands included
 
@@ -69,3 +57,14 @@ arguments — a deterministic counterpart to skills' natural-language triggering
 | Command                                                  | What it does                                                                                                                                                                          |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`/esond:sync-core-docs`](commands/sync-core-docs.md)    | Thin wrapper over the [`sync-core-repo-docs`](skills/sync-core-repo-docs/SKILL.md) skill. Accepts `--readme`, `--claude`, `--review` (they combine; no flags runs all three) and hands off to the skill. |
+
+## Deprecated
+
+Kept in the marketplace for reference and to avoid breaking anything mid-flight, but their
+`description`s no longer match new requests — Claude should not invoke these.
+
+| Skill / agent                                                          | What it does                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`orchestrate`](skills/orchestrate/SKILL.md) (skill)                     | Orchestrator/workers workflow on the "plan big, execute small" pattern. Superseded by the built-in `Workflow` tool (`/workflows`), which runs the same plan/fan-out/synthesize pattern natively and more reliably. |
+| [`worker`](agents/worker.md) (agent, Sonnet, bundled by `orchestrate`)   | Executed one self-contained sub-task in an isolated context and returned distilled findings, not raw dumps. Deprecated alongside `orchestrate`.                                                              |
+| [`volatility-decomposition`](skills/volatility-decomposition/SKILL.md) (skill) | Superseded by [`righting-software-system-design`](skills/righting-software-system-design/SKILL.md), a more faithful and complete implementation of the same methodology from Löwy's *Righting Software*. Kept only so users can finish in-progress decompositions started before deprecation. |

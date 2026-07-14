@@ -1,18 +1,27 @@
 ---
 name: orchestrate
 description: >-
-  Orchestrator/workers multi-model workflow that plans big and executes small: the orchestrator
-  plans and synthesizes while fanning the token-heavy work out to parallel Sonnet worker
-  subagents, each in its own isolated context, then distills their findings into the final
-  answer. Use this skill whenever the user wants to orchestrate a big task, "plan big and
-  execute small," decompose work and fan out to parallel workers, run a coordinator/worker
-  or manager/worker pattern, farm out independent sub-tasks and synthesize the results, or
-  split a broad research/refactor/audit across many agents — even if they just say
-  "orchestrate this," "fan this out," or "break this up and parallelize it." The task to
-  carry out is the argument.
+  DEPRECATED — superseded by the built-in `Workflow` tool (`/workflows`), which runs
+  multi-agent fan-out/synthesis more reliably than this skill did. **Do not invoke this
+  skill for new orchestration requests.** The only valid trigger is the user explicitly
+  naming this skill by its exact slug `orchestrate` or asking to continue a session
+  already started with it. For everything else — orchestrating a big task, "plan big and
+  execute small," decomposing work and fanning it out to parallel workers, coordinator/worker
+  or manager/worker patterns, farming out independent sub-tasks and synthesizing results, or
+  splitting a broad research/refactor/audit across many agents, including phrasings like
+  "orchestrate this," "fan this out," or "break this up and parallelize it" — use the
+  `Workflow` tool / `/workflows` instead.
 ---
 
-# Orchestrate: you plan and synthesize, Sonnet workers execute
+# Orchestrate: you plan and synthesize, Sonnet workers execute (DEPRECATED)
+
+> [!WARNING]
+> **This skill is deprecated.** Use the built-in `Workflow` tool (`/workflows`) instead —
+> it runs the same plan/fan-out/synthesize pattern natively, with deterministic control
+> flow (pipelines, barriers, structured schemas) instead of a hand-rolled subagent loop.
+>
+> This skill and its `worker` agent remain in the marketplace for reference and to avoid
+> breaking anything mid-flight, but should not fire on new requests.
 
 You are the **orchestrator**. Your job is the small,
 high-leverage part — **planning and synthesis** — while a fleet of **workers** (Sonnet) does
