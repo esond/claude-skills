@@ -174,13 +174,18 @@ still open — and move on. The cap is a hard stop; never run a fourth round.
 Break `plan.md` into a task breakdown in your built-in task tracker, then fan it out through a
 `Workflow` — no sign-off pause, `--implement` is autonomous.
 
+**Pin every implement agent to Sonnet** — pass `model: 'sonnet'` on each `agent()` call in the
+Workflow script. This is not optional and not the default: a Workflow `agent()` with no `model`
+inherits your session model (Opus here), so the explicit pin is the only thing keeping the
+token-heavy building on Sonnet. Same as the research fan-out.
+
 Follow the same independence rule as research: **parallelize only tasks that touch disjoint files**;
 sequence anything that shares files or depends on another task's output (do the dependency first,
 then brief the dependent task with its result). Because the tasks are disjoint, the Sonnet agents
 share one working tree safely — no worktree isolation needed. Brief each agent to **edit only** — no
-staging, commits, or builds; you integrate and run the project's build/tests serially as work lands.
-Each brief is a self-contained ticket: the task, the relevant `plan.md` excerpt, and what "done"
-looks like; agents edit and report their changes back, you integrate.
+staging, commits, or builds. Each brief is a self-contained ticket: the task, the relevant `plan.md`
+excerpt, and what "done" looks like. The agents write their edits straight to the shared tree; you
+run the project's build/tests serially as work lands.
 
-Mark tasks done as they land, run the build/test commands as you integrate, and if an agent reports
-the plan doesn't hold, stop and revise the plan rather than improvising.
+Mark tasks done as they land, run the build/test commands as work lands, and if an agent reports the
+plan doesn't hold, stop and revise the plan rather than improvising.
