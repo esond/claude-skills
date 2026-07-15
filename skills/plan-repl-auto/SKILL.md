@@ -81,9 +81,11 @@ Decompose the task into **independent** research questions — areas of the code
 to find, external docs to check. Batch trivial questions together rather than spawning an agent per
 tiny lookup.
 
-Launch a `Workflow` that fans one Sonnet agent per question (`model: 'sonnet'`) as a parallel batch
-— a barrier is correct here, you need every finding before synthesis. Give each a `schema` so it
-returns structured distilled findings rather than prose. Each brief:
+Launch a `Workflow` that fans one Sonnet agent per question as a parallel batch — a barrier is
+correct here, you need every finding before synthesis. **Pin every agent to Sonnet** — pass
+`model: 'sonnet'` on each `agent()` call; this is not optional and not the default, since a Workflow
+`agent()` with no `model` inherits your session model (Opus here). Give each a `schema` so it returns
+structured distilled findings rather than prose. Each brief:
 - **Goal** — the one question, stated so an agent with no other context could answer it.
 - **Context** — the paths, task summary, and constraints it needs (it has none of yours).
 - **Deliverable** — distilled findings: what's true, the `file:line` evidence, and any pitfalls. Not
