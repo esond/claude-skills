@@ -40,9 +40,11 @@ Parse the flags out of the task string first: `--implement` (default off) and `-
 The two fan-out tiers (research, implementation) run through the `Workflow` tool — invoking this
 skill is your explicit opt-in to use it. **Pin every fan-out `agent()` call to `model: 'sonnet'`**:
 with no `model`, a Workflow agent inherits your session model — whatever `/model` you're on, not
-Sonnet. The conversational tiers (synthesis, triage, arbitration) stay in the main loop so a human
-can be in the middle; the arbiter is a single subagent per round, not a Workflow, because its loop is
-interactive.
+Sonnet. The conversational tiers (synthesis, triage, arbitration) stay in the main loop — that's the
+coordinator's own judgment work, and in default mode it's where the human sits in the middle. The
+arbiter is a single subagent per round, not a Workflow, because you revise `plan.md` and drive the
+loop between rounds; that between-round coordinator work can't be handed to a detached Workflow (true
+in both modes).
 
 Every research/arbiter/implementation agent has an **isolated context** — it sees nothing of this
 conversation or its siblings, so every brief must stand alone and carry every path, fact, and
@@ -121,8 +123,9 @@ This is the cheap touchpoint that keeps the expensive arbiter rounds focused. Tr
 question by its tag:
 - **`[user]`** — default mode: ask the user directly, right here. `--implement` mode: make the call
   yourself using the research and record the assumption in `plan.md`.
-- **`[research]`** — spawn a follow-up Sonnet research agent (`Workflow`, same as Phase 1), then
-  append its findings to `research.md`.
+- **`[research]`** — spawn a follow-up Sonnet research agent (a plain `Agent` call,
+  `subagent_type: general-purpose`, `model: sonnet`; reserve `Workflow` for when you have several
+  independent follow-ups to fan out), then append its findings to `research.md`.
 - **`[judgment]`** — leave it. That is exactly what the arbiter is for.
 
 Once `[user]` and `[research]` items are resolved, fold the answers and any new research into
