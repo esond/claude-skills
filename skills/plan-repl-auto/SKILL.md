@@ -38,9 +38,11 @@ Parse the flags out of the task string first: `--implement` (default off) and `-
 (default `fable`). Everything left over is the task.
 
 The two fan-out tiers (research, implementation) run through the `Workflow` tool — invoking this
-skill is your explicit opt-in to use it. The conversational tiers (synthesis, triage, arbitration)
-stay in the main loop so a human can be in the middle; the arbiter is a single subagent per round,
-not a Workflow, because its loop is interactive.
+skill is your explicit opt-in to use it. **Pin every fan-out `agent()` call to `model: 'sonnet'`**:
+with no `model`, a Workflow agent inherits your session model — whatever `/model` you're on, not
+Sonnet. The conversational tiers (synthesis, triage, arbitration) stay in the main loop so a human
+can be in the middle; the arbiter is a single subagent per round, not a Workflow, because its loop is
+interactive.
 
 Every research/arbiter/implementation agent has an **isolated context** — it sees nothing of this
 conversation or its siblings, so every brief must stand alone and carry every path, fact, and
@@ -82,11 +84,8 @@ to find, external docs to check. Batch trivial questions together rather than sp
 tiny lookup.
 
 Launch a `Workflow` that fans one Sonnet agent per question as a parallel batch — a barrier is
-correct here, you need every finding before synthesis. **Pin every agent to Sonnet** — pass
-`model: 'sonnet'` on each `agent()` call; this is not optional and not the default, since a Workflow
-`agent()` with no `model` inherits your session model — whatever `/model` you're on, not Sonnet.
-Give each a `schema` so it returns
-structured distilled findings rather than prose. Each brief:
+correct here, you need every finding before synthesis. Pin each to `model: 'sonnet'` (see Tiers), and
+give each a `schema` so it returns structured distilled findings rather than prose. Each brief:
 - **Goal** — the one question, stated so an agent with no other context could answer it.
 - **Context** — the paths, task summary, and constraints it needs (it has none of yours).
 - **Deliverable** — distilled findings: what's true, the `file:line` evidence, and any pitfalls. Not
@@ -175,12 +174,8 @@ still open — and move on. The cap is a hard stop; never run a fourth round.
 ## Phase 6: Implement (Sonnet, `Workflow` fan-out — only with `--implement`)
 
 Break `plan.md` into a task breakdown in your built-in task tracker, then fan it out through a
-`Workflow` — no sign-off pause, `--implement` is autonomous.
-
-**Pin every implement agent to Sonnet** — pass `model: 'sonnet'` on each `agent()` call in the
-Workflow script. This is not optional and not the default: a Workflow `agent()` with no `model`
-inherits your session model — whatever `/model` you're on, not Sonnet — so the explicit pin is the
-only thing keeping the token-heavy building on Sonnet. Same as the research fan-out.
+`Workflow` — no sign-off pause, `--implement` is autonomous. Pin each implement `agent()` to
+`model: 'sonnet'` (see Tiers).
 
 Follow the same independence rule as research: **parallelize only tasks that touch disjoint files**;
 sequence anything that shares files or depends on another task's output (do the dependency first,
