@@ -29,7 +29,7 @@ Synthesis runs on your session model, and a skill can't remodel its own turn —
 
 | Tier | Runs via | Model | Job |
 |------|----------|-------|-----|
-| Coordinator + synthesis + triage | main loop (this turn) | session model (Opus) | Decompose, plan, `plan.md`, the checkpoints, drive the arbiter loop |
+| Coordinator + synthesis + triage | main loop (this turn) | session model (Opus recommended) | Decompose, plan, `plan.md`, the checkpoints, drive the arbiter loop |
 | Research | `Workflow` fan-out | `sonnet` | Read code/docs/web, return distilled findings |
 | Arbiter | subagent, one per round (≤3) | `fable` (`--arbiter`) | Grill the plan — prioritized critique + verdict |
 | Implementation | `Workflow` fan-out | `sonnet` | Build the approved plan (only with `--implement`) |
@@ -84,7 +84,8 @@ tiny lookup.
 Launch a `Workflow` that fans one Sonnet agent per question as a parallel batch — a barrier is
 correct here, you need every finding before synthesis. **Pin every agent to Sonnet** — pass
 `model: 'sonnet'` on each `agent()` call; this is not optional and not the default, since a Workflow
-`agent()` with no `model` inherits your session model (Opus here). Give each a `schema` so it returns
+`agent()` with no `model` inherits your session model — whatever `/model` you're on, not Sonnet.
+Give each a `schema` so it returns
 structured distilled findings rather than prose. Each brief:
 - **Goal** — the one question, stated so an agent with no other context could answer it.
 - **Context** — the paths, task summary, and constraints it needs (it has none of yours).
@@ -178,8 +179,8 @@ Break `plan.md` into a task breakdown in your built-in task tracker, then fan it
 
 **Pin every implement agent to Sonnet** — pass `model: 'sonnet'` on each `agent()` call in the
 Workflow script. This is not optional and not the default: a Workflow `agent()` with no `model`
-inherits your session model (Opus here), so the explicit pin is the only thing keeping the
-token-heavy building on Sonnet. Same as the research fan-out.
+inherits your session model — whatever `/model` you're on, not Sonnet — so the explicit pin is the
+only thing keeping the token-heavy building on Sonnet. Same as the research fan-out.
 
 Follow the same independence rule as research: **parallelize only tasks that touch disjoint files**;
 sequence anything that shares files or depends on another task's output (do the dependency first,
