@@ -67,9 +67,6 @@ used throughout this repo:
   clear action.
 - **Explicit stop-and-ask checkpoints** for destructive or ambiguous operations
   — never push past a checkpoint without user confirmation.
-- **Inline shell commands** written for bash (this repo targets a Windows
-  machine running bash via Git for Windows; use Unix shell syntax, forward
-  slashes, `/dev/null`).
 - **"Things not to do" / "What this doesn't touch"** sections near the end to
   prevent scope creep when Claude executes the skill.
 
