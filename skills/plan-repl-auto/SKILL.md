@@ -3,8 +3,9 @@ name: plan-repl-auto
 description: >-
   Automated multi-model variant of `plan-repl`: a coordinator fans token-heavy research out to
   parallel Sonnet subagents (via the Workflow tool), synthesizes an implementation plan on the
-  session model, then a Fable arbiter grills the plan over up to three bounded rounds until it has
-  no substantive objections — replacing plan-repl's human `> NOTE:` loop with a cheap→mid→expensive
+  session model, then a Fable arbiter grills the plan over bounded rounds (three by default,
+  extendable by explicit request when you're in the loop) until it has no substantive objections —
+  replacing plan-repl's human `> NOTE:` loop with a cheap→mid→expensive
   model cascade. Explicit-only: invoke via the `/esond:plan-repl-auto` command or by name. Do NOT
   auto-suggest or fire it on general planning/refactor requests — `plan-repl` is the default; use
   this ONLY when the user explicitly asks for `plan-repl-auto` or the automated multi-model plan
@@ -31,7 +32,7 @@ Synthesis runs on your session model, and a skill can't remodel its own turn —
 |------|----------|-------|-----|
 | Coordinator + synthesis + triage | main loop (this turn) | session model (Opus recommended) | Decompose, plan, `plan.md`, the checkpoints, drive the arbiter loop |
 | Research | `Workflow` fan-out | `sonnet` | Read code/docs/web, return distilled findings |
-| Arbiter | subagent, one per round (≤3) | `fable` (`--arbiter`) | Grill the plan — prioritized critique + verdict |
+| Arbiter | subagent, one per round (3 by default; more on explicit request in default mode) | `fable` (`--arbiter`) | Grill the plan — prioritized critique + verdict |
 | Implementation | `Workflow` fan-out | `sonnet` | Build the approved plan (only with `--implement`) |
 
 Parse the flags out of the task string first: `--implement` (default off) and `--arbiter <model>`
@@ -134,11 +135,11 @@ plan reaches the arbiter.
 
 ---
 
-## Phase 4: Arbitrate — bounded adversarial loop (Fable, ≤3 rounds)
+## Phase 4: Arbitrate — bounded adversarial loop (Fable, 3 rounds; extendable in default mode)
 
-The arbiter's job is to **grill** the plan, not rubber-stamp it. Run up to **three** rounds; each
-round spawns a **fresh** arbiter subagent so it comes at the revised plan with unanchored eyes. Each
-round:
+The arbiter's job is to **grill** the plan, not rubber-stamp it. Run up to **three** rounds by
+default; each round spawns a **fresh** arbiter subagent so it comes at the revised plan with
+unanchored eyes. Each round:
 
 1. **Grill.** Spawn one arbiter subagent (`subagent_type: general-purpose`, `model:
    {--arbiter, default fable}`) briefed to read `research.md` and `plan.md` and attack the plan:
@@ -158,11 +159,17 @@ round:
 
    Fold accepted points into `plan.md`, and note in `review.md` what you accepted or rejected and why.
 4. **Continue or stop.** End the loop when any of: the arbiter returned `NO SUBSTANTIVE ISSUES`;
-   (default mode) the user accepts; or three rounds have run. Otherwise start the next round with a
+   (default mode) the user accepts; or the round cap is reached. Otherwise start the next round with a
    fresh arbiter on the revised plan.
 
-After the loop, state the outcome — clean pass, accepted early, or hit the 3-round cap with N points
-still open — and move on. The cap is a hard stop; never run a fourth round.
+**Beyond three rounds (default mode only).** Three is the cap for autonomous runs. In default mode
+the user is in the loop, so when the third round ends with substantive issues still open, don't just
+stop — report where the plan stands and ask whether they want another round. Each explicit "yes"
+buys exactly one more round; keep offering until the user is satisfied or a round comes back clean.
+In `--implement` mode there is no one to ask, so three rounds is a hard stop — never a fourth.
+
+After the loop, state the outcome — clean pass, accepted early, or stopped with N points still open —
+and move on.
 
 ---
 
