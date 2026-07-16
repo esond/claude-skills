@@ -61,10 +61,10 @@ resolution status and thread IDs):
 
 ```bash
 gh api graphql -f query='
-  query($owner:String!, $repo:String!, $pr:Int!) {
+  query($owner:String!, $repo:String!, $pr:Int!, $after:String) {
     repository(owner:$owner, name:$repo) {
       pullRequest(number:$pr) {
-        reviewThreads(first:100) {
+        reviewThreads(first:100, after:$after) {
           pageInfo { hasNextPage endCursor }
           nodes {
             id
@@ -87,10 +87,14 @@ gh api graphql -f query='
 ' -F owner="$OWNER" -F repo="$REPO" -F pr="$PR_NUMBER"
 ```
 
-**General comments** (REST — top-level, not attached to lines):
+The first call omits `after` (GraphQL treats the unset variable as null, i.e. start from the first page).
+
+**General comments** (REST — top-level, not attached to lines). `--paginate` is
+required: without it `gh api` returns only the first page and silently drops
+actionable items on longer PRs:
 
 ```bash
-gh api "repos/$OWNER/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | {id, body, user: .user.login}'
+gh api --paginate "repos/$OWNER/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | {id, body, user: .user.login}'
 ```
 
 Rules for the subagent's brief:
@@ -115,24 +119,40 @@ Rules for the subagent's brief:
   "tidy up" a node `id` or `databaseId`; a single altered character breaks the
   reply and resolve steps. Use `null` for a field that's genuinely absent.
 - **Paginate if truncated.** If the review-threads query returns
-  `pageInfo.hasNextPage == true`, request the next page with `endCursor` and merge
-  — never stop at the first 100. (A thread with >50 comments is vanishingly rare;
-  don't bother paginating within a thread.)
+  `pageInfo.hasNextPage == true`, re-run it with `-F after="<endCursor>"` to fetch
+  the next page and merge — never stop at the first 100. (A thread with >50
+  comments is vanishingly rare; don't bother paginating within a thread. The REST
+  general-comments call already handles this via `--paginate`.)
 - **Never fabricate a worklist.** If either command fails (auth, network, wrong
   repo), return its error output verbatim as the result — do not return an empty
   or invented worklist. An empty list means "genuinely nothing unresolved," and
   the next step trusts it.
 
-Tell the subagent its final message must be **exactly** this JSON object and
-nothing else — no prose, no code fences:
+Tell the subagent its final message must be **exactly** one JSON object in this
+shape and nothing else — no prose, no code fences. Values below are illustrative
+placeholders; the field names and structure are what matter:
 
-```
+```json
 {
-  reviewThreads: [
-    { threadId, firstCommentDatabaseId, path, line, isOutdated, author, body }
+  "reviewThreads": [
+    {
+      "threadId": "PRRT_kwDO…",
+      "firstCommentDatabaseId": 123456789,
+      "path": "src/foo.ts",
+      "line": 42,
+      "isOutdated": false,
+      "author": "copilot-pull-request-reviewer",
+      "body": "distilled conversation of the whole thread"
+    }
   ],
-  generalComments: [
-    { commentId, author, items: [ { summary, detail } ] }
+  "generalComments": [
+    {
+      "commentId": 987654321,
+      "author": "claude[bot]",
+      "items": [
+        { "summary": "one-line point", "detail": "enough context to assess it" }
+      ]
+    }
   ]
 }
 ```
