@@ -1,6 +1,6 @@
 ---
 name: pr-review-resolver
-description: Address outstanding review comments on a GitHub pull request. Fetches all unresolved review threads and general PR comments, assesses each for validity, then either fixes the code, commits, replies with the commit hash, and resolves the thread, or — when declining — replies with justification and leaves the thread for the reviewer to resolve. Use this skill whenever the user wants to address, fix, resolve, or work through PR review comments or feedback — even if they just say something like "handle the PR comments", "address the review feedback", "fix what the reviewers said", or "go through the PR". Also trigger when the user pastes a PR URL and asks you to act on the feedback there.
+description: Address outstanding review comments on a GitHub pull request. Fetches all unresolved review threads, submitted review bodies, and general PR comments, assesses each for validity, then either fixes the code, commits, replies with the commit hash, and resolves the thread, or — when declining — replies with justification and leaves the thread for the reviewer to resolve. Use this skill whenever the user wants to address, fix, resolve, or work through PR review comments or feedback — even if they just say something like "handle the PR comments", "address the review feedback", "fix what the reviewers said", or "go through the PR". Also trigger when the user pastes a PR URL and asks you to act on the feedback there.
 ---
 
 # PR Review Resolver
@@ -29,13 +29,21 @@ Every later command references three identifiers — `OWNER`, `REPO`, `PR_NUMBER
 - **Shell state doesn't persist between separate command runs.** A variable you set in one call is gone by the next, so the `$OWNER`/`$REPO`/`$PR_NUMBER` placeholders in the examples below are just that — substitute the literal values you read above into each command (or re-set the variables inside the same call). Don't assume an earlier assignment is still live.
 - **If the user pasted a PR URL, read all three from the URL itself.** `gh repo view` reports the *current directory's* repo, which may not be where the PR lives (forks, monorepo splits, a URL for an unrelated repo). The URL is authoritative.
 
-Then size the PR — Step 2 uses these counts to decide whether delegating is worth it. This gets both counts without pulling any comment bodies:
+Then size the PR — Step 2 uses these counts to decide whether delegating is worth it. This gets all three counts without pulling any comment bodies:
 
 ```bash
-gh api graphql -f query='query($owner:String!,$repo:String!,$pr:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$pr){reviewThreads{totalCount} comments{totalCount}}}}' -F owner="$OWNER" -F repo="$REPO" -F pr="$PR_NUMBER"
+gh api graphql -f query='query($owner:String!,$repo:String!,$pr:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$pr){reviewThreads{totalCount} comments{totalCount} reviews{totalCount}}}}' -F owner="$OWNER" -F repo="$REPO" -F pr="$PR_NUMBER"
 ```
 
 ## Step 2: Fetch and distill outstanding comments (delegate to a cheap model)
+
+PR feedback lives in **three separate buckets**, and no single API call returns
+them all: inline **review threads** (line-anchored conversations), **review
+bodies** (the summary text submitted with a review — where human reviewers and
+bots put verdicts and multi-point findings), and **general comments** (top-level
+issue comments). Fetching only one or two of these silently drops the rest —
+review bodies in particular are easy to miss because they appear in neither the
+`reviewThreads` GraphQL connection nor the issue-comments REST endpoint.
 
 The payloads are large and parsing them is low-judgment: automated reviewers
 (Copilot, Claude, bots) bury a few actionable points under markdown chrome —
@@ -48,16 +56,16 @@ Spawn **one** subagent with the `Agent` tool (`subagent_type: general-purpose`,
 `model: sonnet`). Pin the model explicitly — with no `model`, the subagent
 inherits your session model rather than Sonnet. Its context is isolated (it sees
 nothing of this conversation), so the brief must carry the literal `OWNER`,
-`REPO`, and `PR_NUMBER` values from Step 1, the two commands below, and the rules
-that follow.
+`REPO`, and `PR_NUMBER` values from Step 1, the three commands below, and the
+rules that follow.
 
 > **Skip delegation for a tiny PR.** If the counts from Step 1 are small (say,
-> under ~5 threads and comments combined), just run the two commands yourself —
-> spawning a subagent isn't worth the overhead. The delegation pays off when
-> there are many threads or verbose bot reviews.
+> under ~5 threads, reviews, and comments combined), just run the three commands
+> yourself — spawning a subagent isn't worth the overhead. The delegation pays
+> off when there are many threads or verbose bot reviews.
 
-The subagent runs two commands. **Review threads** (GraphQL — the only way to get
-resolution status and thread IDs):
+The subagent runs three commands, one per bucket. **Review threads** (GraphQL —
+the only way to get resolution status and thread IDs):
 
 ```bash
 gh api graphql -f query='
@@ -97,6 +105,13 @@ actionable items on longer PRs:
 gh api --paginate "repos/$OWNER/$REPO/issues/$PR_NUMBER/comments" --jq '.[] | {id, body, user: .user.login}'
 ```
 
+**Review bodies** (REST — the summary text a reviewer submits with a review,
+distinct from the review's inline threads). Same `--paginate` caveat:
+
+```bash
+gh api --paginate "repos/$OWNER/$REPO/pulls/$PR_NUMBER/reviews" --jq '.[] | select(.body != "") | {id, state, body, user: .user.login}'
+```
+
 Rules for the subagent's brief:
 
 - **Review threads:** keep only `isResolved == false`. Human and automated
@@ -112,6 +127,14 @@ Rules for the subagent's brief:
   items, one entry per point, and include items labeled "non-blocking", "nit", or
   "observation" (they may still be worth fixing). Preserve the parent comment's
   numeric `id` (needed later to reference the comment when declining).
+- **Review bodies:** skip `PENDING` and `DISMISSED` reviews and empty bodies
+  (plain approvals, and reviews submitted only to anchor inline comments).
+  Treat the rest like general comments: split structured reviews into discrete
+  actionable items, keep nits and non-blocking items, preserve the review's
+  numeric `id` and `state`. **Dedupe against threads:** a review body often
+  restates its own inline comments — when a body item duplicates a fetched
+  thread, keep the thread entry and drop the body item; keep body-only points
+  (verdicts, cross-cutting findings) that no thread carries.
 - **Distill, don't dump.** Strip boilerplate, collapsible wrappers, emoji headers,
   and status tables, but keep the technical substance faithfully enough to be
   assessed on its own. Never paste whole files or diffs.
@@ -122,8 +145,8 @@ Rules for the subagent's brief:
   `pageInfo.hasNextPage == true`, re-run it with `-F after="<endCursor>"` to fetch
   the next page and merge — never stop at the first 100. (A thread with >50
   comments is vanishingly rare; don't bother paginating within a thread. The REST
-  general-comments call already handles this via `--paginate`.)
-- **Never fabricate a worklist.** If either command fails (auth, network, wrong
+  calls already handle this via `--paginate`.)
+- **Never fabricate a worklist.** If any command fails (auth, network, wrong
   repo), return its error output verbatim as the result — do not return an empty
   or invented worklist. An empty list means "genuinely nothing unresolved," and
   the next step trusts it.
@@ -153,6 +176,16 @@ placeholders; the field names and structure are what matter:
         { "summary": "one-line point", "detail": "enough context to assess it" }
       ]
     }
+  ],
+  "reviews": [
+    {
+      "reviewId": 123456789,
+      "author": "some-reviewer",
+      "state": "CHANGES_REQUESTED",
+      "items": [
+        { "summary": "one-line point", "detail": "enough context to assess it" }
+      ]
+    }
   ]
 }
 ```
@@ -167,7 +200,7 @@ downstream depends on these identifiers.
 ### Short-circuit if there's nothing to do
 
 If the worklist comes back with no unresolved threads and nothing actionable in
-the general comments, stop here. Tell the user the PR has no outstanding feedback
+the review bodies or general comments, stop here. Tell the user the PR has no outstanding feedback
 and exit — don't press on into Step 3 just to be thorough, and don't invent work
 to fill the void.
 
@@ -312,9 +345,11 @@ gh api graphql -f query='
 
 `$THREAD_ID` is the `threadId` from the Step 2 worklist (the opaque `PRRT_kw…` node ID, not `firstCommentDatabaseId`).
 
-### For general comments
+### For general comments and review bodies
 
-No reply needed — the commit message serves as the record.
+No reply needed for fixes — the commit message serves as the record. (A review
+body has no reply endpoint and nothing to "resolve"; it closes out exactly like
+a general comment.)
 
 ### For declined comments
 
@@ -338,8 +373,8 @@ Don't run the `resolveReviewThread` mutation. Don't include a commit hash —
 there's no commit to cite, and the reply should read as a position, not a
 fix announcement.
 
-For general comments (which have no thread reply mechanism), post the
-justification as a top-level PR comment:
+For general comments and review bodies (neither has a thread reply mechanism),
+post the justification as a top-level PR comment:
 
 ```bash
 gh api "repos/$OWNER/$REPO/issues/$PR_NUMBER/comments" \
@@ -348,17 +383,18 @@ gh api "repos/$OWNER/$REPO/issues/$PR_NUMBER/comments" \
 
 A top-level comment is detached from what it answers, so open the justification
 by naming the item it addresses — quote the reviewer's phrasing or the point,
-not just "re: your comment." If that comment was a multi-item bot review where
-you fixed some items and declined others, note the fixed ones too ("items 1 and
+not just "re: your comment." If the comment or review was multi-item and you
+fixed some items and declined others, note the fixed ones too ("items 1 and
 3 addressed in abc1234; on item 2: …") so the reviewer gets one coherent reply
-rather than a response that looks partial.
+rather than a response that looks partial. One reply per source comment or
+review, not one per item.
 
 The justification text should be the reasoning you and the user agreed on in
 Step 3 — phrased for the reviewer, not paraphrased into something vaguer.
 
 ## Ordering and hash reuse
 
-- Process review threads before general comments. General comments frequently restate feedback that's already a line-level thread; doing threads first means you either catch the duplication or fix the underlying issue once and skip the general-comment restatement.
+- Process review threads before review bodies and general comments. Both frequently restate feedback that's already a line-level thread; doing threads first means you either catch the duplication or fix the underlying issue once and skip the restatement.
 - Cite the short hash from the Step 5 {item → commit} map — the commit that actually contains each fix, not whatever `HEAD` happens to be at reply time.
 - If multiple review threads were fixed in one commit, reply to each with that same hash.
 
@@ -369,4 +405,4 @@ Step 3 — phrased for the reviewer, not paraphrased into something vaguer.
 - **Don't** resolve a thread without a commit to back it up. Every resolve should cite a real hash. In particular, don't resolve a thread you declined — the reviewer raised it and gets to decide whether your justification settles things. Resolving on their behalf signals you're treating the conversation as one-sided.
 - **Don't** reply using the GraphQL node `id` — see Step 6 for why. Replies use `databaseId`; only the resolve mutation takes the node ID.
 - **Don't** force-push or rewrite history as part of this skill. This is a forward-merge workflow — new commits land on top. History rewriting belongs to a different skill.
-- **Don't** re-fix a general comment that restates a review thread you already addressed. The record is the commit; the thread reply is the acknowledgment. Two replies to the same fix is noise.
+- **Don't** re-fix a general comment or review body that restates a review thread you already addressed. The record is the commit; the thread reply is the acknowledgment. Two replies to the same fix is noise.
