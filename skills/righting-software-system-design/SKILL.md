@@ -156,8 +156,7 @@ All persistent artifacts live in `decompositions/{system-name}/`:
 Write everything important to `report.md` as the session progresses.
 Chat is the conversation surface; the file is the durable record.
 
-If a decomposition was previously run on this system — whether with
-this skill or the deprecated `volatility-decomposition` skill — pick
+If a decomposition was previously run on this system, pick
 a distinct system name (`order-pipeline-v2`, `order-pipeline-rework`,
 etc.) so the prior report isn't overwritten. The directory layout is
 intentional: each session gets its own `decompositions/{system-name}/`

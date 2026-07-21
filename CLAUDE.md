@@ -23,8 +23,8 @@ Three files drive discovery; changing one without the others will break loading:
   corresponding marketplace entry.
 - `skills/<skill-name>/SKILL.md` — the skill. One per directory. The directory
   name is the skill name.
-- `agents/<name>.md` — a subagent bundled for a skill to spawn (e.g.
-  `orchestrate` bundles `worker`). Frontmatter sets its
+- `agents/<name>.md` — a subagent bundled for a skill to spawn.
+  Frontmatter sets its
   `name`, `description`, `tools`, and a pinned `model`; the file body is the
   agent's prompt. Listed in `plugin.json` under `agents`, and invoked by a skill
   via `subagent_type` rather than by the user.
