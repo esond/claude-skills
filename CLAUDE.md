@@ -28,6 +28,12 @@ Three files drive discovery; changing one without the others will break loading:
   `name`, `description`, `tools`, and a pinned `model`; the file body is the
   agent's prompt. Listed in `plugin.json` under `agents`, and invoked by a skill
   via `subagent_type` rather than by the user.
+- `hooks/hooks.json` — event handlers, auto-discovered at the plugin root, so
+  `plugin.json` does not list them. Scripts live beside it in `hooks/` and are
+  invoked via `${CLAUDE_PLUGIN_ROOT}`. A hook fires for every session, so it
+  must exit 0 on all failure paths rather than block startup. Write them in
+  POSIX `sh` (Git Bash runs them on Windows); `.gitattributes` pins `*.sh` to
+  LF, since CRLF survives Git Bash but breaks dash.
 
 When adding or removing a skill, update both `plugin.json` (add to `skills`
 array) and — if the plugin's surface area changed meaningfully — bump `version`
@@ -39,6 +45,11 @@ on deletion.
 When a skill bundles a subagent, add its file under `agents/`, list it in
 `plugin.json`'s `agents` array, and add a row to the "Agents included" table in
 `README.md`.
+
+When a skill bundles a hook, add the script under `hooks/`, register it in
+`hooks/hooks.json`, and add a row to the "Hooks included" table in `README.md`.
+A hook that changes Claude's behavior should be opt-in and reversible from the
+skill that owns it, so the hook stays inert until the user turns it on.
 
 ## Authoring skills
 
@@ -76,6 +87,10 @@ No automated validation exists. To verify a change:
 
 1. Reload the plugin in Claude Code (via the marketplace).
 2. Trigger the skill with a phrase from its `description` and confirm it runs.
+
+Edits to a `SKILL.md` body apply immediately. Changes under `hooks/` do not —
+run `/reload-plugins` or restart. `claude plugin validate .claude-plugin/plugin.json`
+checks manifest, frontmatter, and `hooks/hooks.json` syntax without a reload.
 
 If the skill doesn't fire, the `description` is usually the problem — not the
 body.

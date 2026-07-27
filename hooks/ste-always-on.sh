@@ -39,5 +39,9 @@ else
   ' "$skill_path") || exit 0
 fi
 
+# A truncated or mid-edit SKILL.md can leave nothing after the marker. Claiming
+# the mode is active with no ruleset attached is worse than staying quiet.
+[ -n "$body" ] || exit 0
+
 printf 'ASD-STE100 OUTPUT MODE ACTIVE (always-on). The ruleset below shapes every message you send to the user for the rest of this session. The mode is already on, so do not announce it unless the user asks. "stop STE mode" turns it off for this session only. `/esond:asd-ste100-output off` (or deleting %s) turns always-on off for good.\n\n%s\n' \
   "$flag_path" "$body"
