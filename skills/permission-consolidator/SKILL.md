@@ -1,6 +1,15 @@
 ---
 name: permission-consolidator
-description: Review and consolidate Claude Code permission entries in settings.json files. Use this skill whenever the user wants to clean up, consolidate, review, audit, or prune their Claude Code permissions, or says things like "my allow list is huge", "too many permission entries", "the permissions file is a mess", "consolidate my permissions", or "look at settings.local.json". Also trigger proactively when the user mentions "permissions", "settings.local.json", "settings.json", "allow list", or complains about repeatedly approving similar commands — even if they don't literally ask to "consolidate".
+description: >-
+  Review and consolidate Claude Code permission entries in settings.json
+  files. Use this skill whenever the user wants to clean up, consolidate,
+  review, audit, or prune their Claude Code permissions, or says things like
+  "my allow list is huge", "too many permission entries", "the permissions
+  file is a mess", "consolidate my permissions", or "look at
+  settings.local.json". Also trigger proactively when the user mentions
+  "permissions", "settings.local.json", "settings.json", "allow list", or
+  complains about repeatedly approving similar commands — even if they don't
+  literally ask to "consolidate".
 ---
 
 # Permission Consolidator

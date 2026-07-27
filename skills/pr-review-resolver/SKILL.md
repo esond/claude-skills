@@ -1,6 +1,16 @@
 ---
 name: pr-review-resolver
-description: Address outstanding review comments on a GitHub pull request. Fetches all unresolved review threads, submitted review bodies, and general PR comments, assesses each for validity, then either fixes the code, commits, replies with the commit hash, and resolves the thread, or — when declining — replies with justification and leaves the thread for the reviewer to resolve. Use this skill whenever the user wants to address, fix, resolve, or work through PR review comments or feedback — even if they just say something like "handle the PR comments", "address the review feedback", "fix what the reviewers said", or "go through the PR". Also trigger when the user pastes a PR URL and asks you to act on the feedback there.
+description: >-
+  Address outstanding review comments on a GitHub pull request. Fetches all
+  unresolved review threads, submitted review bodies, and general PR comments,
+  assesses each for validity, then either fixes the code, commits, replies
+  with the commit hash, and resolves the thread, or — when declining — replies
+  with justification and leaves the thread for the reviewer to resolve. Use
+  this skill whenever the user wants to address, fix, resolve, or work through
+  PR review comments or feedback — even if they just say something like
+  "handle the PR comments", "address the review feedback", "fix what the
+  reviewers said", or "go through the PR". Also trigger when the user pastes a
+  PR URL and asks you to act on the feedback there.
 ---
 
 # PR Review Resolver

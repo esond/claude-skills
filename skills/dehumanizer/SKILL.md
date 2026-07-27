@@ -1,18 +1,19 @@
 ---
 name: dehumanizer
-description: |
-  Make any message look AI-generated — the mirror image of the humanizer skill.
-  Rewrites text to pile on the tells of LLM slop (em dashes, rule of three,
-  "it's not just X, it's Y," words like delve / tapestry / testament / underscore,
-  inflated significance, sycophantic openers, emoji bold headers) while keeping the
-  original meaning fully intact. Has an intensity dial — subtle (the default, plausibly
-  deniable), heavy (unmistakably AI), and unhinged (maximum slop). Use this skill
-  whenever the user wants to make writing look AI-written, robotic, botted, or
-  ChatGPT-flavored — phrasings like "dehumanize this," "make this look AI-generated,"
-  "make it sound like a bot wrote it," "AI-ify this," "add some slop," "give it the
-  ChatGPT treatment," "dial up the AI," or "make this more obviously AI" — even if
-  they never say the word "dehumanize." Mostly used for trolling and parody. If the
-  text already looks AI-ish, dial it up rather than tone it down.
+description: >-
+  Make any message look AI-generated — the mirror image of the humanizer
+  skill. Rewrites text to pile on the tells of LLM slop (em dashes, rule of
+  three, "it's not just X, it's Y," words like delve / tapestry / testament /
+  underscore, inflated significance, sycophantic openers, emoji bold headers)
+  while keeping the original meaning fully intact. Has an intensity dial —
+  subtle (the default, plausibly deniable), heavy (unmistakably AI), and
+  unhinged (maximum slop). Use this skill whenever the user wants to make
+  writing look AI-written, robotic, botted, or ChatGPT-flavored — phrasings
+  like "dehumanize this," "make this look AI-generated," "make it sound like a
+  bot wrote it," "AI-ify this," "add some slop," "give it the ChatGPT
+  treatment," "dial up the AI," or "make this more obviously AI" — even if
+  they never say the word "dehumanize." Mostly used for trolling and parody.
+  If the text already looks AI-ish, dial it up rather than tone it down.
 ---
 
 # Dehumanizer: Make Writing Look AI-Generated

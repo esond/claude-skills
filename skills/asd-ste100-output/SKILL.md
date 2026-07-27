@@ -1,16 +1,16 @@
 ---
 name: asd-ste100-output
 description: >-
-  Shape every message you send to the user with ASD-STE100 Simplified Technical
-  English: short sentences, active voice, approved verb forms, one meaning per
-  word, no idioms. The goal is shorter, plainer output, not certified
-  compliance. Run `/esond:asd-ste100-output` to turn it on for this session,
-  `/esond:asd-ste100-output on` to make it the default for all future sessions,
-  `off` to turn it off everywhere, `status` to report the mode. Once on, it
-  applies to every response until the user says "stop STE mode" or "normal
-  mode". Shapes only the prose the user reads in the transcript. It never
-  touches code, commit messages, PR or issue comments, file contents, docs, or
-  drafts of messages to other people.
+  Shape every message you send to the user with ASD-STE100 Simplified
+  Technical English: short sentences, active voice, approved verb forms, one
+  meaning per word, no idioms. The goal is shorter, plainer output, not
+  certified compliance. Run `/esond:asd-ste100-output` to turn it on for this
+  session, `/esond:asd-ste100-output on` to make it the default for all future
+  sessions, `off` to turn it off everywhere, `status` to report the mode. Once
+  on, it applies to every response until the user says "stop STE mode" or
+  "normal mode". Shapes only the prose the user reads in the transcript. It
+  never touches code, commit messages, PR or issue comments, file contents,
+  docs, or drafts of messages to other people.
 disable-model-invocation: true
 ---
 

@@ -1,16 +1,17 @@
 ---
 name: inline-review
-description: |
-  Find and address inline code-review comments left in the code, marked with the
-  `rev:` prefix (e.g. `// rev:`, `# rev:`, `-- rev:`). These are a manual code
-  review done inline instead of on GitHub — each comment is a question,
+description: >-
+  Find and address inline code-review comments left in the code, marked with
+  the `rev:` prefix (e.g. `// rev:`, `# rev:`, `-- rev:`). These are a manual
+  code review done inline instead of on GitHub — each comment is a question,
   suggestion, concern, or change request about the nearby code. Use this skill
-  whenever the user asks you to address, handle, resolve, go through, or respond
-  to their inline review comments, rev comments, or `rev:` comments — even when
-  phrased tersely, like "address my rev comments", "handle the reviews", "go
-  through the rev: notes", "I left some inline comments", "respond to my review",
-  or just "address these" right after leaving such comments. Trigger whenever the
-  request references `rev:` comments in the code.
+  whenever the user asks you to address, handle, resolve, go through, or
+  respond to their inline review comments, rev comments, or `rev:` comments —
+  even when phrased tersely, like "address my rev comments", "handle the
+  reviews", "go through the rev: notes", "I left some inline comments",
+  "respond to my review", or just "address these" right after leaving such
+  comments. Trigger whenever the request references `rev:` comments in the
+  code.
 ---
 
 # inline-review
