@@ -3,7 +3,7 @@
 # turned always-on mode on, which is recorded by the presence of
 # $CLAUDE_CONFIG_DIR/.asd-ste100-always (default ~/.claude).
 #
-# Toggle it with `/asd-ste100-output on` and `/asd-ste100-output off`.
+# Toggle it with `/esond:asd-ste100-output on` and `/esond:asd-ste100-output off`.
 #
 # Pure POSIX sh so it runs anywhere Claude Code runs a command hook (sh on
 # macOS and Linux, Git Bash on Windows) with no dependency on Node being on
@@ -39,5 +39,5 @@ else
   ' "$skill_path") || exit 0
 fi
 
-printf 'ASD-STE100 OUTPUT MODE ACTIVE (always-on). The ruleset below shapes every message you send to the user for the rest of this session. The mode is already on, so do not announce it unless the user asks. "stop STE mode" turns it off for this session only. `/asd-ste100-output off` (or deleting %s) turns always-on off for good.\n\n%s\n' \
+printf 'ASD-STE100 OUTPUT MODE ACTIVE (always-on). The ruleset below shapes every message you send to the user for the rest of this session. The mode is already on, so do not announce it unless the user asks. "stop STE mode" turns it off for this session only. `/esond:asd-ste100-output off` (or deleting %s) turns always-on off for good.\n\n%s\n' \
   "$flag_path" "$body"

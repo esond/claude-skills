@@ -4,9 +4,9 @@ description: >-
   Shape every message you send to the user with ASD-STE100 Simplified Technical
   English: short sentences, active voice, approved verb forms, one meaning per
   word, no idioms. The goal is shorter, plainer output, not certified
-  compliance. Run `/asd-ste100-output` to turn it on for this session,
-  `/asd-ste100-output on` to make it the default for all future sessions, `off`
-  to turn it off everywhere, `status` to report the current mode. Once on, it
+  compliance. Run `/esond:asd-ste100-output` to turn it on for this session,
+  `/esond:asd-ste100-output on` to make it the default for all future sessions,
+  `off` to turn it off everywhere, `status` to report the mode. Once on, it
   applies to every response until the user says "stop STE mode" or "normal
   mode". Shapes only the prose the user reads in the transcript. It never
   touches code, commit messages, PR or issue comments, file contents, docs, or
@@ -41,7 +41,7 @@ Only the presence of the file matters. The content does not.
 Confirm the mode in one sentence. Then answer what the user asked.
 
 The two levels are independent. The flag sets the default across sessions. A
-bare `/asd-ste100-output` or a "stop STE mode" changes the current session only.
+bare `/esond:asd-ste100-output` or a "stop STE mode" changes this session only.
 The user can therefore compare the two output modes without losing the default.
 
 <!-- ste:always-on -->
@@ -54,7 +54,8 @@ context is compacted. If you are unsure whether it still applies, it does.
 
 Turn it off for the session when the user says "stop STE mode" or "normal mode".
 Confirm in one line. If the flag file exists, say that future sessions still
-start in STE mode, and name `/asd-ste100-output off` as the way to change that.
+start in STE mode. Name `/esond:asd-ste100-output off` as the way to change
+that.
 
 ## What STE governs
 
