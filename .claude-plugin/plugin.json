@@ -1,6 +1,6 @@
 {
   "name": "esond",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Eric's personal Claude Code skills.",
   "author": {
     "name": "Eric Sondergard",
@@ -8,6 +8,7 @@
   },
   "repository": "https://github.com/esond/claude-skills",
   "skills": [
+    "./skills/asd-ste100-output",
     "./skills/bro",
     "./skills/clean-unused-cpm-packages",
     "./skills/dehumanizer",
