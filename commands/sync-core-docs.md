@@ -1,5 +1,6 @@
 ---
-description: Create or audit a repo's README.md, CLAUDE.md, and REVIEW.md docs.
+description: >-
+  Create or audit a repo's README.md, CLAUDE.md, and REVIEW.md docs.
 argument-hint: "[--readme] [--claude] [--review]"
 ---
 
