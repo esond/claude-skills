@@ -19,7 +19,7 @@ flag_path="$claude_dir/.asd-ste100-always"
 
 # $0 is the absolute script path substituted into hooks.json by Claude Code,
 # so resolve SKILL.md relative to it instead of trusting an exported env var.
-script_dir=$(dirname -- "$0")
+script_dir=$(dirname "$0")
 skill_path="$script_dir/../skills/asd-ste100-output/SKILL.md"
 [ -f "$skill_path" ] || exit 0
 
