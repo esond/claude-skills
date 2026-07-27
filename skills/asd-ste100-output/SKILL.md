@@ -11,6 +11,7 @@ description: >-
   "normal mode". Shapes only the prose the user reads in the transcript. It
   never touches code, commit messages, PR or issue comments, file contents,
   docs, or drafts of messages to other people.
+argument-hint: "[on|off|status]"
 disable-model-invocation: true
 ---
 
