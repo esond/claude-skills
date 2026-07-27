@@ -1,6 +1,20 @@
 ---
 name: plan-repl-resume
-description: Resume an in-progress `plan-repl` task from its persisted files. Reads `tasks/{task-name}/research.md`, `plan.md`, and `todo.md`, cross-references them against the current branch's git state to figure out where the previous session actually left off, then continues from that phase. Use this skill whenever the user wants to pick a `plan-repl` task back up — even if they phrase it as "resume the X task", "continue where we left off", "I cleared my context, let's keep going", "pick up the webhook-retries task", "what were we doing on X", or just "let's continue X" with a name that matches a directory under `tasks/`. The two main scenarios: (1) the user cleared their context mid-workflow because research and planning bloated the conversation and wants a fresh slate without losing the work on disk, and (2) the user is returning to a task in a new session after exiting earlier. Trigger proactively when the user references a task name that exists under `tasks/` and hasn't been part of the current conversation yet.
+description: >-
+  Resume an in-progress `plan-repl` task from its persisted files. Reads
+  `tasks/{task-name}/research.md`, `plan.md`, and `todo.md`, cross-references
+  them against the current branch's git state to figure out where the previous
+  session actually left off, then continues from that phase. Use this skill
+  whenever the user wants to pick a `plan-repl` task back up — even if they
+  phrase it as "resume the X task", "continue where we left off", "I cleared
+  my context, let's keep going", "pick up the webhook-retries task", "what
+  were we doing on X", or just "let's continue X" with a name that matches a
+  directory under `tasks/`. The two main scenarios: (1) the user cleared their
+  context mid-workflow because research and planning bloated the conversation
+  and wants a fresh slate without losing the work on disk, and (2) the user is
+  returning to a task in a new session after exiting earlier. Trigger
+  proactively when the user references a task name that exists under `tasks/`
+  and hasn't been part of the current conversation yet.
 ---
 
 # plan-repl-resume
