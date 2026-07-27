@@ -83,14 +83,21 @@ used throughout this repo:
 
 ## Testing a change
 
-No automated validation exists. To verify a change:
+CI runs the `validate` job in `.github/workflows/release.yml` on every pull
+request and every push to `main`. It checks that both manifests parse, that
+their versions match, that every path in `plugin.json`'s `skills` array has a
+`SKILL.md`, and that each skill's frontmatter carries `name` and `description`
+with `name` matching its directory. Run the same structural checks locally with
+`claude plugin validate .claude-plugin/plugin.json`, which also covers
+`hooks/hooks.json` syntax.
+
+Nothing automated executes a skill, so behavior is still verified by hand:
 
 1. Reload the plugin in Claude Code (via the marketplace).
 2. Trigger the skill with a phrase from its `description` and confirm it runs.
 
 Edits to a `SKILL.md` body apply immediately. Changes under `hooks/` do not —
-run `/reload-plugins` or restart. `claude plugin validate .claude-plugin/plugin.json`
-checks manifest, frontmatter, and `hooks/hooks.json` syntax without a reload.
+run `/reload-plugins` or restart.
 
 If the skill doesn't fire, the `description` is usually the problem — not the
 body.
