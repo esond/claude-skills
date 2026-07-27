@@ -1,6 +1,20 @@
 ---
 name: righting-software-system-design
-description: Opt-in, collaborative system-design workflow based on Juval Löwy's iDesign methodology in *Righting Software*. Conducts a multi-phase interview (framing → use cases → volatility analysis → components → call-chain validation → report) that surfaces unknown-unknowns and produces a written recommendation at `decompositions/{system-name}/report.md`. **Run only when the user explicitly invites this workflow** — not for general architecture questions, lightweight design conversations, or quick "where should X live?" questions. Valid triggers: the user names the skill directly, references *Righting Software* / Juval Löwy / iDesign / "The Method" / volatility-based decomposition and asks to run a full session, asks for a "deep" or "structured" or "Löwy-style" system design session, or accepts a prior suggestion to run it. Wait for an explicit yes before entering Phase 0. The skill is interrogative — a back-and-forth interview that challenges each volatility candidate and proposes ones the user hasn't considered.
+description: >-
+  Opt-in, collaborative system-design workflow based on Juval Löwy's iDesign
+  methodology in *Righting Software*. Conducts a multi-phase interview
+  (framing → use cases → volatility analysis → components → call-chain
+  validation → report) that surfaces unknown-unknowns and produces a written
+  recommendation at `decompositions/{system-name}/report.md`. **Run only when
+  the user explicitly invites this workflow** — not for general architecture
+  questions, lightweight design conversations, or quick "where should X live?"
+  questions. Valid triggers: the user names the skill directly, references
+  *Righting Software* / Juval Löwy / iDesign / "The Method" / volatility-based
+  decomposition and asks to run a full session, asks for a "deep" or
+  "structured" or "Löwy-style" system design session, or accepts a prior
+  suggestion to run it. Wait for an explicit yes before entering Phase 0. The
+  skill is interrogative — a back-and-forth interview that challenges each
+  volatility candidate and proposes ones the user hasn't considered.
 ---
 
 # Righting Software: System Decomposition

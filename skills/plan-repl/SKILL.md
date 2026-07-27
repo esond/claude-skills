@@ -1,6 +1,17 @@
 ---
 name: plan-repl
-description: Structured research-plan-implement workflow for non-trivial tasks. Researches the codebase deeply and writes findings to a persistent file, then produces an annotatable implementation plan the user can mark up with inline notes, iterates through annotation cycles until approved, builds a task breakdown, and finally implements. Use this skill whenever the user has a multi-step implementation task, feature request, refactoring, or architectural change. Suggest this workflow when you detect tasks that would benefit from upfront research and planning — multi-file changes, unfamiliar code, architectural decisions, or anything where jumping straight to code would be risky. Even if the user doesn't explicitly ask for "research" or "planning", suggest it for substantial work.
+description: >-
+  Structured research-plan-implement workflow for non-trivial tasks.
+  Researches the codebase deeply and writes findings to a persistent file,
+  then produces an annotatable implementation plan the user can mark up with
+  inline notes, iterates through annotation cycles until approved, builds a
+  task breakdown, and finally implements. Use this skill whenever the user has
+  a multi-step implementation task, feature request, refactoring, or
+  architectural change. Suggest this workflow when you detect tasks that would
+  benefit from upfront research and planning — multi-file changes, unfamiliar
+  code, architectural decisions, or anything where jumping straight to code
+  would be risky. Even if the user doesn't explicitly ask for "research" or
+  "planning", suggest it for substantial work.
 ---
 
 # Research → Plan → Implement

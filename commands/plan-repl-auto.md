@@ -1,5 +1,7 @@
 ---
-description: Run the multi-model plan cascade — Sonnet research, Opus synthesis, Fable arbitration.
+description: >-
+  Run the multi-model plan cascade — Sonnet research, Opus synthesis, Fable
+  arbitration.
 argument-hint: "<task> [--implement] [--arbiter <model>]"
 ---
 

@@ -1,0 +1,4 @@
+# Hook scripts run through `sh` on whatever platform installs the plugin.
+# CRLF survives Git Bash but breaks dash on Linux/macOS, so pin them to LF
+# regardless of the checkout's core.autocrlf setting.
+*.sh text eol=lf

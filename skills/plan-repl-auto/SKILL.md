@@ -1,16 +1,19 @@
 ---
 name: plan-repl-auto
 description: >-
-  Automated multi-model variant of `plan-repl`: a coordinator fans token-heavy research out to
-  parallel Sonnet subagents (via the Workflow tool), synthesizes an implementation plan on the
-  session model, then a Fable arbiter grills the plan over bounded rounds (three by default,
-  extendable by explicit request when you're in the loop) until it has no substantive objections —
-  replacing plan-repl's human `> NOTE:` loop with a cheap→mid→expensive
-  model cascade. Explicit-only: invoke via the `/esond:plan-repl-auto` command or by name. Do NOT
-  auto-suggest or fire it on general planning/refactor requests — `plan-repl` is the default; use
-  this ONLY when the user explicitly asks for `plan-repl-auto` or the automated multi-model plan
-  cascade. Flags: `--implement` (run end-to-end and autonomously with no human checkpoints, then fan
-  Sonnet subagents to build the plan) and `--arbiter <model>` (arbiter, default Fable).
+  Automated multi-model variant of `plan-repl`: a coordinator fans token-heavy
+  research out to parallel Sonnet subagents (via the Workflow tool),
+  synthesizes an implementation plan on the session model, then a Fable
+  arbiter grills the plan over bounded rounds (three by default, extendable by
+  explicit request when you're in the loop) until it has no substantive
+  objections — replacing plan-repl's human `> NOTE:` loop with a
+  cheap→mid→expensive model cascade. Explicit-only: invoke via the
+  `/esond:plan-repl-auto` command or by name. Do NOT auto-suggest or fire it
+  on general planning/refactor requests — `plan-repl` is the default; use this
+  ONLY when the user explicitly asks for `plan-repl-auto` or the automated
+  multi-model plan cascade. Flags: `--implement` (run end-to-end and
+  autonomously with no human checkpoints, then fan Sonnet subagents to build
+  the plan) and `--arbiter <model>` (arbiter, default Fable).
 ---
 
 # plan-repl-auto: a cheap → mid → expensive model cascade for planning

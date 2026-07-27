@@ -1,6 +1,20 @@
 ---
 name: sync-core-repo-docs
-description: Create or audit a repo's three core doc files — README.md, CLAUDE.md, and REVIEW.md — in that dependency order. If a file is missing, generate it from the actual codebase; if it exists, audit it against the current code and apply targeted fixes after confirmation. README.md gets a developer from clone to running the project; CLAUDE.md captures coding guidance for Claude (delegating to /init or the claude-md-improver skill); REVIEW.md holds reviewer-facing guidance for automated code review agents without duplicating CLAUDE.md. Target files with --readme, --claude, and --review, or run all three by default. Use whenever the user wants to set up, bootstrap, scaffold, refresh, audit, update, or sync a repo's docs, or says things like "create a README", "is my README still accurate", "write a CLAUDE.md", "audit our docs", or "get this repo ready for contributors" — even if they name only one of the three files. Prefer it over claude-md-improver alone when README or REVIEW are also in scope.
+description: >-
+  Create or audit a repo's three core doc files — README.md, CLAUDE.md, and
+  REVIEW.md — in that dependency order. If a file is missing, generate it from
+  the actual codebase; if it exists, audit it against the current code and
+  apply targeted fixes after confirmation. README.md gets a developer from
+  clone to running the project; CLAUDE.md captures coding guidance for Claude
+  (delegating to /init or the claude-md-improver skill); REVIEW.md holds
+  reviewer-facing guidance for automated code review agents without
+  duplicating CLAUDE.md. Target files with --readme, --claude, and --review,
+  or run all three by default. Use whenever the user wants to set up,
+  bootstrap, scaffold, refresh, audit, update, or sync a repo's docs, or says
+  things like "create a README", "is my README still accurate", "write a
+  CLAUDE.md", "audit our docs", or "get this repo ready for contributors" —
+  even if they name only one of the three files. Prefer it over
+  claude-md-improver alone when README or REVIEW are also in scope.
 ---
 
 # sync-core-repo-docs
