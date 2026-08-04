@@ -167,13 +167,17 @@ jobs:
 
           \`\`\`text
           /plugin marketplace add $GITHUB_REPOSITORY
-          /plugin install eng@$MARKET_NAME
-          /plugin install comms@$MARKET_NAME
-          /plugin install behavior@$MARKET_NAME
-          \`\`\`
+          INSTALL
+
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            echo "/plugin install $(jq -r '.name' "$manifest")@$MARKET_NAME" >> notes.md
+          done
+
+          cat >> notes.md << 'FOOT'
+          ```
 
           Install only the plugins you want — they toggle independently.
-          INSTALL
+          FOOT
 
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
