@@ -8,7 +8,7 @@ be toggled on and off independently, per project or context.
 | ----------------------------- | ----------------------------------------------------------------------------------- |
 | [`eng`](plugins/eng)          | Writing software: planning, review, git history, .NET hygiene, design, repo docs.   |
 | [`comms`](plugins/comms)      | External communications and human-facing writing.                                   |
-| [`behavior`](plugins/behavior)| Tweaks to Claude's behavior and Claude Code configuration.                          |
+| [`behavior`](plugins/behavior) | Tweaks to Claude's behavior and Claude Code configuration.                          |
 
 ## Installation
 
@@ -85,7 +85,7 @@ arguments — a deterministic counterpart to skills' natural-language triggering
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`bro`](plugins/behavior/skills/bro/SKILL.md)                                  | Restates Claude's last message in plain, jargon-free language. Explicit-only (`disable-model-invocation: true`) — invoked by name, not auto-triggered.                                                      |
 | [`permission-consolidator`](plugins/behavior/skills/permission-consolidator/SKILL.md) | Reviews a Claude Code `settings.json` allow list, proposes consolidations for `Bash(...)` entries that share a command prefix, and flags one-off or stale entries for pruning.                               |
-| [`toggle-simplified-english`](plugins/behavior/skills/toggle-simplified-english/SKILL.md) | Enables, disables, or toggles the Simplified Technical English output style by editing the `outputStyle` key in Claude Code settings — say "turn on simplified english" instead of hand-editing JSON. User scope by default, project scope on request. |
+| [`toggle-simplified-english`](plugins/behavior/skills/toggle-simplified-english/SKILL.md) | Enables, disables, or toggles the Simplified Technical English output style by editing the `outputStyle` key in Claude Code settings, instead of hand-editing JSON. Explicit-only (`disable-model-invocation: true`) — run it as `/behavior:toggle-simplified-english`, since it writes to a settings file. Confirms which scope to write (user or project-local) before touching anything. |
 
 ### Output styles
 
@@ -98,10 +98,10 @@ active at a time, and it replaces whichever built-in style you were on.
 | [`Simplified Technical English`](plugins/behavior/output-styles/simplified-technical-english.md) | Shapes every message Claude sends with ASD-STE100 Simplified Technical English: short sentences, active voice, approved verb forms, one meaning per word, no idioms. Scoped to transcript prose only — never code, commits, PR comments, file contents, drafts for other people, or Claude's own thinking. Sets `keep-coding-instructions: true`, so Claude Code's software-engineering system prompt loads exactly as it does under the Default style. |
 
 Turn one on with `/config` → **Output style**, set it in
-`~/.claude/settings.json` to apply it everywhere, or just ask — the
-[`toggle-simplified-english`](plugins/behavior/skills/toggle-simplified-english/SKILL.md)
-skill edits the setting for you. A plugin output style is registered as
-`<plugin>:<name>`, so the value is namespaced:
+`~/.claude/settings.json` to apply it everywhere, or run
+[`/behavior:toggle-simplified-english`](plugins/behavior/skills/toggle-simplified-english/SKILL.md),
+which edits the setting for you after confirming the scope. A plugin output
+style is registered as `<plugin>:<name>`, so the value is namespaced:
 
 ```json
 "outputStyle": "behavior:Simplified Technical English"
