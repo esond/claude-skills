@@ -165,7 +165,7 @@ jobs:
           ## What's in this release
 
           Every plugin ships at **$VERSION** — they share one version, so a
-          release moves all three whether or not each one changed.
+          release moves all of them whether or not each one changed.
 
           HEADER
 

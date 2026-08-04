@@ -24,7 +24,8 @@ suggest a bucket from the three above and confirm before proceeding. If it
 genuinely fits none of them, propose creating a new plugin bucket (new
 directory under `plugins/`, new `plugin.json`, new marketplace entry) rather
 than forcing a bad fit — the whole point of the split is that buckets toggle
-independently per context.
+independently per context. A new bucket starts at the version the other
+plugins are already on, not at `0.1.0`; CI rejects a plugin that disagrees.
 
 A command must live in the same plugin as the skill it wraps, and skills that
 hand off to each other (the `plan-repl` family) must stay in one plugin.

@@ -8,8 +8,9 @@ skill instructs Claude to do, not runtime bugs.
 
 1. **Manifest integrity.** Any change touching a skill must keep three things in
    agreement (CLAUDE.md gives the authoring rule — verify it actually held):
-   the owning plugin's `plugin.json` lists the skill dir; that plugin's
-   `plugin.json` version and its `marketplace.json` entry are identical; the
+   the owning plugin's `plugin.json` lists the skill dir; every plugin's
+   `plugin.json` version and `marketplace.json` entry carry one shared version
+   (a bump moves all of them, not just the plugin that changed); the
    plugin's skills table in the README has a matching alphabetical row. Also
    check the skill landed in the right plugin bucket (`eng`/`comms`/`behavior`
    — CLAUDE.md "Choosing a bucket").
