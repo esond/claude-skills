@@ -53,7 +53,7 @@ A tutorial answers "teach me to cook"; a how-to answers "how do I make this toni
 
 ## Step 4 — The drift checklist
 
-Use this on your own draft, and as the audit lens when the `diataxis` router sends an existing how-to guide here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for the router's confirmation gate. The repair move is usually **relocation, not deletion**.
+Use this on your own draft, and as the audit lens when the `diataxis` router sends an existing how-to guide here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for explicit confirmation — the router's gate, or the user's when invoked directly. The repair move is usually **relocation, not deletion**.
 
 - Trivial guidance — "to shut off the water, turn the tap clockwise" — telling a competent reader what they already know → cut.
 - Teaching, background, history, or concept-building mid-task → relocate to explanation or a tutorial, leaving the one-clause statement plus a link in place. Relocation keeps a stub — don't strip the step of its naming sentence and leave a bare hole.

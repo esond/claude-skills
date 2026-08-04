@@ -53,7 +53,7 @@ Usage examples are welcome and often the fastest way to convey a fact — but ke
 
 ## Step 4 — The drift checklist
 
-Use this on your own draft, and as the audit lens when the `diataxis` router sends an existing reference here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for the router's confirmation gate. The repair move is usually **relocation, not deletion**.
+Use this on your own draft, and as the audit lens when the `diataxis` router sends an existing reference here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for explicit confirmation — the router's gate, or the user's when invoked directly. The repair move is usually **relocation, not deletion**.
 
 - Explanatory asides — rationale, history, design discussion sprinkled between entries → consolidate into an explanation article and link; digressions interrupt and obscure the reference, and the fragments never add up to a proper explanation either.
 - Instructional creep — recipes and step sequences inside entries → relocate to a how-to guide; link.

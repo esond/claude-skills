@@ -52,7 +52,7 @@ Explanation has permissions the other three types deny — use them:
 
 ## Step 4 — The drift checklist
 
-Use this on your own draft, and as the audit lens when the `diataxis` router sends an existing explanation here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for the router's confirmation gate. The repair move is usually **relocation — or consolidation**.
+Use this on your own draft, and as the audit lens when the `diataxis` router sends an existing explanation here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for explicit confirmation — the router's gate, or the user's when invoked directly. The repair move is usually **relocation — or consolidation**.
 
 - Instruction or procedure creeping in → relocate to a how-to guide or tutorial; link.
 - Dry enumerations of options, parameters, structures → relocate to reference; link.

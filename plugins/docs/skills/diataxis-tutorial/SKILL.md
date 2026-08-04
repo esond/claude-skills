@@ -65,7 +65,7 @@ The first rule of teaching: **don't try to teach.** Give the learner things to d
 
 ## Step 4 — The drift checklist
 
-Use this when reviewing your own draft, and as the audit lens when the `diataxis` router sends an existing tutorial here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for the router's confirmation gate. The audit's repair move is usually **relocation, not deletion** — the content is fine, it just lives in the wrong place.
+Use this when reviewing your own draft, and as the audit lens when the `diataxis` router sends an existing tutorial here. An audit invocation runs only this step — skip Steps 1–3 and report findings without editing; edits wait for explicit confirmation — the router's gate, or the user's when invoked directly. The audit's repair move is usually **relocation, not deletion** — the content is fine, it just lives in the wrong place.
 
 - Explanation running past a sentence → move it to an explanation article; leave a one-line note and a link.
 - Options or alternative paths offered → cut to the single path; alternatives belong in how-to guides or reference.
