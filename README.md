@@ -33,7 +33,6 @@ installs the `esond` plugin from it.
 
 | Skill                                                                        | What it does                                                                                                                                                                                                 |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`asd-ste100-output`](skills/asd-ste100-output/SKILL.md)                     | Shapes every message Claude sends into ASD-STE100 Simplified Technical English (short sentences, active voice, approved verb forms, no idioms) and keeps it on for the whole session. Scoped to transcript prose only — never code, commits, PR comments, file contents, or drafts for other people. Explicit-only (`disable-model-invocation: true`). `/esond:asd-ste100-output` is session-only; `on`/`off` toggle a persistent flag that a `SessionStart` hook reads to start every future session in STE mode; `status` reports the mode. |
 | [`bro`](skills/bro/SKILL.md)                                                 | Restates Claude's last message in plain, jargon-free language. Explicit-only (`disable-model-invocation: true`) — invoked by name, not auto-triggered.                                                      |
 | [`clean-unused-cpm-packages`](skills/clean-unused-cpm-packages/SKILL.md)     | Removes unused `<PackageVersion>` entries from `Directory.Packages.props` files in a .NET CPM repo by scanning every `.csproj`/`.props`/`.targets` for `PackageReference` includes, then verifies via `dotnet restore`. |
 | [`dehumanizer`](skills/dehumanizer/SKILL.md)                                 | Makes a message look AI-generated — the inverse of [the `humanizer`](https://github.com/blader/humanizer), a separate external skill. Injects LLM "tells" (em dashes, rule of three, copula avoidance, AI vocabulary, emoji bold headers) while preserving both the original meaning and its mood, on an intensity dial (`subtle` default, `heavy`, `unhinged`). Mostly for trolling. |
@@ -62,11 +61,28 @@ arguments — a deterministic counterpart to skills' natural-language triggering
 | [`/esond:sync-core-docs`](commands/sync-core-docs.md)    | Thin wrapper over the [`sync-core-repo-docs`](skills/sync-core-repo-docs/SKILL.md) skill. Accepts `--readme`, `--claude`, `--review` (they combine; no flags runs all three) and hands off to the skill. |
 | [`/esond:plan-repl-auto`](commands/plan-repl-auto.md)    | Runs the [`plan-repl-auto`](skills/plan-repl-auto/SKILL.md) multi-model plan cascade. Takes the planning task plus `--implement` and `--arbiter <model>`, and routes them to the skill. |
 
-## Hooks included
+## Output styles included
 
-| Hook                                              | What it does                                                                                                                                                                                                 |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`ste-always-on.sh`](hooks/ste-always-on.sh)      | `SessionStart`. No-ops unless `$CLAUDE_CONFIG_DIR/.asd-ste100-always` exists (default `~/.claude`); when it does, injects the [`asd-ste100-output`](skills/asd-ste100-output/SKILL.md) ruleset so the session starts in STE mode. Toggle the flag with `/esond:asd-ste100-output on` / `off`. Exits 0 on every failure path, so it never blocks session start. |
+An output style appends its instructions to Claude Code's system prompt, so it
+shapes every response instead of firing on a trigger phrase. Only one can be
+active at a time, and it replaces whichever built-in style you were on.
 
-Hook changes need `/reload-plugins` (or a restart) to take effect — unlike
-`SKILL.md` edits, which apply immediately.
+| Output style                                                                | What it does                                                                                                                                                                                                 |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`Simplified Technical English`](output-styles/simplified-technical-english.md) | Shapes every message Claude sends with ASD-STE100 Simplified Technical English: short sentences, active voice, approved verb forms, one meaning per word, no idioms. Scoped to transcript prose only — never code, commits, PR comments, file contents, drafts for other people, or Claude's own thinking. Sets `keep-coding-instructions: true`, so Claude Code's software-engineering system prompt loads exactly as it does under the Default style. |
+
+Turn one on with `/config` → **Output style**, or set it in
+`~/.claude/settings.json` to apply it everywhere. A plugin output style is
+registered as `<plugin>:<name>`, so the value is namespaced:
+
+```json
+"outputStyle": "esond:Simplified Technical English"
+```
+
+Either way it takes effect on the next `/clear` or new session. Edits to the
+style file also need `/reload-plugins` (or a restart) — unlike `SKILL.md` edits,
+which apply immediately.
+
+The Simplified Technical English style is unofficial, and it is not endorsed by
+ASD or STEMG. The Part 2 dictionary is copyrighted, so the style applies the
+rules and public examples only.

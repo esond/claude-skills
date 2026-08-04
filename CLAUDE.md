@@ -12,7 +12,8 @@ and skill markdown files.
 
 ## Manifest layout
 
-Three files drive discovery; changing one without the others will break loading:
+These files drive discovery; changing one without the others will break
+loading:
 
 - `.claude-plugin/marketplace.json` — declares the marketplace and lists its
   plugins. Each plugin entry has `name`, `source` (relative path to plugin
@@ -34,6 +35,16 @@ Three files drive discovery; changing one without the others will break loading:
   must exit 0 on all failure paths rather than block startup. Write them in
   POSIX `sh` (Git Bash runs them on Windows); `.gitattributes` pins `*.sh` to
   LF, since CRLF survives Git Bash but breaks dash.
+- `output-styles/<name>.md` — an output style, auto-discovered at the plugin
+  root, so `plugin.json` does not list it. (An `outputStyles` manifest key
+  *replaces* the default scan rather than adding to it, so pointing it anywhere
+  but `./output-styles/` hides this directory.) Frontmatter sets `name`,
+  `description`, and
+  `keep-coding-instructions` — leave that last one `true` unless the style
+  really means to drop Claude Code's software-engineering instructions. Do not
+  set `force-for-plugin`: it applies the style to anyone with the plugin
+  enabled, so the only way to turn it off becomes disabling every skill here
+  along with it.
 
 When adding or removing a skill, update both `plugin.json` (add to `skills`
 array) and — if the plugin's surface area changed meaningfully — bump `version`
@@ -47,9 +58,14 @@ When a skill bundles a subagent, add its file under `agents/`, list it in
 `README.md`.
 
 When a skill bundles a hook, add the script under `hooks/`, register it in
-`hooks/hooks.json`, and add a row to the "Hooks included" table in `README.md`.
-A hook that changes Claude's behavior should be opt-in and reversible from the
-skill that owns it, so the hook stays inert until the user turns it on.
+`hooks/hooks.json`, and add a "Hooks included" row to `README.md`. A hook that
+changes Claude's behavior should be opt-in and reversible from the skill that
+owns it, so the hook stays inert until the user turns it on.
+
+When adding or removing an output style, add the file under `output-styles/`,
+update the "Output styles included" table in `README.md`, and bump `version` in
+both manifests as you would for a skill. There is no manifest entry for the
+style itself to keep in sync.
 
 ## Authoring skills
 
@@ -96,8 +112,10 @@ Nothing automated executes a skill, so behavior is still verified by hand:
 1. Reload the plugin in Claude Code (via the marketplace).
 2. Trigger the skill with a phrase from its `description` and confirm it runs.
 
-Edits to a `SKILL.md` body apply immediately. Changes under `hooks/` do not —
-run `/reload-plugins` or restart.
+Edits to a `SKILL.md` body apply immediately. Changes under `hooks/` and
+`output-styles/` do not — run `/reload-plugins` or restart. An output style is
+also read once when the system prompt is built, so a change to it needs
+`/clear` or a new session on top of the reload.
 
 If the skill doesn't fire, the `description` is usually the problem — not the
 body.
