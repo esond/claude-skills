@@ -6,14 +6,26 @@
   },
   "repository": "https://github.com/esond/claude-skills",
   "metadata": {
-    "description": "Eric's personal Claude Code marketplace plugin."
+    "description": "Eric's personal Claude Code marketplace."
   },
   "plugins": [
     {
-      "name": "esond",
-      "source": "./",
-      "description": "Personal skills for Claude Code.",
-      "version": "0.20.0"
+      "name": "eng",
+      "source": "./plugins/eng",
+      "description": "Software engineering skills: planning workflows, code review, git history, .NET hygiene, system design, repo docs.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "comms",
+      "source": "./plugins/comms",
+      "description": "Communication skills: transforms for messages and human-facing writing.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "behavior",
+      "source": "./plugins/behavior",
+      "description": "Agent-behavior tweaks: Claude Code configuration upkeep and output shaping.",
+      "version": "0.1.0"
     }
   ]
 }

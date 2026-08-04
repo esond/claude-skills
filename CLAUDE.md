@@ -5,10 +5,30 @@ code in this repository.
 
 ## What this repo is
 
-A Claude Code **plugin marketplace** (`claude-skills`) that publishes a single
-plugin (`esond`) containing Eric's personal skills. There is no build, no tests,
-no runtime — Claude Code consumes the repo directly by reading the manifest JSON
-and skill markdown files.
+A Claude Code **plugin marketplace** (`claude-skills`) that publishes Eric's
+personal skills as three independently toggleable plugins, one per bucket:
+
+- `eng` — writing software: planning workflows, code review, git history,
+  .NET hygiene, system design, repo docs.
+- `comms` — external communications and human-facing writing.
+- `behavior` — tweaks to Claude's behavior or Claude Code configuration.
+
+There is no build, no tests, no runtime — Claude Code consumes the repo
+directly by reading the manifest JSON and skill markdown files.
+
+## Choosing a bucket for new content
+
+Every skill, command, output style, hook, or agent belongs to exactly one
+plugin. When adding one and the user hasn't said which plugin it goes in,
+suggest a bucket from the three above and confirm before proceeding. If it
+genuinely fits none of them, propose creating a new plugin bucket (new
+directory under `plugins/`, new `plugin.json`, new marketplace entry) rather
+than forcing a bad fit — the whole point of the split is that buckets toggle
+independently per context. A new bucket starts at the version the other
+plugins are already on, not at `0.1.0`; CI rejects a plugin that disagrees.
+
+A command must live in the same plugin as the skill it wraps, and skills that
+hand off to each other (the `plan-repl` family) must stay in one plugin.
 
 ## Manifest layout
 
@@ -17,56 +37,65 @@ loading:
 
 - `.claude-plugin/marketplace.json` — declares the marketplace and lists its
   plugins. Each plugin entry has `name`, `source` (relative path to plugin
-  root), `description`, `version`.
-- `.claude-plugin/plugin.json` — declares the plugin itself. `skills` is an
-  array of paths to skill directories; `agents` (optional) is an array of paths
-  to bundled subagent definition files. `name` and `version` must match the
-  corresponding marketplace entry.
-- `skills/<skill-name>/SKILL.md` — the skill. One per directory. The directory
-  name is the skill name.
-- `agents/<name>.md` — a subagent bundled for a skill to spawn.
-  Frontmatter sets its
-  `name`, `description`, `tools`, and a pinned `model`; the file body is the
-  agent's prompt. Listed in `plugin.json` under `agents`, and invoked by a skill
-  via `subagent_type` rather than by the user.
-- `hooks/hooks.json` — event handlers, auto-discovered at the plugin root, so
-  `plugin.json` does not list them. Scripts live beside it in `hooks/` and are
-  invoked via `${CLAUDE_PLUGIN_ROOT}`. A hook fires for every session, so it
-  must exit 0 on all failure paths rather than block startup. Write them in
-  POSIX `sh` (Git Bash runs them on Windows); `.gitattributes` pins `*.sh` to
-  LF, since CRLF survives Git Bash but breaks dash.
-- `output-styles/<name>.md` — an output style, auto-discovered at the plugin
-  root, so `plugin.json` does not list it. (An `outputStyles` manifest key
-  *replaces* the default scan rather than adding to it, so pointing it anywhere
-  but `./output-styles/` hides this directory.) Frontmatter sets `name`,
-  `description`, and
-  `keep-coding-instructions` — leave that last one `true` unless the style
-  really means to drop Claude Code's software-engineering instructions. Do not
-  set `force-for-plugin`: it applies the style to anyone with the plugin
-  enabled, so the only way to turn it off becomes disabling every skill here
-  along with it.
+  root, e.g. `./plugins/eng`), `description`, `version`.
+- `plugins/<plugin>/.claude-plugin/plugin.json` — declares one plugin. `skills`
+  is an array of paths (relative to the plugin root) to skill directories;
+  `agents` (optional) is an array of paths to bundled subagent definition
+  files. `name` and `version` must match the corresponding marketplace entry,
+  and every plugin carries the *same* `version` — see below.
+- `plugins/<plugin>/skills/<skill-name>/SKILL.md` — the skill. One per
+  directory. The directory name is the skill name.
+- `plugins/<plugin>/commands/<name>.md` — a slash command, auto-discovered at
+  the plugin root, so `plugin.json` does not list it. Invoked as
+  `/<plugin>:<name>` (e.g. `/eng:plan-repl-auto`) — the namespace is the
+  plugin name, so moving a command between plugins renames it.
+- `plugins/<plugin>/agents/<name>.md` — a subagent bundled for a skill to
+  spawn. Frontmatter sets its `name`, `description`, `tools`, and a pinned
+  `model`; the file body is the agent's prompt. Listed in that plugin's
+  `plugin.json` under `agents`, and invoked by a skill via `subagent_type`
+  rather than by the user.
+- `plugins/<plugin>/hooks/hooks.json` — event handlers, auto-discovered at the
+  plugin root, so `plugin.json` does not list them. Scripts live beside it in
+  `hooks/` and are invoked via `${CLAUDE_PLUGIN_ROOT}`. A hook fires for every
+  session the plugin is enabled in, so it must exit 0 on all failure paths
+  rather than block startup. Write them in POSIX `sh` (Git Bash runs them on
+  Windows); `.gitattributes` pins `*.sh` to LF, since CRLF survives Git Bash
+  but breaks dash.
+- `plugins/<plugin>/output-styles/<name>.md` — an output style,
+  auto-discovered at the plugin root, so `plugin.json` does not list it. (An
+  `outputStyles` manifest key *replaces* the default scan rather than adding
+  to it, so pointing it anywhere but `./output-styles/` hides this directory.)
+  Frontmatter sets `name`, `description`, and `keep-coding-instructions` —
+  leave that last one `true` unless the style really means to drop Claude
+  Code's software-engineering instructions. Do not set `force-for-plugin`: it
+  applies the style to anyone with the plugin enabled, so the only way to turn
+  it off becomes disabling every skill in that plugin along with it.
 
-When adding or removing a skill, update both `plugin.json` (add to `skills`
-array) and — if the plugin's surface area changed meaningfully — bump `version`
-in both `plugin.json` and the matching `marketplace.json` plugin entry together.
-Also update the "Skills included" table in `README.md`: add the new skill in
-alphabetical order with a one-line summary of what it does, or remove the row
-on deletion.
+When adding or removing a skill, update the owning plugin's `plugin.json`
+(`skills` array) and — if the marketplace's surface area changed meaningfully
+— bump the version. **The version is global**: one number shared by all
+plugins, so bump it in every `plugins/*/.claude-plugin/plugin.json` and every
+`marketplace.json` plugin entry at once, including the plugins that didn't
+change. CI fails when they diverge, and a `v*` release tag must equal that
+version. Also update that plugin's skills table in `README.md`: add the new
+skill in alphabetical order with a one-line summary of what it does, or remove
+the row on deletion.
 
-When a skill bundles a subagent, add its file under `agents/`, list it in
-`plugin.json`'s `agents` array, and add a row to the "Agents included" table in
-`README.md`.
+When a skill bundles a subagent, add its file under the owning plugin's
+`agents/`, list it in that plugin's `plugin.json` `agents` array, and add an
+"Agents" subsection to the plugin's section in `README.md`.
 
-When a skill bundles a hook, add the script under `hooks/`, register it in
-`hooks/hooks.json`, and document it under a "Hooks included" section in
-`README.md` — the repo ships no hooks now, so create that section. A hook that
-changes Claude's behavior should be opt-in and reversible from the skill that
-owns it, so the hook stays inert until the user turns it on.
+When a skill bundles a hook, add the script under the owning plugin's
+`hooks/`, register it in that plugin's `hooks/hooks.json`, and document it
+under a "Hooks" subsection in the plugin's `README.md` section — no plugin
+ships hooks now, so create that subsection. A hook that changes Claude's
+behavior should be opt-in and reversible from the skill that owns it, so the
+hook stays inert until the user turns it on.
 
-When adding or removing an output style, add the file under `output-styles/`,
-update the "Output styles included" table in `README.md`, and bump `version` in
-both manifests as you would for a skill. There is no manifest entry for the
-style itself to keep in sync.
+When adding or removing an output style, add the file under the owning
+plugin's `output-styles/`, update that plugin's output styles table in
+`README.md`, and bump the shared `version` as you would for a skill.
+There is no manifest entry for the style itself to keep in sync.
 
 ## Authoring skills
 
@@ -101,22 +130,25 @@ used throughout this repo:
 ## Testing a change
 
 CI runs the `validate` job in `.github/workflows/release.yml` on every pull
-request and every push to `main`. It checks that both manifests parse, that
-their versions match, that every path in `plugin.json`'s `skills` array has a
-`SKILL.md`, and that each skill's frontmatter carries `name` and `description`
-with `name` matching its directory. Run the same structural checks locally with
-`claude plugin validate .claude-plugin/plugin.json`, which also covers
-`hooks/hooks.json` syntax.
+request and every push to `main`. It checks that the marketplace manifest and
+every `plugins/*/.claude-plugin/plugin.json` parse, that each plugin's name and
+version match its marketplace entry (and that every plugin directory is
+listed), that all plugins carry the same version, that every path in a
+plugin's `skills` array has a `SKILL.md`, and
+that each skill's frontmatter carries `name` and `description` with `name`
+matching its directory. Run the same structural checks locally with
+`claude plugin validate plugins/<plugin>/.claude-plugin/plugin.json` per
+plugin, which also covers `hooks/hooks.json` syntax.
 
 Nothing automated executes a skill, so behavior is still verified by hand:
 
-1. Reload the plugin in Claude Code (via the marketplace).
+1. Reload the plugins in Claude Code (via the marketplace).
 2. Trigger the skill with a phrase from its `description` and confirm it runs.
 
-Edits to a `SKILL.md` body apply immediately. Changes under `hooks/` and
-`output-styles/` do not — run `/reload-plugins` or restart. An output style is
-also read once when the system prompt is built, so a change to it needs
-`/clear` or a new session on top of the reload.
+Edits to a `SKILL.md` body apply immediately. Changes under a plugin's
+`hooks/` and `output-styles/` do not — run `/reload-plugins` or restart. An
+output style is also read once when the system prompt is built, so a change to
+it needs `/clear` or a new session on top of the reload.
 
 If the skill doesn't fire, the `description` is usually the problem — not the
 body.

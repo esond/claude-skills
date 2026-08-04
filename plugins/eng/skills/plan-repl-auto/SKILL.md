@@ -8,7 +8,7 @@ description: >-
   explicit request when you're in the loop) until it has no substantive
   objections — replacing plan-repl's human `> NOTE:` loop with a
   cheap→mid→expensive model cascade. Explicit-only: invoke via the
-  `/esond:plan-repl-auto` command or by name. Do NOT auto-suggest or fire it
+  `/eng:plan-repl-auto` command or by name. Do NOT auto-suggest or fire it
   on general planning/refactor requests — `plan-repl` is the default; use this
   ONLY when the user explicitly asks for `plan-repl-auto` or the automated
   multi-model plan cascade. Flags: `--implement` (run end-to-end and

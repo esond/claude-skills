@@ -18,47 +18,90 @@ jobs:
         run: |
           echo "Validating marketplace.json..."
           jq . .claude-plugin/marketplace.json > /dev/null
-          echo "Validating plugin.json..."
-          jq . .claude-plugin/plugin.json > /dev/null
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            echo "Validating $manifest..."
+            jq . "$manifest" > /dev/null
+          done
 
-      - name: Validate plugin/marketplace version alignment
+      - name: Validate plugin/marketplace alignment
         run: |
-          PLUGIN_NAME=$(jq -r '.name' .claude-plugin/plugin.json)
-          PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
-          MARKET_VERSION=$(jq -r --arg n "$PLUGIN_NAME" \
-            '.plugins[] | select(.name == $n) | .version' \
-            .claude-plugin/marketplace.json)
+          jq -c '.plugins[]' .claude-plugin/marketplace.json | while read -r entry; do
+            NAME=$(printf '%s' "$entry" | jq -r '.name')
+            SOURCE=$(printf '%s' "$entry" | jq -r '.source')
+            MARKET_VERSION=$(printf '%s' "$entry" | jq -r '.version')
+            MANIFEST="${SOURCE#./}/.claude-plugin/plugin.json"
 
-          if [ -z "$MARKET_VERSION" ] || [ "$MARKET_VERSION" = "null" ]; then
-            echo "ERROR: plugin '$PLUGIN_NAME' not found in marketplace.json"
-            exit 1
-          fi
+            if [ ! -f "$MANIFEST" ]; then
+              echo "ERROR: $MANIFEST not found for marketplace plugin '$NAME'"
+              exit 1
+            fi
 
-          if [ "$PLUGIN_VERSION" != "$MARKET_VERSION" ]; then
-            echo "ERROR: version mismatch"
-            echo "  plugin.json: $PLUGIN_VERSION"
-            echo "  marketplace.json ($PLUGIN_NAME): $MARKET_VERSION"
-            exit 1
-          fi
-          echo "OK: $PLUGIN_NAME @ $PLUGIN_VERSION"
+            PLUGIN_NAME=$(jq -r '.name' "$MANIFEST")
+            PLUGIN_VERSION=$(jq -r '.version' "$MANIFEST")
+
+            if [ "$PLUGIN_NAME" != "$NAME" ]; then
+              echo "ERROR: name mismatch for '$NAME'"
+              echo "  marketplace.json: $NAME"
+              echo "  $MANIFEST: $PLUGIN_NAME"
+              exit 1
+            fi
+
+            if [ "$PLUGIN_VERSION" != "$MARKET_VERSION" ]; then
+              echo "ERROR: version mismatch for '$NAME'"
+              echo "  $MANIFEST: $PLUGIN_VERSION"
+              echo "  marketplace.json: $MARKET_VERSION"
+              exit 1
+            fi
+            echo "OK: $NAME @ $PLUGIN_VERSION"
+          done
+
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            NAME=$(jq -r '.name' "$manifest")
+            LISTED=$(jq -r --arg n "$NAME" \
+              '.plugins[] | select(.name == $n) | .name' \
+              .claude-plugin/marketplace.json)
+            if [ -z "$LISTED" ]; then
+              echo "ERROR: plugin '$NAME' ($manifest) not listed in marketplace.json"
+              exit 1
+            fi
+          done
+
+      - name: Validate the shared version
+        run: |
+          GLOBAL_VERSION=""
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            VERSION=$(jq -r '.version' "$manifest")
+            if [ -z "$GLOBAL_VERSION" ]; then
+              GLOBAL_VERSION="$VERSION"
+            elif [ "$VERSION" != "$GLOBAL_VERSION" ]; then
+              echo "ERROR: every plugin must carry the same version"
+              echo "  $manifest: $VERSION"
+              echo "  expected: $GLOBAL_VERSION"
+              exit 1
+            fi
+          done
+          echo "OK: all plugins at $GLOBAL_VERSION"
 
       - name: Validate skill references
         run: |
           echo "Checking skill folders..."
-          jq -r '.skills[]' .claude-plugin/plugin.json | while read -r source; do
-            clean_source="${source#./}"
-            file="${clean_source}/SKILL.md"
-            if [ ! -f "$file" ]; then
-              echo "ERROR: Missing SKILL.md: $file"
-              exit 1
-            fi
-            echo "OK: $file"
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            plugin_root=$(dirname "$(dirname "$manifest")")
+            jq -r '.skills[]' "$manifest" | while read -r source; do
+              clean_source="${source#./}"
+              file="${plugin_root}/${clean_source}/SKILL.md"
+              if [ ! -f "$file" ]; then
+                echo "ERROR: Missing SKILL.md: $file"
+                exit 1
+              fi
+              echo "OK: $file"
+            done
           done
 
       - name: Validate YAML frontmatter
         run: |
           echo "Checking YAML frontmatter in skills..."
-          find skills -name "SKILL.md" | while read -r file; do
+          find plugins/*/skills -name "SKILL.md" | while read -r file; do
             if ! head -1 "$file" | grep -q "^---$"; then
               echo "ERROR: Missing YAML frontmatter in $file"
               exit 1
@@ -88,9 +131,9 @@ jobs:
       - name: Summary
         run: |
           echo "=== Marketplace Summary ==="
-          echo "Plugin: $(jq -r '.name' .claude-plugin/plugin.json)"
-          echo "Version: $(jq -r '.version' .claude-plugin/plugin.json)"
-          echo "Skills: $(jq '.skills | length' .claude-plugin/plugin.json)"
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            echo "Plugin: $(jq -r '.name' "$manifest") @ $(jq -r '.version' "$manifest") ($(jq '.skills | length' "$manifest") skills)"
+          done
 
   release:
     needs: validate
@@ -103,46 +146,48 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate tag matches plugin version
+      - name: Verify the tag matches the shared version
         run: |
-          TAG="${GITHUB_REF#refs/tags/v}"
-          VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
-          if [ "$TAG" != "$VERSION" ]; then
-            echo "ERROR: tag v$TAG does not match plugin.json version $VERSION"
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+          if [ "$TAG_VERSION" != "$VERSION" ]; then
+            echo "ERROR: tag v$TAG_VERSION does not match the plugin version $VERSION"
             exit 1
           fi
-          echo "OK: tag v$TAG matches plugin version"
+          echo "OK: tag v$TAG_VERSION matches every plugin"
 
       - name: Generate release notes
         run: |
-          PLUGIN_NAME=$(jq -r '.name' .claude-plugin/plugin.json)
           MARKET_NAME=$(jq -r '.name' .claude-plugin/marketplace.json)
-          VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
-          SKILLS=$(jq '.skills | length' .claude-plugin/plugin.json)
+          VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
 
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-
-          cat > notes.md << 'HEADER'
+          cat > notes.md << HEADER
           ## What's in this release
+
+          Every plugin ships at **$VERSION** — they share one version, so a
+          release moves all of them whether or not each one changed.
 
           HEADER
 
-          echo "This release includes **$SKILLS skills** in the \`$PLUGIN_NAME\` plugin." >> notes.md
-          echo "" >> notes.md
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            plugin_root=$(dirname "$(dirname "$manifest")")
+            PLUGIN_NAME=$(jq -r '.name' "$manifest")
+            SKILLS=$(jq '.skills | length' "$manifest")
 
-          echo "### Skills" >> notes.md
-          echo "" >> notes.md
-          jq -r '.skills[]' .claude-plugin/plugin.json | while read -r source; do
-            clean_source="${source#./}"
-            file="${clean_source}/SKILL.md"
-            if [ -f "$file" ]; then
-              frontmatter=$(awk '/^---$/{c++; next} c==1' "$file")
-              skill_name=$(printf '%s\n' "$frontmatter" | grep -m1 "^name:" | sed 's/^name: *//')
-              skill_desc=$(printf '%s\n' "$frontmatter" | awk '/^description:/{v=$0;sub(/^description:[ \t]*/,"",v);if(v~/^[|>][0-9+-]*[ \t]*$/)v="";d=v;f=1;next} f&&/^[^ \t]/{f=0} f{s=$0;sub(/^[ \t]+/,"",s);if(s!="")d=(d==""?s:d" "s)} END{print d}' | head -c 200)
-              echo "- \`$skill_name\`: ${skill_desc}" >> notes.md
-            fi
+            echo "### \`$PLUGIN_NAME\` ($SKILLS skills)" >> notes.md
+            echo "" >> notes.md
+            jq -r '.skills[]' "$manifest" | while read -r source; do
+              clean_source="${source#./}"
+              file="${plugin_root}/${clean_source}/SKILL.md"
+              if [ -f "$file" ]; then
+                frontmatter=$(awk '/^---$/{c++; next} c==1' "$file")
+                skill_name=$(printf '%s\n' "$frontmatter" | grep -m1 "^name:" | sed 's/^name: *//')
+                skill_desc=$(printf '%s\n' "$frontmatter" | awk '/^description:/{v=$0;sub(/^description:[ \t]*/,"",v);if(v~/^[|>][0-9+-]*[ \t]*$/)v="";d=v;f=1;next} f&&/^[^ \t]/{f=0} f{s=$0;sub(/^[ \t]+/,"",s);if(s!="")d=(d==""?s:d" "s)} END{print d}' | head -c 200)
+                echo "- \`$skill_name\`: ${skill_desc}" >> notes.md
+              fi
+            done
+            echo "" >> notes.md
           done
-          echo "" >> notes.md
 
           cat >> notes.md << INSTALL
           ## Installation
@@ -151,10 +196,19 @@ jobs:
 
           \`\`\`text
           /plugin marketplace add $GITHUB_REPOSITORY
-          /plugin install $PLUGIN_NAME@$MARKET_NAME
-          \`\`\`
           INSTALL
 
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            echo "/plugin install $(jq -r '.name' "$manifest")@$MARKET_NAME" >> notes.md
+          done
+
+          cat >> notes.md << 'FOOT'
+          ```
+
+          Install only the plugins you want — they toggle independently.
+          FOOT
+
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
             echo "" >> notes.md
             echo "## Changes since $PREV_TAG" >> notes.md

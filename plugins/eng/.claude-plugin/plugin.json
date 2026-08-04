@@ -1,18 +1,15 @@
 {
-  "name": "esond",
-  "version": "0.20.0",
-  "description": "Eric's personal Claude Code skills.",
+  "name": "eng",
+  "version": "0.1.0",
+  "description": "Eric's software engineering skills: planning workflows, code review, git history, .NET hygiene, system design, repo docs.",
   "author": {
     "name": "Eric Sondergard",
     "url": "https://github.com/esond"
   },
   "repository": "https://github.com/esond/claude-skills",
   "skills": [
-    "./skills/bro",
     "./skills/clean-unused-cpm-packages",
-    "./skills/dehumanizer",
     "./skills/inline-review",
-    "./skills/permission-consolidator",
     "./skills/plan-repl",
     "./skills/plan-repl-auto",
     "./skills/plan-repl-resume",
