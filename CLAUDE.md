@@ -40,7 +40,8 @@ loading:
 - `plugins/<plugin>/.claude-plugin/plugin.json` — declares one plugin. `skills`
   is an array of paths (relative to the plugin root) to skill directories;
   `agents` (optional) is an array of paths to bundled subagent definition
-  files. `name` and `version` must match the corresponding marketplace entry.
+  files. `name` and `version` must match the corresponding marketplace entry,
+  and every plugin carries the *same* `version` — see below.
 - `plugins/<plugin>/skills/<skill-name>/SKILL.md` — the skill. One per
   directory. The directory name is the skill name.
 - `plugins/<plugin>/commands/<name>.md` — a slash command, auto-discovered at
@@ -70,10 +71,12 @@ loading:
   it off becomes disabling every skill in that plugin along with it.
 
 When adding or removing a skill, update the owning plugin's `plugin.json`
-(`skills` array) and — if that plugin's surface area changed meaningfully —
-bump `version` in both its `plugin.json` and the matching `marketplace.json`
-plugin entry together. Versions are per plugin; only bump the plugin that
-changed. Also update that plugin's skills table in `README.md`: add the new
+(`skills` array) and — if the marketplace's surface area changed meaningfully
+— bump the version. **The version is global**: one number shared by all
+plugins, so bump it in every `plugins/*/.claude-plugin/plugin.json` and every
+`marketplace.json` plugin entry at once, including the plugins that didn't
+change. CI fails when they diverge, and a `v*` release tag must equal that
+version. Also update that plugin's skills table in `README.md`: add the new
 skill in alphabetical order with a one-line summary of what it does, or remove
 the row on deletion.
 
@@ -90,7 +93,7 @@ hook stays inert until the user turns it on.
 
 When adding or removing an output style, add the file under the owning
 plugin's `output-styles/`, update that plugin's output styles table in
-`README.md`, and bump `version` in both manifests as you would for a skill.
+`README.md`, and bump the shared `version` as you would for a skill.
 There is no manifest entry for the style itself to keep in sync.
 
 ## Authoring skills
@@ -129,7 +132,8 @@ CI runs the `validate` job in `.github/workflows/release.yml` on every pull
 request and every push to `main`. It checks that the marketplace manifest and
 every `plugins/*/.claude-plugin/plugin.json` parse, that each plugin's name and
 version match its marketplace entry (and that every plugin directory is
-listed), that every path in a plugin's `skills` array has a `SKILL.md`, and
+listed), that all plugins carry the same version, that every path in a
+plugin's `skills` array has a `SKILL.md`, and
 that each skill's frontmatter carries `name` and `description` with `name`
 matching its directory. Run the same structural checks locally with
 `claude plugin validate plugins/<plugin>/.claude-plugin/plugin.json` per

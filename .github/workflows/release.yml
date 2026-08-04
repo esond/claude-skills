@@ -66,6 +66,22 @@ jobs:
             fi
           done
 
+      - name: Validate the shared version
+        run: |
+          GLOBAL_VERSION=""
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            VERSION=$(jq -r '.version' "$manifest")
+            if [ -z "$GLOBAL_VERSION" ]; then
+              GLOBAL_VERSION="$VERSION"
+            elif [ "$VERSION" != "$GLOBAL_VERSION" ]; then
+              echo "ERROR: every plugin must carry the same version"
+              echo "  $manifest: $VERSION"
+              echo "  expected: $GLOBAL_VERSION"
+              exit 1
+            fi
+          done
+          echo "OK: all plugins at $GLOBAL_VERSION"
+
       - name: Validate skill references
         run: |
           echo "Checking skill folders..."
@@ -130,22 +146,35 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify the tag matches the shared version
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+          if [ "$TAG_VERSION" != "$VERSION" ]; then
+            echo "ERROR: tag v$TAG_VERSION does not match the plugin version $VERSION"
+            exit 1
+          fi
+          echo "OK: tag v$TAG_VERSION matches every plugin"
+
       - name: Generate release notes
         run: |
           MARKET_NAME=$(jq -r '.name' .claude-plugin/marketplace.json)
+          VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
 
-          cat > notes.md << 'HEADER'
+          cat > notes.md << HEADER
           ## What's in this release
+
+          Every plugin ships at **$VERSION** — they share one version, so a
+          release moves all three whether or not each one changed.
 
           HEADER
 
           for manifest in plugins/*/.claude-plugin/plugin.json; do
             plugin_root=$(dirname "$(dirname "$manifest")")
             PLUGIN_NAME=$(jq -r '.name' "$manifest")
-            VERSION=$(jq -r '.version' "$manifest")
             SKILLS=$(jq '.skills | length' "$manifest")
 
-            echo "### \`$PLUGIN_NAME\` @ $VERSION ($SKILLS skills)" >> notes.md
+            echo "### \`$PLUGIN_NAME\` ($SKILLS skills)" >> notes.md
             echo "" >> notes.md
             jq -r '.skills[]' "$manifest" | while read -r source; do
               clean_source="${source#./}"
