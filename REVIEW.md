@@ -8,9 +8,11 @@ skill instructs Claude to do, not runtime bugs.
 
 1. **Manifest integrity.** Any change touching a skill must keep three things in
    agreement (CLAUDE.md gives the authoring rule — verify it actually held):
-   `plugin.json` lists the skill dir; `plugin.json` and `marketplace.json`
-   versions are identical; the README "Skills included" table has a matching
-   alphabetical row.
+   the owning plugin's `plugin.json` lists the skill dir; that plugin's
+   `plugin.json` version and its `marketplace.json` entry are identical; the
+   plugin's skills table in the README has a matching alphabetical row. Also
+   check the skill landed in the right plugin bucket (`eng`/`comms`/`behavior`
+   — CLAUDE.md "Choosing a bucket").
 2. **Description length.** Each SKILL.md `description` must stay under the
    ~1024-char upload-validation ceiling (see CLAUDE.md "Authoring skills").
    Over-length descriptions fail marketplace upload — check any added/edited

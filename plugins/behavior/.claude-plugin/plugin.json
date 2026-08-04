@@ -1,0 +1,14 @@
+{
+  "name": "behavior",
+  "version": "0.1.0",
+  "description": "Eric's agent-behavior tweaks: Claude Code configuration upkeep and output shaping.",
+  "author": {
+    "name": "Eric Sondergard",
+    "url": "https://github.com/esond"
+  },
+  "repository": "https://github.com/esond/claude-skills",
+  "skills": [
+    "./skills/bro",
+    "./skills/permission-consolidator"
+  ]
+}
