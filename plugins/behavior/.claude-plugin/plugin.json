@@ -9,6 +9,7 @@
   "repository": "https://github.com/esond/claude-skills",
   "skills": [
     "./skills/bro",
-    "./skills/permission-consolidator"
+    "./skills/permission-consolidator",
+    "./skills/toggle-simplified-english"
   ]
 }
