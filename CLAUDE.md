@@ -58,7 +58,8 @@ When a skill bundles a subagent, add its file under `agents/`, list it in
 `README.md`.
 
 When a skill bundles a hook, add the script under `hooks/`, register it in
-`hooks/hooks.json`, and add a "Hooks included" row to `README.md`. A hook that
+`hooks/hooks.json`, and document it under a "Hooks included" section in
+`README.md` — the repo ships no hooks now, so create that section. A hook that
 changes Claude's behavior should be opt-in and reversible from the skill that
 owns it, so the hook stays inert until the user turns it on.
 
