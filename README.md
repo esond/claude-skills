@@ -1,8 +1,8 @@
 # claude-skills
 
 Eric's personal [Claude Code](https://claude.ai/code) plugin marketplace. It
-publishes four plugins — `eng`, `comms`, `behavior`, and `docs` — so each
-bucket can be toggled on and off independently, per project or context.
+publishes five plugins — `eng`, `comms`, `behavior`, `docs`, and `esond` — so
+each bucket can be toggled on and off independently, per project or context.
 
 | Plugin                        | Bucket                                                                              |
 | ----------------------------- | ----------------------------------------------------------------------------------- |
@@ -10,6 +10,7 @@ bucket can be toggled on and off independently, per project or context.
 | [`comms`](plugins/comms)      | External communications and human-facing writing.                                   |
 | [`behavior`](plugins/behavior) | Tweaks to Claude's behavior and Claude Code configuration.                          |
 | [`docs`](plugins/docs)        | Documentation: Diátaxis-guided writing and auditing of docs.                        |
+| [`esond`](plugins/esond)      | Personal to Eric: how he writes and works, not a general-purpose workflow.          |
 
 ## Installation
 
@@ -21,6 +22,7 @@ Run these inside Claude Code:
 /plugin install comms@claude-skills
 /plugin install behavior@claude-skills
 /plugin install docs@claude-skills
+/plugin install esond@claude-skills
 ```
 
 The first line registers this repo as a marketplace; the rest install plugins
@@ -224,3 +226,13 @@ type skill; the four type skills each carry the craft rules for their kind.
 | [`diataxis-how-to`](plugins/docs/skills/diataxis-how-to/SKILL.md)            | Writes or audits goal-oriented directions — runbooks, recipes, troubleshooting guides for competent practitioners. Names the goal in the title, omits the unnecessary, links out to reference and explanation. |
 | [`diataxis-reference`](plugins/docs/skills/diataxis-reference/SKILL.md)      | Writes or audits information-oriented technical description — API/CLI/config docs. Austere and consistent, structured to mirror the machinery, describing without instructing or opining.                     |
 | [`diataxis-tutorial`](plugins/docs/skills/diataxis-tutorial/SKILL.md)        | Writes or audits learning-oriented lessons — getting-started and onboarding walkthroughs. Single reliable path, visible results at every step, ruthlessly minimized explanation.                              |
+
+## `esond` — personal
+
+Skills that encode how Eric specifically writes and works. Everything else in
+this marketplace is meant to be useful to anyone; this bucket is not. Enable it
+only where output should sound like him.
+
+| Skill                                                                              | What it does                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`conversational-voice`](plugins/esond/skills/conversational-voice/SKILL.md)       | Writes Eric's side of a conversation with another person — Slack, DMs, email, PR and review comments — in his own voice. Direct, casual, brief but complete, and stripped of the tells that give away an AI draft (em dashes, rule of three, corporate vocabulary, hedged asks, punchy closers). Applies to turns in an exchange, not to artifacts he authors like PR descriptions or commit messages. |

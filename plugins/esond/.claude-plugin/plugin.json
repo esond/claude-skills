@@ -1,13 +1,13 @@
 {
-  "name": "comms",
+  "name": "esond",
   "version": "0.23.0",
-  "description": "Eric's communication skills: transforms for messages and human-facing writing.",
+  "description": "Eric's personal skills: how he writes and works, rather than a general-purpose workflow.",
   "author": {
     "name": "Eric Sondergard",
     "url": "https://github.com/esond"
   },
   "repository": "https://github.com/esond/claude-skills",
   "skills": [
-    "./skills/dehumanizer"
+    "./skills/conversational-voice"
   ]
 }
