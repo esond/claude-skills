@@ -128,6 +128,51 @@ jobs:
             echo "OK: $file"
           done
 
+      - name: Validate the shared STE rules block
+        run: |
+          echo "Checking that both STE styles carry the same rules..."
+          STYLES=plugins/behavior/output-styles
+          PLAIN=$STYLES/simplified-technical-english.md
+          INSIGHTS=$STYLES/simplified-technical-english-with-insights.md
+
+          # Both files are read verbatim into the system prompt, so a rule edited
+          # in one and missed in the other leaves the two flavors enforcing
+          # different rules with nothing to report it. `## The rules` and
+          # `## Do not lose the answer` are byte-identical by design. `## Scope`
+          # is deliberately not — the insights style names insight blocks — so it
+          # stays out of this check rather than needing an allowlist.
+          for style in "$PLAIN" "$INSIGHTS"; do
+            if [ ! -f "$style" ]; then
+              echo "ERROR: $style not found — a style was renamed or removed"
+              echo "  update the paths in this step to match"
+              exit 1
+            fi
+          done
+
+          extract() {
+            sed -n "/^## The rules/,/^## $2\$/p" "$1" | sed '$d'
+          }
+
+          extract "$PLAIN" 'Do not lose the answer' > /tmp/ste-plain.txt
+          extract "$INSIGHTS" 'Insights' > /tmp/ste-insights.txt
+
+          # Without this, renaming a heading makes both extractions empty, the
+          # diff passes, and the check silently covers nothing.
+          if [ ! -s /tmp/ste-plain.txt ] || [ ! -s /tmp/ste-insights.txt ]; then
+            echo "ERROR: could not read the shared rules block from both styles"
+            echo "  a heading was renamed, so this check reads nothing — fix the"
+            echo "  section names in this step to match the files"
+            exit 1
+          fi
+
+          if ! diff -u /tmp/ste-plain.txt /tmp/ste-insights.txt; then
+            echo "ERROR: the shared rules block diverged between the two STE styles"
+            echo "  apply the edit to both files, or move the intended difference"
+            echo "  into a section this check does not cover"
+            exit 1
+          fi
+          echo "OK: both STE styles carry an identical rules block"
+
       - name: Summary
         run: |
           echo "=== Marketplace Summary ==="
