@@ -8,6 +8,7 @@
   },
   "repository": "https://github.com/esond/claude-skills",
   "skills": [
-    "./skills/conversational-voice"
+    "./skills/conversational-voice",
+    "./skills/work-item-voice"
   ]
 }
