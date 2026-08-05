@@ -58,21 +58,36 @@ esac
 # backslashes. Claude Code sets CLAUDE_PROJECT_DIR, so this rarely spawns.
 PROJECT_DIR=${CLAUDE_PROJECT_DIR:-$(printf '%s' "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)}
 
+# Resolve the user scope to '' rather than joining a base that is missing, so an
+# unset HOME reads as "there is no user scope" instead of pointing at /.claude.
 # ${HOME:-} rather than $HOME: `set -u` makes an unset HOME a fatal expansion
 # error, which would exit 1 and break the exit-0 contract above.
-CONFIG_DIR=${CLAUDE_CONFIG_DIR:-${HOME:-}/.claude}
+if [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
+  CONFIG_DIR=$CLAUDE_CONFIG_DIR
+elif [ -n "${HOME:-}" ]; then
+  CONFIG_DIR=$HOME/.claude
+else
+  CONFIG_DIR=''
+fi
 
-# Collect the settings files that exist, highest precedence first.
+# Collect the settings files that exist, highest precedence first. A base
+# directory that resolved to nothing is skipped rather than joined, because
+# "$PROJECT_DIR/.claude/settings.json" with PROJECT_DIR empty probes /.claude —
+# an absolute path the user never configured, and on a POSIX host a readable one.
 set --
-for settings in \
-  "$PROJECT_DIR/.claude/settings.local.json" \
-  "$PROJECT_DIR/.claude/settings.json" \
-  "$CONFIG_DIR/settings.json"
-do
-  if [ -f "$settings" ]; then
-    set -- "$@" "$settings"
-  fi
-done
+if [ -n "$PROJECT_DIR" ]; then
+  for settings in \
+    "$PROJECT_DIR/.claude/settings.local.json" \
+    "$PROJECT_DIR/.claude/settings.json"
+  do
+    if [ -f "$settings" ]; then
+      set -- "$@" "$settings"
+    fi
+  done
+fi
+if [ -n "$CONFIG_DIR" ] && [ -f "$CONFIG_DIR/settings.json" ]; then
+  set -- "$@" "$CONFIG_DIR/settings.json"
+fi
 [ "$#" -gt 0 ] || exit 0
 
 # One jq for all of them, slurped so jq itself picks the winner — piping to
