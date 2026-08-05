@@ -1,14 +1,15 @@
 # claude-skills
 
 Eric's personal [Claude Code](https://claude.ai/code) plugin marketplace. It
-publishes three plugins — `eng`, `comms`, and `behavior` — so each bucket can
-be toggled on and off independently, per project or context.
+publishes four plugins — `eng`, `comms`, `behavior`, and `docs` — so each
+bucket can be toggled on and off independently, per project or context.
 
 | Plugin                        | Bucket                                                                              |
 | ----------------------------- | ----------------------------------------------------------------------------------- |
 | [`eng`](plugins/eng)          | Writing software: planning, review, git history, .NET hygiene, design, repo docs.   |
 | [`comms`](plugins/comms)      | External communications and human-facing writing.                                   |
 | [`behavior`](plugins/behavior) | Tweaks to Claude's behavior and Claude Code configuration.                          |
+| [`docs`](plugins/docs)        | Documentation: Diátaxis-guided writing and auditing of docs.                        |
 
 ## Installation
 
@@ -19,6 +20,7 @@ Run these inside Claude Code:
 /plugin install eng@claude-skills
 /plugin install comms@claude-skills
 /plugin install behavior@claude-skills
+/plugin install docs@claude-skills
 ```
 
 The first line registers this repo as a marketplace; the rest install plugins
@@ -114,3 +116,20 @@ which apply immediately.
 The Simplified Technical English style is unofficial, and it is not endorsed by
 ASD or STEMG. The Part 2 dictionary is copyrighted, so the style applies the
 rules and public examples only.
+
+## `docs` — documentation
+
+Skills for writing and auditing documentation with the
+[Diátaxis](https://diataxis.fr) methodology: every piece of content is one of
+four kinds — tutorial, how-to guide, reference, or explanation — and most
+documentation problems come from one document trying to serve two needs at
+once. The `diataxis` router applies the compass and hands off to the right
+type skill; the four type skills each carry the craft rules for their kind.
+
+| Skill                                                                        | What it does                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`diataxis`](plugins/docs/skills/diataxis/SKILL.md)                          | The router: classifies what the user wants to write with the Diátaxis compass (action/cognition × acquisition/application) and loads the matching type skill. With `--audit`, assesses existing docs against the model and proposes relocations/splits without rewriting content. |
+| [`diataxis-explanation`](plugins/docs/skills/diataxis-explanation/SKILL.md)  | Writes or audits understanding-oriented discussion — architecture overviews, design rationale, concept docs. Consolidates the scattered "why", makes connections, admits opinion, keeps instruction and catalogs out. |
+| [`diataxis-how-to`](plugins/docs/skills/diataxis-how-to/SKILL.md)            | Writes or audits goal-oriented directions — runbooks, recipes, troubleshooting guides for competent practitioners. Names the goal in the title, omits the unnecessary, links out to reference and explanation. |
+| [`diataxis-reference`](plugins/docs/skills/diataxis-reference/SKILL.md)      | Writes or audits information-oriented technical description — API/CLI/config docs. Austere and consistent, structured to mirror the machinery, describing without instructing or opining.                     |
+| [`diataxis-tutorial`](plugins/docs/skills/diataxis-tutorial/SKILL.md)        | Writes or audits learning-oriented lessons — getting-started and onboarding walkthroughs. Single reliable path, visible results at every step, ruthlessly minimized explanation.                              |
