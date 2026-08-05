@@ -187,9 +187,9 @@ A body wrapped at 80 columns reads badly on a phone, fights the next person who
 edits it, and turns a one-word change into a reflowed paragraph. Write each
 paragraph as one long line and let the tracker break it.
 
-The examples below are the exception that proves this, and they will mislead you
-if you copy their shape. They wrap at 80 columns because this file does. Take
-their structure and their register. Do not take their line breaks.
+The examples below break this rule, and they will mislead you if you copy their
+shape. They wrap at 80 columns because this file does. Take their structure and
+their register. Do not take their line breaks.
 
 ## Examples
 
@@ -201,7 +201,7 @@ their structure and their register. Do not take their line breaks.
 > nothing back. They expect money back for the months they will not use.
 >
 > Priya subscribes on 1 March for $240. She cancels on 9 April, 40 days in. She
-> expects about $214 back, the value of the 11 months she gives up.
+> expects about $214 back, the value of the 326 days she will not use.
 >
 > Once this exists, a customer who cancels early gets a refund for the unused
 > part of the term, and sees the amount before they confirm the cancellation.
@@ -266,6 +266,10 @@ how to build it.
 
 Lead with a title line, then the body in a fenced block so it pastes into the
 tracker cleanly. Keep commentary short and put it after.
+
+The fenced block is where the wrapping rule gets broken, because a wall of text
+looks wrong in a terminal. Do not wrap it anyway. What is inside the block is
+what someone pastes, and the hard breaks travel with it.
 
 A title says what is wrong or what is wanted, in one line, without a prefix
 naming the type — the tracker already carries that field.
