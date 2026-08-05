@@ -87,7 +87,7 @@ arguments — a deterministic counterpart to skills' natural-language triggering
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`bro`](plugins/behavior/skills/bro/SKILL.md)                                  | Restates Claude's last message in plain, jargon-free language. Explicit-only (`disable-model-invocation: true`) — invoked by name, not auto-triggered.                                                      |
 | [`permission-consolidator`](plugins/behavior/skills/permission-consolidator/SKILL.md) | Reviews a Claude Code `settings.json` allow list, proposes consolidations for `Bash(...)` entries that share a command prefix, and flags one-off or stale entries for pruning.                               |
-| [`toggle-simplified-english`](plugins/behavior/skills/toggle-simplified-english/SKILL.md) | Enables, disables, or toggles the Simplified Technical English output style by editing the `outputStyle` key in Claude Code settings, instead of hand-editing JSON. Explicit-only (`disable-model-invocation: true`) — run it as `/behavior:toggle-simplified-english`, since it writes to a settings file. Confirms which scope to write (user or project-local) before touching anything. |
+| [`toggle-simplified-english`](plugins/behavior/skills/toggle-simplified-english/SKILL.md) | Enables, disables, toggles, or swaps the flavor of the Simplified Technical English output style by editing the `outputStyle` key in Claude Code settings, instead of hand-editing JSON. Two flavors ship — plain STE and STE with Insights — and words like "insights" or "explanatory" select the second; plain is the default. Explicit-only (`disable-model-invocation: true`) — run it as `/behavior:toggle-simplified-english`, since it writes to a settings file. Confirms which scope to write (user or project-local) before touching anything. |
 
 ### Output styles
 
@@ -170,6 +170,14 @@ STE styles. So
 turns the reinforcement on and off along with the style, and there is no second
 switch. It needs `jq` on `PATH`, and it exits 0 on every path — a hook failure
 must never block a turn or session startup.
+
+Those three files are the scopes the toggle skill can write, but they are not
+Claude Code's whole precedence chain: an enterprise managed-settings file
+outranks all of them. The hook does not read it, since its path is
+platform-specific and the case is rare. If an admin pins `outputStyle` to a
+non-STE style while your user settings still name an STE one, the hook keeps
+injecting reminders for a style that isn't active. Clear the user-level setting
+to stop it.
 
 **Cost and caching.** Hooks
 [never invalidate the prompt cache](https://code.claude.com/docs/en/prompt-caching#enabling-or-disabling-a-plugin)
