@@ -138,9 +138,10 @@ jobs:
           # Both files are read verbatim into the system prompt, so a rule edited
           # in one and missed in the other leaves the two flavors enforcing
           # different rules with nothing to report it. `## The rules` and
-          # `## Do not lose the answer` are byte-identical by design. `## Scope`
-          # is deliberately not — the insights style names insight blocks — so it
-          # stays out of this check rather than needing an allowlist.
+          # `## Do not lose the answer` are byte-identical by design, so both are
+          # compared. `## Scope` is deliberately not identical — the insights
+          # style names insight blocks — so it stays out of this check rather
+          # than needing an allowlist that goes stale on its own.
           for style in "$PLAIN" "$INSIGHTS"; do
             if [ ! -f "$style" ]; then
               echo "ERROR: $style not found — a style was renamed or removed"
@@ -149,29 +150,37 @@ jobs:
             fi
           done
 
-          extract() {
-            sed -n "/^## The rules/,/^## $2\$/p" "$1" | sed '$d'
-          }
+          # `## The rules` runs to the next heading, which differs per file.
+          sed -n '/^## The rules/,/^## Do not lose the answer$/p' "$PLAIN" \
+            | sed '$d' > /tmp/ste-rules-plain.txt
+          sed -n '/^## The rules/,/^## Insights$/p' "$INSIGHTS" \
+            | sed '$d' > /tmp/ste-rules-insights.txt
 
-          extract "$PLAIN" 'Do not lose the answer' > /tmp/ste-plain.txt
-          extract "$INSIGHTS" 'Insights' > /tmp/ste-insights.txt
+          # `## Do not lose the answer` is the last section of both files.
+          sed -n '/^## Do not lose the answer/,$p' "$PLAIN" > /tmp/ste-tail-plain.txt
+          sed -n '/^## Do not lose the answer/,$p' "$INSIGHTS" > /tmp/ste-tail-insights.txt
 
-          # Without this, renaming a heading makes both extractions empty, the
-          # diff passes, and the check silently covers nothing.
-          if [ ! -s /tmp/ste-plain.txt ] || [ ! -s /tmp/ste-insights.txt ]; then
-            echo "ERROR: could not read the shared rules block from both styles"
-            echo "  a heading was renamed, so this check reads nothing — fix the"
-            echo "  section names in this step to match the files"
-            exit 1
-          fi
+          for pair in 'rules:the rules block' 'tail:the closing section'; do
+            key=${pair%%:*}
+            what=${pair#*:}
 
-          if ! diff -u /tmp/ste-plain.txt /tmp/ste-insights.txt; then
-            echo "ERROR: the shared rules block diverged between the two STE styles"
-            echo "  apply the edit to both files, or move the intended difference"
-            echo "  into a section this check does not cover"
-            exit 1
-          fi
-          echo "OK: both STE styles carry an identical rules block"
+            # Without this, renaming a heading makes both extractions empty, the
+            # diff passes, and the check silently covers nothing.
+            if [ ! -s "/tmp/ste-$key-plain.txt" ] || [ ! -s "/tmp/ste-$key-insights.txt" ]; then
+              echo "ERROR: could not read $what from both styles"
+              echo "  a heading was renamed, so this check reads nothing — fix"
+              echo "  the section names in this step to match the files"
+              exit 1
+            fi
+
+            if ! diff -u "/tmp/ste-$key-plain.txt" "/tmp/ste-$key-insights.txt"; then
+              echo "ERROR: $what diverged between the two STE styles"
+              echo "  apply the edit to both files, or move the intended"
+              echo "  difference into a section this check does not cover"
+              exit 1
+            fi
+            echo "OK: $what matches"
+          done
 
       - name: Summary
         run: |
