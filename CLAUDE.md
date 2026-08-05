@@ -100,6 +100,15 @@ plugin's `output-styles/`, update that plugin's output styles table in
 `README.md`, and bump the shared `version` as you would for a skill.
 There is no manifest entry for the style itself to keep in sync.
 
+The two Simplified Technical English styles are the one exception to
+"styles are independent files". An output style has no include mechanism — the
+file goes into the system prompt verbatim — so `simplified-technical-english.md`
+and `simplified-technical-english-with-insights.md` carry byte-identical
+`## The rules` and `## Do not lose the answer` sections by hand, and CI fails
+when either one diverges. Edit a shared rule in both files, or the two flavors
+end up enforcing different rules. Their `## Scope` sections differ on purpose
+(the insights style names insight blocks), so that section is outside the check.
+
 ## Authoring skills
 
 Every skill is a single `SKILL.md` with YAML frontmatter:
@@ -137,11 +146,13 @@ request and every push to `main`. It checks that the marketplace manifest and
 every `plugins/*/.claude-plugin/plugin.json` parse, that each plugin's name and
 version match its marketplace entry (and that every plugin directory is
 listed), that all plugins carry the same version, that every path in a
-plugin's `skills` array has a `SKILL.md`, and
-that each skill's frontmatter carries `name` and `description` with `name`
-matching its directory. Run the same structural checks locally with
+plugin's `skills` array has a `SKILL.md`, that each skill's frontmatter carries
+`name` and `description` with `name` matching its directory, and that the two
+Simplified Technical English styles still share identical `## The rules` and
+`## Do not lose the answer` sections. Run the same structural checks locally with
 `claude plugin validate plugins/<plugin>/.claude-plugin/plugin.json` per
-plugin, which also covers `hooks/hooks.json` syntax.
+plugin, which also covers `hooks/hooks.json` syntax. `claude plugin validate`
+does not cover the STE rules check — that one only runs in CI.
 
 Nothing automated executes a skill, so behavior is still verified by hand:
 
