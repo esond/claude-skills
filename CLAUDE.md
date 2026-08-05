@@ -89,8 +89,9 @@ When a skill bundles a subagent, add its file under the owning plugin's
 
 When a skill bundles a hook, add the script under the owning plugin's
 `hooks/`, register it in that plugin's `hooks/hooks.json`, and document it
-under a "Hooks" subsection in the plugin's `README.md` section — no plugin
-ships hooks now, so create that subsection. A hook that changes Claude's
+under a "Hooks" subsection in the plugin's `README.md` section — `behavior`
+already has one, so create the subsection only for a plugin that doesn't. A
+hook that changes Claude's
 behavior should be opt-in and reversible from the skill that owns it, so the
 hook stays inert until the user turns it on.
 
