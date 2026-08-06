@@ -6,7 +6,7 @@ code in this repository.
 ## What this repo is
 
 A Claude Code **plugin marketplace** (`claude-skills`) that publishes Eric's
-personal skills as four independently toggleable plugins, one per bucket:
+personal skills as five independently toggleable plugins, one per bucket:
 
 - `eng` — writing software: planning workflows, code review, git history,
   .NET hygiene, system design, repo docs.
@@ -14,6 +14,8 @@ personal skills as four independently toggleable plugins, one per bucket:
 - `behavior` — tweaks to Claude's behavior or Claude Code configuration.
 - `docs` — documentation: Diátaxis-guided writing and auditing of tutorials,
   how-to guides, reference, and explanation.
+- `esond` — personal to Eric: how he writes and works. Anything tuned to him
+  rather than useful to anyone belongs here.
 
 There is no build, no tests, no runtime — Claude Code consumes the repo
 directly by reading the manifest JSON and skill markdown files.
@@ -22,7 +24,7 @@ directly by reading the manifest JSON and skill markdown files.
 
 Every skill, command, output style, hook, or agent belongs to exactly one
 plugin. When adding one and the user hasn't said which plugin it goes in,
-suggest a bucket from the four above and confirm before proceeding. If it
+suggest a bucket from the five above and confirm before proceeding. If it
 genuinely fits none of them, propose creating a new plugin bucket (new
 directory under `plugins/`, new `plugin.json`, new marketplace entry) rather
 than forcing a bad fit — the whole point of the split is that buckets toggle
