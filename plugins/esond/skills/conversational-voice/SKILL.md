@@ -10,7 +10,9 @@ description: >-
   a note to", or just paste a thread and ask what to say back. Load it too when
   tightening, shortening, or sanity-checking a message they already wrote, and
   when a message is one step of a larger task. The register is direct, casual,
-  brief but complete, with none of the tells that give away an AI draft.
+  brief but complete, with none of the tells that give away an AI draft. Not for
+  something the user authors rather than sends — an issue body, a PR
+  description, a commit message — even though a person reads those too.
 ---
 
 # Conversational voice
