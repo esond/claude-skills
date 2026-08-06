@@ -1,18 +1,19 @@
 ---
 name: work-item-voice
 description: >-
-  Write the user's issues in their own voice for any work tracker — Jira,
-  Linear, GitHub Issues, Azure DevOps, Shortcut. Covers the three kinds:
-  features (new behavior), tasks (work that needs doing), and bugs (behavior
-  that does not match expectation). Load this whenever the deliverable is an
-  issue body, whether they say "file a bug", "write a ticket", "draft a story",
-  "create an issue for this", "turn this into a Jira", "make a card for", "write
-  this up in Linear", or paste a thread and ask for an issue out of it. Load it
-  too when tightening or rewriting an issue that already exists, and when filing
-  one is a step inside a larger task. Features get behavior-driven framing with
-  no implementation prescribed, bugs get expected versus actual, and every type
-  stays short — the writer pays the compression cost, not the reader. Not for
-  replying to or commenting on an existing issue, which is a conversation turn.
+  Write or edit the user's issues in their own voice, in any work tracker —
+  Jira, Linear, GitHub Issues, Azure DevOps. Covers features (new behavior),
+  tasks (work that needs doing), and bugs (behavior that does not match
+  expectation). Load this whenever the deliverable is an issue body, whether
+  they say "file a bug", "write a ticket", "draft a story", "create an issue for
+  this", "turn this into a Jira", "write this up in Linear", or paste a thread
+  and ask for an issue out of it. Load it too whenever text goes into an issue
+  that already exists — "record this in the issue", "add what we found to the
+  ticket", "note this on the card", "update the one about refunds", or naming an
+  issue by its key and asking for a fact to go in it — and when writing or
+  updating one is a step inside a larger task. Features get behavior-driven
+  framing with no implementation prescribed, and bugs get expected versus
+  actual. Not for a comment on an issue, which is a conversation turn.
 ---
 
 # Work item voice
@@ -34,8 +35,9 @@ they file the issue.
 ## When this applies
 
 It applies when you are authoring the body of a work item: a feature, a task, or
-a bug, in whatever tracker the team uses. It applies the same way when you are
-rewriting or tightening an issue that already exists.
+a bug, in whatever tracker the team uses. It applies the same way to an issue
+that already exists — rewriting it, tightening it, or adding a single fact to
+it. Editing has its own section below.
 
 It does not apply to a *comment* on an issue. That is a turn in a conversation
 with a person, so it belongs to the sibling skill `conversational-voice`. The
@@ -148,6 +150,12 @@ excerpt nobody asked for, a list of files you happened to read, the story of
 your own debugging session, and anything included to show that research was
 done. Research that shaped the issue is already in the issue, in the form of a
 shorter issue.
+
+When issues are linked, the test crosses between them. The spike or the parent
+holds the evidence. A downstream issue cites the conclusion and points at where
+it came from — the issue key, and the question it answers. Copying the same
+evidence into four issues makes it rot in four places, because the next finding
+only corrects one of them.
 
 A background addendum is the one exemption, and it survives on a different test.
 It fails "need this to start" by design. It passes because it sits last, under
@@ -266,29 +274,83 @@ Notice what the good versions share. Each one names the behavior and the gap,
 carries the few facts a developer needs to start, and stops. None of them says
 how to build it.
 
+## Editing an issue that already exists
+
+Most writing into a tracker is not authoring from nothing. Someone answers an
+open question, a finding lands, a date moves — and the fact goes into a body
+that already has an author. That is still this skill, and the request rarely
+sounds like writing. "Record this in the issue", "add what we found to the
+ticket", "update the one about refunds" all produce issue prose.
+
+Two rules make an edit different from a first draft.
+
+**Inherit the voice, or fix it.** You are writing into prose you did not write.
+An edit that ignores the register around it degrades a good issue one append at
+a time, and nobody ever notices the step that did it. Match what is there. When
+what is there is bad enough that matching it makes the issue worse, rewrite the
+part you touched and say which part.
+
+**Re-read the whole body after you edit it.** A new fact often contradicts an
+older one, and the older one goes on looking true. Nobody else re-reads the top
+of the issue. The next person to pick it up sees both statements and has no way
+to tell which one is current.
+
+Appending to a body is still an authored artifact. A comment on that same issue
+is a conversational turn, so it belongs to `conversational-voice`. That is the
+same split as above, and the tracker does not decide it.
+
+### The tracker rewrites your markdown
+
+This bites on the round trip — you write a body, then patch it later and the
+patch does not match.
+
+Linear renumbers ordered lists. `1., 2., 4., 5b., 9.` comes back as `1.`
+through `8.`, so any meaning carried by the numbers is gone. It also normalizes
+`-` bullets to `*`, which breaks an exact-match edit afterward.
+
+So never put meaning in an ordered list's numbers. Put the key in the text,
+where the tracker cannot touch it: `**Q4b —** ...`. Before you patch by exact
+match, read the body back from the tracker rather than trusting what you sent.
+
 ## Delivering the draft
 
-The shared reference covers this. Two things are specific here.
+The shared reference says to lead with the artifact, in a block that copies
+cleanly. That assumes a person does the copying, which is not always true here.
 
-Lead with a title line, then the body in a fenced block so it pastes into the
-tracker cleanly. The fenced block is where the wrapping rule gets broken,
-because a wall of text looks wrong in a terminal. Do not wrap it anyway. What is
-inside the block is what someone pastes, and the hard breaks travel with it.
+**When a person pastes it.** Lead with a title line, then the body in a fenced
+block. The fenced block is where the wrapping rule gets broken, because a wall
+of text looks wrong in a terminal. Do not wrap it anyway. What is inside the
+block is what someone pastes, and the hard breaks travel with it.
+
+**When a tool writes it.** A new issue still shows its full body first, because
+that is the confirmation gate below. An edit is different. Nobody pastes an
+edit, and echoing the whole body into the terminal spends the reader's
+attention on text they can read in the tracker. Report the issue key and the
+part you added or rewrote, then stop.
 
 A title says what is wrong or what is wanted, in one line, without a prefix
 naming the type — the tracker already carries that field.
 
-## Filing the issue
+## Filing and updating
 
-Drafting is the default. Filing is the exception, and only on request.
+Drafting is the default. Writing to the tracker happens on request. What the
+request buys differs between a new issue and an edit.
 
-When asked to file, stop and confirm before any write. Show the rendered title
-and body, name the target — project, repository, board, or team — and name the
-type. Wait for a yes. A filed issue notifies people and is awkward to retract,
-so treat the confirmation as a real gate rather than a formality.
+**A new issue gets a gate.** Stop and confirm before the write. Show the
+rendered title and body, name the target — project, repository, board, or
+team — and name the type. Wait for a yes. Filing notifies people and is awkward
+to retract, so treat the confirmation as real rather than as a formality.
 
-Only after confirmation, create it with whatever tool fits: the Jira or Linear
-MCP tools, `gh issue create`, or the tracker the user names. Report back the key
+**An edit at explicit request does not.** "Record this in the issue" is the
+instruction and the permission in one sentence. Asking again spends a turn on
+something the user already answered. Make the edit, then report what changed.
+
+Two things still stop an edit. A rewrite wider than what was asked needs a yes
+first, because "add this finding" does not authorize reshaping the body around
+it. Deleting someone else's prose needs one too.
+
+Create or patch with whatever tool fits: the Jira or Linear MCP tools, `gh issue
+create` and `gh issue edit`, or the tracker the user names. Report back the key
 or URL.
 
 ## What this does not do
