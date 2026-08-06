@@ -24,6 +24,10 @@ Before you draft, read `../../references/writing-for-people.md` — that is
 rules this skill shares with `work-item-voice`. What follows here is what is
 specific to a conversation.
 
+If that read fails, draft anyway and say so in one line. The rules below still
+apply, but the shared ones are missing, and the user needs to know that before
+they send the message.
+
 ## When this applies
 
 The test is structural, not a list of tools. It applies when the artifact is a
@@ -153,5 +157,6 @@ detail the reader needs to act on it. Then they stop.
 
 ## Delivering the draft
 
-The shared reference covers this. One thing is specific here: the block is a
+The shared reference covers this. Two things are specific here. The block is a
 code block or a quote block, so the message copies cleanly into Slack or email.
+And do not explain the wording choices unless asked.

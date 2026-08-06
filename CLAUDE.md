@@ -80,9 +80,12 @@ loading:
   skill that needs it tells Claude to read the file. Give the path relative to
   the `SKILL.md` (`../../references/<name>.md`), then restate it as a
   plugin-root fragment so the read still resolves by search if the relative hop
-  fails. Use this only for content that genuinely spans skills. A reference
-  used by one skill belongs in that skill's own `references/` directory
-  instead.
+  fails. Nothing in CI ties a reference to the skills that read it, so also
+  tell the skill to say so in one line when the read fails, rather than
+  proceeding as if the shared rules had loaded. Do not make it stop — a
+  stop-and-ask checkpoint is for a destructive action, not for a missing prose
+  file. Use this only for content that genuinely spans skills. A reference used
+  by one skill belongs in that skill's own `references/` directory instead.
 
 When adding or removing a skill, update the owning plugin's `plugin.json`
 (`skills` array) and — if the marketplace's surface area changed meaningfully

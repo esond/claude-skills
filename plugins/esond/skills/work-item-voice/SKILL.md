@@ -27,6 +27,10 @@ Before you draft, read `../../references/writing-for-people.md` — that is
 rules this skill shares with `conversational-voice`. What follows here is what
 is specific to an issue.
 
+If that read fails, draft anyway and say so in one line. The rules below still
+apply, but the shared ones are missing, and the user needs to know that before
+they file the issue.
+
 ## When this applies
 
 It applies when you are authoring the body of a work item: a feature, a task, or
