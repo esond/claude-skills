@@ -201,7 +201,7 @@ their register. Do not take their line breaks.
 > nothing back. They expect money back for the months they will not use.
 >
 > Priya subscribes on 1 March for $240. She cancels on 9 April, 40 days in. She
-> expects about $214 back, the value of the 326 days she will not use.
+> expects about $214 back, the value of the 325 days she will not use.
 >
 > Once this exists, a customer who cancels early gets a refund for the unused
 > part of the term, and sees the amount before they confirm the cancellation.
