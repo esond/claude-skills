@@ -74,6 +74,15 @@ loading:
   Code's software-engineering instructions. Do not set `force-for-plugin`: it
   applies the style to anyone with the plugin enabled, so the only way to turn
   it off becomes disabling every skill in that plugin along with it.
+- `plugins/<plugin>/references/<name>.md` — prose shared by two or more skills
+  in the same plugin, so a rule that is not specific to any one of them gets
+  stated once. There is no manifest entry and no include mechanism, so each
+  skill that needs it tells Claude to read the file. Give the path relative to
+  the `SKILL.md` (`../../references/<name>.md`), then restate it as a
+  plugin-root fragment so the read still resolves by search if the relative hop
+  fails. Use this only for content that genuinely spans skills. A reference
+  used by one skill belongs in that skill's own `references/` directory
+  instead.
 
 When adding or removing a skill, update the owning plugin's `plugin.json`
 (`skills` array) and — if the marketplace's surface area changed meaningfully

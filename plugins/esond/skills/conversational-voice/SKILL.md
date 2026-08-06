@@ -19,6 +19,11 @@ Anything you draft here goes out under the user's name. A coworker reads it as
 the user talking, not as a message the user commissioned. That is the whole
 standard: someone who knows them should read it and notice nothing.
 
+Before you draft, read `../../references/writing-for-people.md` — that is
+`references/writing-for-people.md` at the `esond` plugin root. It holds the
+rules this skill shares with `work-item-voice`. What follows here is what is
+specific to a conversation.
+
 ## When this applies
 
 The test is structural, not a list of tools. It applies when the artifact is a
@@ -60,17 +65,11 @@ So the failure mode is not being too blunt. It is padding: warmth that nobody
 asked for, structure the content does not need, a closer that reaches for a
 feeling instead of ending.
 
-## The tension worth naming
+## The test for what survives
 
-Brief and complete pull against each other, and brief usually wins by accident.
-It should not.
-
-The test is whether the reader can act without replying to ask a question. If
-they need a date, a branch name, a reason, or the thing that changed, it goes
-in. Cutting the context that makes a message actionable is not concision, it
-just moves the cost onto the reader.
-
-Trim the framing. Keep the facts.
+The shared reference states the compression rule. Here the test is whether the
+reader can act without replying to ask a question. If they need a date, a branch
+name, a reason, or the thing that changed, it goes in.
 
 ## What gives away an AI draft
 
@@ -154,9 +153,5 @@ detail the reader needs to act on it. Then they stop.
 
 ## Delivering the draft
 
-Lead with the message itself, in a code block or a quote block so it copies
-cleanly into Slack or email. Keep any commentary short and put it after.
-
-Do not explain the wording choices unless asked. If something is genuinely
-missing, a date the user has not given you or a name you cannot guess, ask for
-it rather than inventing it or leaving a bracket for them to fill.
+The shared reference covers this. One thing is specific here: the block is a
+code block or a quote block, so the message copies cleanly into Slack or email.

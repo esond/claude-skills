@@ -233,7 +233,17 @@ Skills that encode how Eric specifically writes and works. Everything else in
 this marketplace is meant to be useful to anyone; this bucket is not. Enable it
 only where output should sound like him.
 
+### Skills
+
 | Skill                                                                              | What it does                                                                                                                                                                                                 |
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`conversational-voice`](plugins/esond/skills/conversational-voice/SKILL.md)       | Writes Eric's side of a conversation with another person — Slack, DMs, email, PR and review comments — in his own voice. Direct, casual, brief but complete, and stripped of the tells that give away an AI draft (em dashes, rule of three, corporate vocabulary, hedged asks, punchy closers). Applies to turns in an exchange, not to artifacts he authors like PR descriptions or commit messages. |
-| [`work-item-voice`](plugins/esond/skills/work-item-voice/SKILL.md)                 | Writes issues in Eric's voice for any tracker — Jira, Linear, GitHub Issues — across the three kinds: features, tasks, and bugs. Never prescribes the implementation, so the developer keeps room to solve it. Features get behavior-driven framing (the "imagine it's 1922" test) with concrete domain detail; bugs get what happened / what was expected / how to see it. Language is written for non-native readers, and length is kept down on the principle that the writer pays the compression cost, not the reader. Drafts by default and files only on request, behind a confirmation gate. |
+| [`work-item-voice`](plugins/esond/skills/work-item-voice/SKILL.md)                 | Writes issues in Eric's voice for any tracker — Jira, Linear, GitHub Issues — across the three kinds: features, tasks, and bugs. Never prescribes the implementation, so the developer keeps room to solve it. Features get behavior-driven framing (the "imagine it's 1922" test) with concrete domain detail; bugs get what happened / what was expected / how to see it. Language is written for non-native readers, and a sentence stays only if a developer needs it to start. Drafts by default and files only on request, behind a confirmation gate. |
+
+### Shared references
+
+Both voice skills read
+[`references/writing-for-people.md`](plugins/esond/references/writing-for-people.md)
+before they draft. It holds the rules that are not specific to either one — the
+writer pays the compression cost, and how to hand the draft back. A third voice
+skill loads the same file rather than restating them.
