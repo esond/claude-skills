@@ -245,5 +245,5 @@ only where output should sound like him.
 Both voice skills read
 [`references/writing-for-people.md`](plugins/esond/references/writing-for-people.md)
 before they draft. It holds the rules that are not specific to either one — the
-writer pays the compression cost, and how to hand the draft back. A third voice
-skill loads the same file rather than restating them.
+writer pays the compression cost, and how to hand the draft back. Any voice
+skill added later reads the same file rather than restating the rules.
