@@ -74,6 +74,20 @@ loading:
   Code's software-engineering instructions. Do not set `force-for-plugin`: it
   applies the style to anyone with the plugin enabled, so the only way to turn
   it off becomes disabling every skill in that plugin along with it.
+- `plugins/<plugin>/references/<name>.md` — prose shared by two or more skills
+  in the same plugin, so a rule that is not specific to any one of them gets
+  stated once. There is no manifest entry and no include mechanism, so each
+  skill that needs it tells Claude to read the file. Give the path relative to
+  the `SKILL.md` (`../../references/<name>.md`), then restate it as a
+  plugin-root fragment so the read still resolves by search if the relative hop
+  fails. CI checks that link from both ends — every path a skill names must
+  resolve, and every reference must have at least one reader. That catches the
+  rename. It cannot catch a read that fails at runtime, so also tell the skill
+  to say so in one line when the read fails, rather than proceeding as if the
+  shared rules had loaded. Do not make it stop — a stop-and-ask checkpoint is
+  for a destructive action, not for a missing prose file. Use this only for
+  content that genuinely spans skills. A reference used by one skill belongs in
+  that skill's own `references/` directory instead.
 
 When adding or removing a skill, update the owning plugin's `plugin.json`
 (`skills` array) and — if the marketplace's surface area changed meaningfully
@@ -149,12 +163,15 @@ every `plugins/*/.claude-plugin/plugin.json` parse, that each plugin's name and
 version match its marketplace entry (and that every plugin directory is
 listed), that all plugins carry the same version, that every path in a
 plugin's `skills` array has a `SKILL.md`, that each skill's frontmatter carries
-`name` and `description` with `name` matching its directory, and that the two
-Simplified Technical English styles still share identical `## The rules` and
-`## Do not lose the answer` sections. Run the same structural checks locally with
+`name` and `description` with `name` matching its directory, that every shared
+reference path a skill names resolves and every shared reference has a reader,
+and that the two Simplified Technical English styles still share identical
+`## The rules` and `## Do not lose the answer` sections. Run the same structural
+checks locally with
 `claude plugin validate plugins/<plugin>/.claude-plugin/plugin.json` per
 plugin, which also covers `hooks/hooks.json` syntax. `claude plugin validate`
-does not cover the STE rules check — that one only runs in CI.
+covers neither the shared-reference check nor the STE rules check — those two
+only run in CI.
 
 Nothing automated executes a skill, so behavior is still verified by hand:
 

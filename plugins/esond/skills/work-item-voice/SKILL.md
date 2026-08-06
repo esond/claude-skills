@@ -22,6 +22,15 @@ reader pays for what the writer did not bother to cut, and every reader loses
 options the writer closed off by guessing at the solution. Those two costs are
 what this skill exists to keep down.
 
+Before you draft, read `../../references/writing-for-people.md` — that is
+`references/writing-for-people.md` at the `esond` plugin root. It holds the
+rules this skill shares with `conversational-voice`. What follows here is what
+is specific to an issue.
+
+If that read fails, draft anyway and say so in one line. The rules below still
+apply, but the shared ones are missing, and the user needs to know that before
+they file the issue.
+
 ## When this applies
 
 It applies when you are authoring the body of a work item: a feature, a task, or
@@ -127,13 +136,11 @@ A task needs the outcome it produces and a clear enough boundary that someone
 knows when it is finished. Technical vocabulary is fine here. Prescribing *how*
 is still not.
 
-## The writer pays the compression cost
+## The test for what survives
 
-Long issues invert the contract. One person writes it once, and everyone who
-touches it reads it. Pushing the work of finding the point onto every reader is
-the wrong trade, so pay it up front.
-
-The test for any sentence: **does a developer need this fact to start?**
+The shared reference states the compression rule. Long issues are where it bites
+hardest, because one person writes the issue and every reader after them pays.
+The test for any sentence here: **does a developer need this fact to start?**
 
 Keep a date, an amount, a customer name, a concrete failing example, an
 expectation and where it came from, a constraint someone else set. Cut a log
@@ -147,9 +154,6 @@ It fails "need this to start" by design. It passes because it sits last, under
 its own heading, where a reader who is done reading has already stopped. Keep it
 that way and it costs nobody anything. Move it up front and it is a context
 dump.
-
-Cutting real detail is not compression, it just moves the cost. Trim the
-framing. Keep the facts.
 
 ## Language
 
@@ -264,19 +268,15 @@ how to build it.
 
 ## Delivering the draft
 
-Lead with a title line, then the body in a fenced block so it pastes into the
-tracker cleanly. Keep commentary short and put it after.
+The shared reference covers this. Two things are specific here.
 
-The fenced block is where the wrapping rule gets broken, because a wall of text
-looks wrong in a terminal. Do not wrap it anyway. What is inside the block is
-what someone pastes, and the hard breaks travel with it.
+Lead with a title line, then the body in a fenced block so it pastes into the
+tracker cleanly. The fenced block is where the wrapping rule gets broken,
+because a wall of text looks wrong in a terminal. Do not wrap it anyway. What is
+inside the block is what someone pastes, and the hard breaks travel with it.
 
 A title says what is wrong or what is wanted, in one line, without a prefix
 naming the type — the tracker already carries that field.
-
-If a fact is genuinely missing — a date, an amount, the name of the person who
-reported it — ask for it. Do not invent it, and do not leave a bracket for
-someone to fill later, because brackets ship.
 
 ## Filing the issue
 

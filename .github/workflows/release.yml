@@ -128,6 +128,68 @@ jobs:
             echo "OK: $file"
           done
 
+      - name: Validate shared reference files
+        run: |
+          echo "Checking plugin-level shared references..."
+
+          # A `plugins/<plugin>/references/*.md` file is prose that two or more
+          # skills read at runtime. Nothing loads it for them — no manifest
+          # entry, no include mechanism — so each skill names the path in its
+          # body and Claude does the read. That leaves both halves of the link
+          # breakable with nothing to report it: a renamed file leaves the
+          # skills pointing at nothing, and a renamed or deleted skill can
+          # leave the file with no readers. Either way the shared rules stop
+          # reaching the skills that need them, silently, which is worse than
+          # the duplication a references directory exists to remove. So check
+          # the link from both ends.
+          #
+          # This cannot catch a read that fails at runtime — that is why the
+          # skills themselves report a failed read (see CLAUDE.md, manifest
+          # layout). It catches the rename that causes one.
+
+          status=0
+
+          # Forward — every reference path a SKILL.md names must resolve. The
+          # path is written relative to the SKILL.md, so resolve it from that
+          # file's own directory. The pattern allows any number of `../` so a
+          # wrong-depth path is caught here instead of passing unnoticed.
+          while read -r file; do
+            skill_dir=$(dirname "$file")
+            while read -r rel; do
+              [ -n "$rel" ] || continue
+              if [ -f "$skill_dir/$rel" ]; then
+                echo "OK: $file reads $rel"
+              else
+                echo "ERROR: $file names a reference that does not exist: $rel"
+                echo "  resolved to $skill_dir/$rel"
+                echo "  fix the path, or restore the file the skill expects"
+                status=1
+              fi
+            done < <(grep -o '\(\.\./\)\+references/[A-Za-z0-9._-]*\.md' "$file" | sort -u)
+          done < <(find plugins/*/skills -name "SKILL.md")
+
+          # Reverse — every shared reference must have at least one reader. The
+          # grep matches both forms a skill uses to name the file: the relative
+          # path and the plugin-root fragment.
+          for ref in plugins/*/references/*.md; do
+            [ -f "$ref" ] || continue
+            plugin_root=$(dirname "$(dirname "$ref")")
+            name=$(basename "$ref")
+            if [ ! -d "$plugin_root/skills" ]; then
+              echo "ERROR: $ref sits in a plugin with no skills directory"
+              status=1
+            elif grep -rqF "references/$name" "$plugin_root/skills"; then
+              echo "OK: $ref is read by a skill in $plugin_root"
+            else
+              echo "ERROR: no skill in $plugin_root reads $ref"
+              echo "  a shared reference with no readers is dead prose — name it"
+              echo "  from the skills that need it, or delete it"
+              status=1
+            fi
+          done
+
+          exit $status
+
       - name: Validate the shared STE rules block
         run: |
           echo "Checking that both STE styles carry the same rules..."
