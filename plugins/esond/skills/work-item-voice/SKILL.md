@@ -350,7 +350,8 @@ first, because "add this finding" does not authorize reshaping the body around
 it. Deleting someone else's prose needs one too.
 
 Create or patch with whatever tool fits: the Jira or Linear MCP tools, `gh issue
-create`, or the tracker the user names. Report back the key or URL.
+create` and `gh issue edit`, or the tracker the user names. Report back the key
+or URL.
 
 ## What this does not do
 
