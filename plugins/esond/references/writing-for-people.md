@@ -25,8 +25,6 @@ Apply the test from the skill you are in.
 Lead with the artifact itself, in a block that copies cleanly into wherever it
 is going. Keep any commentary short and put it after.
 
-Do not explain the wording choices unless asked.
-
 If a fact is genuinely missing — a date, an amount, a name you cannot guess —
 ask for it. Do not invent it, and do not leave a bracket for someone to fill
 later, because brackets ship.
