@@ -105,25 +105,16 @@ When a skill bundles a subagent, add its file under the owning plugin's
 
 When a skill bundles a hook, add the script under the owning plugin's
 `hooks/`, register it in that plugin's `hooks/hooks.json`, and document it
-under a "Hooks" subsection in the plugin's `README.md` section — `behavior`
-already has one, so create the subsection only for a plugin that doesn't. A
-hook that changes Claude's
+under a "Hooks" subsection in the plugin's `README.md` section — no plugin has
+one today, so create it. A hook that changes Claude's
 behavior should be opt-in and reversible from the skill that owns it, so the
 hook stays inert until the user turns it on.
 
 When adding or removing an output style, add the file under the owning
-plugin's `output-styles/`, update that plugin's output styles table in
-`README.md`, and bump the shared `version` as you would for a skill.
-There is no manifest entry for the style itself to keep in sync.
-
-The two Simplified Technical English styles are the one exception to
-"styles are independent files". An output style has no include mechanism — the
-file goes into the system prompt verbatim — so `simplified-technical-english.md`
-and `simplified-technical-english-with-insights.md` carry byte-identical
-`## The rules` and `## Do not lose the answer` sections by hand, and CI fails
-when either one diverges. Edit a shared rule in both files, or the two flavors
-end up enforcing different rules. Their `## Scope` sections differ on purpose
-(the insights style names insight blocks), so that section is outside the check.
+plugin's `output-styles/`, add an "Output styles" table to that plugin's
+`README.md` section, and bump the shared `version` as you would for a skill.
+There is no manifest entry for the style itself to keep in sync. No plugin
+ships an output style today.
 
 ## Authoring skills
 
@@ -163,15 +154,12 @@ every `plugins/*/.claude-plugin/plugin.json` parse, that each plugin's name and
 version match its marketplace entry (and that every plugin directory is
 listed), that all plugins carry the same version, that every path in a
 plugin's `skills` array has a `SKILL.md`, that each skill's frontmatter carries
-`name` and `description` with `name` matching its directory, that every shared
-reference path a skill names resolves and every shared reference has a reader,
-and that the two Simplified Technical English styles still share identical
-`## The rules` and `## Do not lose the answer` sections. Run the same structural
-checks locally with
+`name` and `description` with `name` matching its directory, and that every
+shared reference path a skill names resolves and every shared reference has a
+reader. Run the same structural checks locally with
 `claude plugin validate plugins/<plugin>/.claude-plugin/plugin.json` per
 plugin, which also covers `hooks/hooks.json` syntax. `claude plugin validate`
-covers neither the shared-reference check nor the STE rules check — those two
-only run in CI.
+does not cover the shared-reference check — that one only runs in CI.
 
 Nothing automated executes a skill, so behavior is still verified by hand:
 
