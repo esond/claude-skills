@@ -1,0 +1,37 @@
+{
+  "$comment": "Skills borrowed from other people's repos. scripts/sync-vendored.sh reads this to answer: has upstream changed since 'synced', what changed, and pull it. See CLAUDE.md, 'Vendored skills'.",
+  "sources": [
+    {
+      "name": "mattpocock-skills",
+      "repo": "https://github.com/mattpocock/skills",
+      "ref": "main",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 Matt Pocock",
+      "synced": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+      "exclude": [
+        "agents/openai.yaml"
+      ],
+      "paths": [
+        {
+          "from": "skills/productivity/grill-me",
+          "to": "plugins/eng/skills/grill-me"
+        },
+        {
+          "from": "skills/productivity/grilling",
+          "to": "plugins/eng/skills/grilling"
+        },
+        {
+          "from": "skills/productivity/writing-for-agents",
+          "to": "plugins/behavior/skills/writing-for-agents"
+        }
+      ],
+      "deltas": [
+        {
+          "file": "plugins/eng/skills/grill-me/SKILL.md",
+          "why": "Upstream says: Call the Skill tool with \"grilling\". Skills shipped in a plugin are namespaced, so the target has to be eng:grilling here.",
+          "synced": "9c9f36ccd3995266cd675468af71639c8dde1ec5"
+        }
+      ]
+    }
+  ]
+}

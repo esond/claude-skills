@@ -1,6 +1,6 @@
 {
   "name": "eng",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "description": "Eric's software engineering skills: planning workflows, code review, git history, .NET hygiene, system design, repo docs.",
   "author": {
     "name": "Eric Sondergard",
@@ -9,6 +9,8 @@
   "repository": "https://github.com/esond/claude-skills",
   "skills": [
     "./skills/clean-unused-cpm-packages",
+    "./skills/grill-me",
+    "./skills/grilling",
     "./skills/inline-review",
     "./skills/plan-repl",
     "./skills/plan-repl-auto",

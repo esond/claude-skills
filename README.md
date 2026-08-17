@@ -44,6 +44,57 @@ Each plugin toggles independently:
 /plugin uninstall eng@claude-skills
 ```
 
+## Vendored skills
+
+A few skills here were written by someone else. They are copied in rather than
+rewritten, and they keep their original author's copyright.
+
+| Skill                | Plugin     | Upstream                                                                                                             |
+| -------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| `grill-me`           | `eng`      | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me) — MIT © Matt Pocock  |
+| `grilling`           | `eng`      | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/productivity/grilling) — MIT © Matt Pocock  |
+| `writing-for-agents` | `behavior` | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-for-agents) — MIT © Matt Pocock |
+
+[mattpocock/skills](https://github.com/mattpocock/skills) is a larger, opinionated
+set that installs as a whole. These three are the ones worth having here, so they
+are borrowed individually instead.
+
+Each is a byte-for-byte copy of upstream with one exception: `grill-me`'s body
+calls `eng:grilling` rather than `grilling`, because a skill shipped inside a
+plugin is namespaced. That change is recorded in the manifest so a sync never
+reverts it.
+
+Full license text lives in the `NOTICE` file at the root of the plugin that
+carries the skill — [`plugins/eng/NOTICE`](plugins/eng/NOTICE) and
+[`plugins/behavior/NOTICE`](plugins/behavior/NOTICE).
+
+### Keeping them in sync
+
+[`vendor/UPSTREAM.json`](vendor/UPSTREAM.json) records each source repo, the
+commit last pulled from it, the upstream → local path map, the files to ignore,
+and any deliberate local change.
+
+```sh
+sh scripts/sync-vendored.sh           # what changed upstream? exits 1 on drift
+sh scripts/sync-vendored.sh --apply   # pull it in and record the new commit
+```
+
+The check diffs upstream between the recorded commit and its current head, so it
+reports the actual upstream change rather than just "these files differ".
+`--apply` copies the new files and rewrites the recorded commit, but skips every
+file listed under `deltas` — it prints their upstream diff instead, so a
+deliberate local change is ported by hand rather than silently reverted.
+
+Each delta carries its own `synced` commit, and `--apply` never advances it.
+That is what keeps an unported change from disappearing: the delta file is
+always diffed from its own baseline, so it keeps reporting on every run until
+someone ports the change and moves that baseline forward by hand. Without it,
+one `--apply` would rewrite the source commit and the change would drop out of
+the next report unnoticed.
+
+Working in this repo with Claude Code, `/sync-vendored` drives the same script
+and walks the results.
+
 ## `eng` — engineering
 
 ### Skills
@@ -51,6 +102,8 @@ Each plugin toggles independently:
 | Skill                                                                        | What it does                                                                                                                                                                                                 |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`clean-unused-cpm-packages`](plugins/eng/skills/clean-unused-cpm-packages/SKILL.md) | Removes unused `<PackageVersion>` entries from `Directory.Packages.props` files in a .NET CPM repo by scanning every `.csproj`/`.props`/`.targets` for `PackageReference` includes, then verifies via `dotnet restore`. |
+| [`grill-me`](plugins/eng/skills/grill-me/SKILL.md)                           | Explicit-only (`disable-model-invocation: true`) entry point that hands off to `grilling`. Type it when you want the interview and don't want to wait for Claude to offer one. **[Vendored](#vendored-skills)** from [mattpocock/skills](https://github.com/mattpocock/skills). |
+| [`grilling`](plugins/eng/skills/grilling/SKILL.md)                           | Interviews you about a plan, decision, or idea until you reach a shared understanding. Models the work as a design tree and asks it in rounds: every question whose prerequisites are already settled goes out together, each with a recommended answer, and your answers push the frontier outward. Looks up facts itself rather than asking you for them; the decisions stay yours. **[Vendored](#vendored-skills)** from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`inline-review`](plugins/eng/skills/inline-review/SKILL.md)                 | Finds and addresses inline code-review comments left in the code, marked with a `rev:` prefix (`// rev:`, `# rev:`, etc.) — treats each like a GitHub review comment, makes the change or answers the question, then removes the ones it handled. |
 | [`plan-repl`](plugins/eng/skills/plan-repl/SKILL.md)                         | Research → plan → annotate → implement workflow for non-trivial tasks. Writes research and a plan to `tasks/{name}/`, iterates on the plan via inline `> NOTE:` blockquotes until approved, then implements. |
 | [`plan-repl-auto`](plugins/eng/skills/plan-repl-auto/SKILL.md)               | Automated multi-model variant of `plan-repl`: a coordinator fans research out to parallel Sonnet subagents (via the Workflow tool), synthesizes `plan.md` on the session model, then a Fable arbiter grills the plan over up to three bounded rounds until it has no substantive objections — a cheap→mid→expensive cascade that replaces the human `> NOTE:` loop. Explicit-only via [`/eng:plan-repl-auto`](plugins/eng/commands/plan-repl-auto.md); `--implement` runs the whole cascade autonomously (no human checkpoints) and fans out Sonnet subagents to build the plan, `--arbiter` overrides the arbiter model. Synthesis runs on the session model (`/model opus`). |
@@ -89,6 +142,7 @@ arguments — a deterministic counterpart to skills' natural-language triggering
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`bro`](plugins/behavior/skills/bro/SKILL.md)                                  | Restates Claude's last message in plain, jargon-free language. Explicit-only (`disable-model-invocation: true`) — invoked by name, not auto-triggered.                                                      |
 | [`permission-consolidator`](plugins/behavior/skills/permission-consolidator/SKILL.md) | Reviews a Claude Code `settings.json` allow list, proposes consolidations for `Bash(...)` entries that share a command prefix, and flags one-off or stale entries for pruning.                               |
+| [`writing-for-agents`](plugins/behavior/skills/writing-for-agents/SKILL.md)    | Reference for writing anything an agent reads — a skill, an `AGENTS.md`/`CLAUDE.md`, a doc behind a pointer. Covers context pointers and how their wording decides when material gets reached, the context/cognitive load tradeoff, the information hierarchy and progressive disclosure, completion criteria, leading words, and pruning for no-ops and duplication. [`SKILL-MECHANICS.md`](plugins/behavior/skills/writing-for-agents/SKILL-MECHANICS.md) adds the skill-specific part: frontmatter, model- vs user-invocation, and router skills. **[Vendored](#vendored-skills)** from [mattpocock/skills](https://github.com/mattpocock/skills). |
 
 ## `docs` — documentation
 
