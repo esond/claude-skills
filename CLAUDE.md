@@ -157,8 +157,9 @@ When vendoring a new skill:
   shows up as drift.
 - Add a `NOTICE` file at the root of the owning plugin carrying the upstream
   license text and copyright, and list the skill in the README's "Vendored
-  skills" table. The root `LICENSE` is MIT and points at those NOTICE files;
-  vendored work stays under its own author's copyright.
+  skills" table. The root `LICENSE` is MIT and covers the work written here;
+  vendored work stays under its own author's copyright, and that plugin's
+  NOTICE is where it is recorded.
 - Mark the skill's README row so it reads as borrowed rather than written here.
 
 Two known frictions with vendored content, both left alone on purpose:

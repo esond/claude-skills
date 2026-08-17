@@ -36,7 +36,8 @@ if [ "$APPLY" = 1 ]; then
   fi
 fi
 
-WORK=$(mktemp -d)
+# Plain `mktemp -d` is a GNU extension; BSD/macOS wants an explicit template.
+WORK=$(mktemp -d 2>/dev/null || mktemp -d "${TMPDIR:-/tmp}/sync-vendored.XXXXXX")
 trap 'rm -rf "$WORK"' EXIT
 
 DRIFT=0
@@ -68,7 +69,6 @@ for i in $(jqr -r '.sources | to_entries[] | .key' "$MANIFEST"); do
 
   # Walk each mapped directory file by file so excluded files stay out of both
   # the report and the copy, and so a file added upstream shows up as new.
-  # The loop runs in this shell (not a pipeline subshell) so CHANGED survives it.
   printf '%s' "$SRC" | jqr -r '.paths[] | .from + "\t" + .to' > "$WORK/paths"
   while IFS="$(printf '\t')" read -r FROM TO; do
     # 2>/dev/null: a directory dropped upstream entirely is reported by the
