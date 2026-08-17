@@ -116,6 +116,81 @@ plugin's `output-styles/`, add an "Output styles" table to that plugin's
 There is no manifest entry for the style itself to keep in sync. No plugin
 ships an output style today.
 
+## Vendored skills
+
+Some skills are copied in from someone else's repo rather than written here.
+They live in a normal plugin alongside the rest — nothing about the manifest
+layout changes — but they are **not yours to edit freely**: a local change has
+to survive every future sync, so it costs something to make one.
+
+`vendor/UPSTREAM.json` is the record. Each source entry holds the upstream repo
+and ref, the commit last pulled from it (`synced`), the upstream → local
+directory pairs, the files to `exclude`, and the `deltas` — deliberate local
+changes, each with the reason it exists.
+
+`scripts/sync-vendored.sh` reads it. With no arguments it diffs upstream
+between `synced` and its current head and exits 1 on drift, so it reports what
+upstream actually changed rather than just which files differ. `--apply` copies
+the new files in and rewrites `synced`, but skips every file named in `deltas`
+and prints its upstream diff instead — a deliberate local change gets ported by
+hand, never silently reverted. `/sync-vendored` (repo-local, in
+`.claude/commands/`) drives the same script and walks the results.
+
+Each delta entry carries its own `synced`, and `--apply` never advances it — a
+delta file is diffed from that baseline rather than the source's. **After
+porting an upstream change into a delta file, set that delta's `synced` to the
+source's `synced`.** Until you do, the change keeps appearing in every report,
+which is the point: the source commit moves on `--apply` whether or not anyone
+ported the delta, so without a separate baseline an unported change would
+silently drop out of the next run's diff.
+
+When vendoring a new skill:
+
+- Copy it byte for byte. Every edit becomes a permanent merge cost, so make one
+  only when the skill is broken here otherwise — namespacing a cross-skill
+  handoff is the usual case, since a skill shipped in a plugin is reached as
+  `<plugin>:<skill>`.
+- Record any such edit under `deltas` with its reason, or the next sync reverts
+  it.
+- Add its directory pair to `paths`, and `exclude` anything Claude Code does
+  not read (`agents/openai.yaml` is OpenAI Codex interop metadata) so it never
+  shows up as drift.
+- Add a `NOTICE` file at the root of the owning plugin carrying the upstream
+  license text and copyright, and list the skill in the README's "Vendored
+  skills" table. The root `LICENSE` is MIT and points at those NOTICE files;
+  vendored work stays under its own author's copyright.
+- Mark the skill's README row so it reads as borrowed rather than written here.
+
+Two known frictions with vendored content, both left alone on purpose:
+
+- `writing-for-agents` argues for pruning a skill's description hard — one
+  trigger per branch, synonyms collapsed. This repo's convention (below) is to
+  enumerate trigger phrases, because terse descriptions miss matches. The
+  disagreement is real, and it is about how far the model generalizes over
+  surface phrasing. Resolve it this way, which is what this repo already does
+  in practice:
+
+  - **Enumerate branches. Sample synonyms.** A branch is a distinct situation
+    the skill handles — a bug versus a feature, drafting versus editing an
+    existing issue. Those must all be named, because they define the skill's
+    scope. A synonym is one situation said differently ("file a bug" / "log a
+    bug" / "report a bug"); two or three anchors spanning the register are
+    enough, and the fourth is a no-op.
+  - **Spell out vocabulary the name cannot carry.** `rev:` in `inline-review`,
+    "CPM" in `clean-unused-cpm-packages` — the model cannot infer those. This is
+    where verbosity is load-bearing and pruning breaks triggering.
+  - **State the boundary once several skills could match.** The `diataxis`
+    family names what belongs to a sibling instead. As the installed set grows,
+    a description's job shifts from being findable to being distinguishable, and
+    a wrong fire costs more than a missed one.
+
+  Where they still disagree, this repo's convention wins for skills written
+  here.
+- `writing-for-agents` and `esond/references/writing-for-people.md` cover
+  adjacent ground and neither should absorb the other. One is about an agent's
+  context window and attention; the other is about a human reader. Keep them
+  separate.
+
 ## Authoring skills
 
 Every skill is a single `SKILL.md` with YAML frontmatter:
