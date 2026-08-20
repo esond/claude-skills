@@ -132,6 +132,7 @@ arguments — a deterministic counterpart to skills' natural-language triggering
 
 | Skill                                                       | What it does                                                                                                                                                                                                 |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`de-slop`](plugins/comms/skills/de-slop/SKILL.md)  | Deep-strips AI tells (claudisms) from a draft while preserving its meaning and the writer's voice — the inverse of `dehumanizer`. Sweeps the draft against the living [claudisms banlist](https://claudisms.ai/claudisms.md) (fetched live, with a built-in fallback checklist), catches the constructions a text search misses, then re-sweeps its own rewrites. For writing that ships under your name. |
 | [`dehumanizer`](plugins/comms/skills/dehumanizer/SKILL.md)  | Makes a message look AI-generated — the inverse of [the `humanizer`](https://github.com/blader/humanizer), a separate external skill. Injects LLM "tells" (em dashes, rule of three, copula avoidance, AI vocabulary, emoji bold headers) while preserving both the original meaning and its mood, on an intensity dial (`subtle` default, `heavy`, `unhinged`). Mostly for trolling. |
 
 ## `behavior` — agent behavior
