@@ -12,18 +12,16 @@ description: >-
   this," "scrub the AI out of this," "make this sound like I wrote it," "this
   reads like ChatGPT wrote it," or "would this pass as human?" — even if they
   never say "de-slop." This is the deep, deliberate pass for writing that
-  ships under the user's name. It is not for making text look more
-  AI-generated — that is the dehumanizer skill.
+  ships under the user's name.
 ---
 
 # De-slop: Strip the AI Tells from Writing
 
 You take a draft that reads like a model wrote it and return one that reads
-like the person whose name is on it wrote it. The animating idea comes from
-[Your Name Is Still on It](https://wespomeroy.substack.com/p/your-name-is-still-on-it):
-when writing ships under someone's name, every AI fingerprint left in it
-spends that person's credibility. Your job is to find every tell and remove
-it — without touching what the draft says or who it sounds like.
+like the person whose name is on it wrote it. When writing ships under
+someone's name, every AI fingerprint left in it spends that person's
+credibility. Your job is to find every tell and remove it — without touching
+what the draft says or who it sounds like.
 
 This is a deep pass, not a quick polish. Expect to read the draft several
 times and to work through an inventory of tells systematically. That cost is
@@ -52,22 +50,16 @@ the voice.
 
 ## Step 1: Load the inventory
 
-Download the living banlist **verbatim**: save
-https://claudisms.ai/claudisms.md to a temp file and read it — for example
-`curl -sL https://claudisms.ai/claudisms.md -o <scratchpad>/claudisms.md`,
-then read that file. Do not use a web-fetch tool that answers a prompt
-about the page: those summarize, and a condensed inventory silently drops
-entries from your sweep (in testing, the banned adjective "real" and
-metaphorical "quieter" slipped through exactly this way).
+Read the bundled banlist at `references/claudisms.md`, relative to this
+skill's directory. It is a verbatim snapshot of the living inventory at
+https://claudisms.ai/claudisms.md — 80+ confirmed claudisms plus structural
+tics, register tics, and spoken-word tells, each with the reasoning and
+preferred rewrites. The upstream list grows, so the snapshot is worth
+re-downloading over the bundled copy from time to time.
 
-The list holds 80+ confirmed claudisms plus structural tics, register tics,
-and spoken-word tells, each with the reasoning and preferred rewrites — and
-it grows, which is why the skill downloads it live rather than bundling a
-copy.
-
-If the download fails, say so in one line and proceed using the distilled
-checklist at the bottom of this file. Do not stop — the checklist covers the
-highest-signal families.
+If the file is somehow missing, say so in one line and proceed — the
+construction and structure families in Step 3 still cover the
+highest-signal tells by shape.
 
 One caution: the inventory encodes a few of its author's house-style
 conventions alongside the genuine AI tells — pieces are "articles" not
@@ -185,44 +177,6 @@ wherever it's going. Below it, keep commentary short:
 
 Do not deliver a line-by-line diff or lecture on each change; the user came
 for the clean draft.
-
-## Fallback checklist (when the fetch fails)
-
-The highest-signal families from the inventory, compressed. This is a floor,
-not the full list — say in your delivery that the live inventory was
-unavailable and this pass used the built-in subset.
-
-- **Em dashes** — the most reliable single tell. Replace with commas,
-  periods, parentheses, or spaced hyphens per the surrounding voice.
-- **Negative parallelism** — "not just X, it's Y" and all cleft contrasts.
-- **AI vocabulary** — delve, tapestry, testament, underscore, leverage,
-  robust, seamless, holistic, intricate, comprehensive, navigate
-  (figurative), landscape, realm, foster, harness, pivotal, transformative,
-  game-changing, groundbreaking, unpack, surface (as verb), double-click,
-  pressure-test, north star, paradigm shift, at the end of the day.
-- **Value-claim filler** — "worth [anything]," "it's worth noting," "this
-  matters," "the right [X]," "the useful thing."
-- **Totalizers and crowned superlatives** — "the whole [X]," "the only [X]
-  that [verb]," "the most/best [X]," "that's the whole game."
-- **Pseudo-reflective framing** — "sit with," "keep coming back to," "where
-  I landed," "I can't stop thinking about," "what struck me most."
-- **"Real" and writerly modifiers** — the adjective "real" ("the real
-  value," "real reviews"), metaphorical "quieter"/"louder," "quietly" as
-  hidden-drama adverb.
-- **Placement/agency metaphors** — abstractions that live, hold, carry,
-  compound, or do work; "the engine," "the shape of," "load-bearing."
-- **Invented observation/emotion** — "most people I've talked to," "hit a
-  nerve," "stuck with me" — unless the experience is real and stated.
-- **Signposting and throat-clearing** — announcing structure, "Here's where
-  it gets interesting," "Let's break it down," restating the question,
-  sweeping "In today's..." openers, one-liner thesis closes.
-- **Rule of three and flattened rhythm** — forced triples; uniform
-  mid-length subject-first sentences; 4+ staccato declaratives; "No X. No
-  Y. Just Z."
-- **Formatting** — `---` dividers, "**Bold term:** explanation" lists,
-  emoji, mechanical bold.
-- **Sycophancy and hedging** — "Great question," "I'd be happy to," "It's
-  important to note," "That said" as a universal joint.
 
 ## What not to do
 
