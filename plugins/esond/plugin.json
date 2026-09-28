@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "esond",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "description": "Eric's personal skills: how he writes and works, rather than a general-purpose workflow.",
   "author": {
     "name": "Eric Sondergard",
