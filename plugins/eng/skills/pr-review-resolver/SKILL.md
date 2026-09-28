@@ -10,13 +10,28 @@ description: >-
   PR review comments or feedback — even if they just say something like
   "handle the PR comments", "address the review feedback", "fix what the
   reviewers said", or "go through the PR". Also trigger when the user pastes a
-  PR URL and asks you to act on the feedback there.
+  PR URL and asks you to act on the feedback there. With --auto, applies its
+  own proposed dispositions without waiting for confirmation.
+argument-hint: "[--auto] [pr-number-or-url]"
 ---
 
 # PR Review Resolver
 
 You address outstanding review feedback on a GitHub pull request: assess each
 comment, fix the code, commit, and close the loop with reviewers.
+
+## Arguments
+
+`$ARGUMENTS` may carry a PR number or URL and the `--auto` flag, in any order.
+
+- **PR number or URL** — the PR to work on. Without one, Step 1 detects it from
+  the current branch.
+- **`--auto`** — skip the Step 3 confirmation. You still assess every item
+  and build the triage table, but instead of waiting for the user you take
+  every proposed disposition as approved, and you settle each item you would
+  have marked **Ask** by taking the disposition you lean toward. Everything
+  else runs as normal, including the stops on a missing PR and a failed push.
+  The user can also turn this on by saying "don't ask" in the request.
 
 ## Prerequisites
 
@@ -25,14 +40,16 @@ comment, fix the code, commit, and close the loop with reviewers.
 
 ## Step 1: Identify the PR and capture identifiers
 
-Try to detect the PR from the current branch:
+If the arguments carried a PR number or URL, use it. Otherwise, detect the PR
+from the current branch:
 
 ```bash
 gh pr view --json number,url,headRefName
 gh repo view --json owner,name --jq '{owner: .owner.login, name: .name}'
 ```
 
-If there's no PR on the current branch, ask the user for a PR number or URL.
+If there's no PR on the current branch and none was passed, ask the user for a
+PR number or URL (in `--auto` mode too — there is no safe guess).
 
 Every later command references three identifiers — `OWNER`, `REPO`, `PR_NUMBER`. Two caveats on how you carry them:
 
@@ -269,6 +286,23 @@ response doesn't resolve an Ask, re-ask before moving on.
 
 The user is the final judge — you're proposing the slate, not deciding it.
 
+### In `--auto` mode
+
+The user decided up front to take your slate, so there is no checkpoint:
+
+- Don't produce **Ask** rows. For each item you'd have asked about, pick the
+  disposition you lean toward, write **Fix (auto)** or **Decline (auto)** in
+  the Proposed column, and say in the Why column what the open question was.
+  When you have no real lean, prefer the smaller change: Decline a new
+  feature, a reshaping of the design, or a change to user-facing copy, and
+  Fix a naming change or a wording change in code comments or docs.
+- Still print the table and the full Decline reply text, as a record of what
+  is about to go out under the user's name, then proceed straight to Step 4
+  without waiting.
+- If while fixing you find a disposition was wrong, flip it yourself and note
+  the flip and the reason in the final summary (end of Step 6). Don't stop
+  to ask.
+
 Once the user has responded, lock in the dispositions. Keep, for each Decline,
 the full reply text; and for each Ask, its resolved Fix/Decline. If while fixing
 you discover a disposition was wrong — the comment was right after all, or the
@@ -404,6 +438,13 @@ review, not one per item.
 The justification text should be the reasoning you and the user agreed on in
 Step 3 — phrased for the reviewer, not paraphrased into something vaguer.
 
+### In `--auto` mode: summarize what you decided
+
+End with a short summary listing each item's final disposition, the commit hash
+for each Fix, and any rows marked `(auto)` or flipped. The user didn't see the
+slate before it went out, so this is their only record of what you decided for
+them.
+
 ## Ordering and hash reuse
 
 - Process review threads before review bodies and general comments. Both frequently restate feedback that's already a line-level thread; doing threads first means you either catch the duplication or fix the underlying issue once and skip the restatement.
@@ -412,8 +453,8 @@ Step 3 — phrased for the reviewer, not paraphrased into something vaguer.
 
 ## Things not to do
 
-- **Don't** silently skip a comment you think isn't worth addressing. Surface it in the Step 3 triage table with your reasoning and the reply text, and let the user sign off on the slate before you post — they can veto any row (silence on a row they saw is agreement; a decline you never showed them is not). Then post that justification as a reply so the reviewer sees it — they're not in the room and you don't get to overrule them unilaterally.
-- **Don't** capitulate to a comment you don't believe in just to make it go away. Quietly fixing a comment you think is wrong is the inverse failure of silently declining — it pollutes the codebase to satisfy a single review. If you disagree, say so concretely and let the user decide.
+- **Don't** silently skip a comment you think isn't worth addressing. Surface it in the Step 3 triage table with your reasoning and the reply text, and let the user sign off on the slate before you post — they can veto any row (silence on a row they saw is agreement; a decline you never showed them is not). `--auto` is the user's sign-off in advance, not a license to skip the table: print it anyway. Then post that justification as a reply so the reviewer sees it — they're not in the room and you don't get to overrule them unilaterally.
+- **Don't** capitulate to a comment you don't believe in just to make it go away. Quietly fixing a comment you think is wrong is the inverse failure of silently declining — it pollutes the codebase to satisfy a single review. If you disagree, say so concretely and let the user decide. In `--auto` mode, the user agreed in advance to your slate, so a concrete Decline is how you say so; read each "the user agreed" in Step 6 the same way.
 - **Don't** resolve a thread without a commit to back it up. Every resolve should cite a real hash. In particular, don't resolve a thread you declined — the reviewer raised it and gets to decide whether your justification settles things. Resolving on their behalf signals you're treating the conversation as one-sided.
 - **Don't** reply using the GraphQL node `id` — see Step 6 for why. Replies use `databaseId`; only the resolve mutation takes the node ID.
 - **Don't** force-push or rewrite history as part of this skill. This is a forward-merge workflow — new commits land on top. History rewriting belongs to a different skill.

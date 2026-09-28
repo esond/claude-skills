@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "docs",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "description": "Eric's documentation skills: Diátaxis-guided writing and auditing of tutorials, how-to guides, reference, and explanation.",
   "author": {
     "name": "Eric Sondergard",
